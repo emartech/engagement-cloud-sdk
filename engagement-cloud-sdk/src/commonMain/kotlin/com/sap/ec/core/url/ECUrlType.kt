@@ -20,4 +20,5 @@ internal sealed interface ECUrlType {
     data object FetchMeta : ECUrlType
     data object UpdateTagsForMessages : ECUrlType
     data object FetchInlineInAppMessages : ECUrlType
+    data object Recommendation: ECUrlType
 }

@@ -226,4 +226,34 @@ class DefaultClientExceptionHandlerTests {
             verifySuspend { mockEventsDao.upsertEvent(trackDeepLinkEvent2) }
             verifySuspend { mockSdkLogger.error(expectedErrorMessage, testException) }
         }
+
+    @Test
+    fun handleException_shouldLogLocally_whenThrowableIsKnownError_andNoEventPassed() = runTest {
+        val expectedErrorMessage = "Test error message"
+
+        val testException = FailedRequestException(RESPONSE)
+
+        exceptionHandler.handleException(
+            throwable = testException,
+            errorMessage = expectedErrorMessage
+        )
+        advanceUntilIdle()
+
+        verifySuspend { mockSdkLogger.error(expectedErrorMessage, testException, isRemoteLog = false) }
+    }
+
+    @Test
+    fun handleException_shouldLogLocally_whenThrowableIsUnknownError_andNoEventPassed() = runTest {
+        val expectedErrorMessage = "Test error message"
+
+        val testException = Exception("Unknown error")
+
+        exceptionHandler.handleException(
+            throwable = testException,
+            errorMessage = expectedErrorMessage
+        )
+        advanceUntilIdle()
+
+        verifySuspend { mockSdkLogger.error(expectedErrorMessage, testException) }
+    }
 }

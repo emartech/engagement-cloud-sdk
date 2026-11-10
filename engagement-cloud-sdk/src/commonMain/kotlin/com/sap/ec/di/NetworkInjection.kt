@@ -2,9 +2,11 @@ package com.sap.ec.di
 
 import com.sap.ec.core.networking.clients.GenericNetworkClient
 import com.sap.ec.core.networking.clients.NetworkClientApi
+import com.sap.ec.core.storage.StringStorageApi
 import com.sap.ec.networking.ContactTokenRefresher
 import com.sap.ec.networking.ContactTokenRefresherApi
 import com.sap.ec.networking.ECClient
+import com.sap.ec.networking.RecommendationNetworkClient
 import com.sap.ec.networking.clients.EventBasedClientApi
 import com.sap.ec.networking.clients.config.ConfigClient
 import com.sap.ec.networking.clients.device.DeviceClient
@@ -13,6 +15,7 @@ import com.sap.ec.networking.clients.error.ClientExceptionHandler
 import com.sap.ec.networking.clients.error.DefaultClientExceptionHandler
 import com.sap.ec.networking.clients.event.EventClient
 import com.sap.ec.networking.clients.logging.LoggingClient
+import com.sap.ec.networking.clients.recommendation.RecommendationClient
 import com.sap.ec.networking.clients.remoteConfig.RemoteConfigClient
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpRequestRetry
@@ -53,6 +56,18 @@ internal object NetworkInjection {
                 sdkEventDistributor = get()
             )
         }
+        single<NetworkClientApi>(named(NetworkClientTypes.Recommendation)) {
+            RecommendationNetworkClient(
+                genericNetworkClient = get<NetworkClientApi>(
+                    named(NetworkClientTypes.Generic)
+                ),
+                stringStorage = get<StringStorageApi>(),
+                requestContext = get(),
+                userAgentProvider = get(),
+                contactTokenRefresher = get(),
+                sdkLogger = get { parametersOf(RecommendationNetworkClient::class.simpleName) },
+            )
+        }
         single<ClientExceptionHandler> {
             DefaultClientExceptionHandler(
                 eventsDao = get(),
@@ -88,6 +103,19 @@ internal object NetworkInjection {
                 eventsDao = get(),
                 clientExceptionHandler = get(),
                 embeddedMessagingContext = get()
+            )
+        }
+        single<EventBasedClientApi>(named(EventBasedClientTypes.Recommendation)) {
+            RecommendationClient(
+                sdkEventManager = get(),
+                applicationScope = get(named(CoroutineScopeTypes.Application)),
+                recommendationNetworkClient = get(named(NetworkClientTypes.Recommendation)),
+                recommendationRequestFactory = get(),
+                recommendationResponseMapper = get(),
+                eventsDao = get(),
+                recommendationCartStorageUpdater = get(),
+                clientExceptionHandler = get(),
+                sdkLogger = get { parametersOf(RecommendationClient::class.simpleName) },
             )
         }
         single<EventBasedClientApi>(named(EventBasedClientTypes.Device)) {

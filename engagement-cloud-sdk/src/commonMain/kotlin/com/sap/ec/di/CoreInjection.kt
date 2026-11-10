@@ -52,8 +52,6 @@ import com.sap.ec.core.util.Downloader
 import com.sap.ec.core.util.DownloaderApi
 import com.sap.ec.mobileengage.action.EventActionFactory
 import com.sap.ec.mobileengage.action.EventActionFactoryApi
-import com.sap.ec.mobileengage.embeddedmessaging.networking.EmbeddedMessagesRequestFactory
-import com.sap.ec.mobileengage.embeddedmessaging.networking.EmbeddedMessagingRequestFactoryApi
 import com.sap.ec.networking.clients.jsbridge.JsBridgeClient
 import com.sap.ec.networking.clients.jsbridge.JsBridgeClientApi
 import com.sap.ec.util.JsonUtil
@@ -129,7 +127,8 @@ internal object CoreInjection {
                 "https://log-dealer.gservice.emarsys.net",
                 "https://embedded-messaging.gservice.emarsys.net",
                 "https://mobile-sdk-config.gservice.emarsys.net/jsbridge/latest.min.js",
-                "https://mobile-sdk-config.gservice.emarsys.net/jsbridge/latest.min.sign"
+                "https://mobile-sdk-config.gservice.emarsys.net/jsbridge/latest.min.sign",
+                "https://recommender.scarabresearch.com/app"
             )
         }
         single<SdkEventDistributor> {
@@ -188,7 +187,6 @@ internal object CoreInjection {
         single<RequestContextApi> { RequestContext() }
         single<SessionContext> { SessionContext() }
         singleOf(::UrlFactory) { bind<UrlFactoryApi>() }
-        singleOf(::EmbeddedMessagesRequestFactory) { bind<EmbeddedMessagingRequestFactoryApi>() }
         single<CryptoApi> {
             Crypto(
                 logger = get<Logger> { parametersOf(Crypto::class.simpleName) },
@@ -216,15 +214,15 @@ internal enum class CoroutineScopeTypes {
 }
 
 internal enum class ThreadSafePersistentStoreTypes {
-    PushCall, InAppCall, ConfigCall, ContactCall, EventTrackerCall
+    PushCall, InAppCall, ConfigCall, ContactCall, EventTrackerCall, RecommendationCartItems
 }
 
 internal enum class NetworkClientTypes {
-    Generic, EC
+    Generic, EC, Recommendation
 }
 
 internal enum class EventBasedClientTypes {
-    Device, Config, DeepLink, Contact, Event, Push, RemoteConfig, Logging, Reregistration, EmbeddedMessaging
+    Device, Config, DeepLink, Contact, Event, Push, RemoteConfig, Logging, Reregistration, EmbeddedMessaging, Recommendation
 }
 
 internal enum class EventFlowTypes {
@@ -241,4 +239,5 @@ internal object PersistentStoreIds {
     const val CONFIG_CONTEXT_PERSISTENT_ID = "SAPEngagementCloudSdkConfigContextCalls"
     const val CONTACT_CONTEXT_PERSISTENT_ID = "SAPEngagementCloudSdkContactContextCalls"
     const val EVENT_TRACKER_CONTEXT_PERSISTENT_ID = "SAPEngagementCloudSdkEventTrackerContextCalls"
+    const val RECOMMENDATION_CART_ITEMS_PERSISTENT_ID = "SAPEngagementCloudSdkCartItems"
 }

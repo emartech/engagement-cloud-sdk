@@ -67,14 +67,14 @@ class EventTrackerInternalTests {
     fun setUp() {
         mockSdkEventDistributor = mock()
         mockStorage = mock(MockMode.autofill)
-        mockTimestampProvider = mock()
-        mockUuidProvider = mock()
         mockWaiter = mock()
         everySuspend { mockWaiter.await<Any>() } returns SdkEvent.Internal.Sdk.Answer.Response(
             "0",
             Result.success(Any())
         )
+        mockUuidProvider = mock()
         every { mockUuidProvider.provide() } returns UUID
+        mockTimestampProvider = mock()
         everySuspend { mockTimestampProvider.provide() } returns timestamp
         logger = SdkLogger("TestLoggerName", mock(MockMode.autofill), logConfigHolder = mock())
         threadSafePersistentStore = createSafeStore()

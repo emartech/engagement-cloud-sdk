@@ -20,6 +20,8 @@ import com.sap.ec.api.push.JSPushApi
 import com.sap.ec.api.push.PushApi
 import com.sap.ec.api.push.PushConstants.WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED
 import com.sap.ec.api.push.PushConstants.WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME
+import com.sap.ec.api.recommendation.JsRecommendation
+import com.sap.ec.api.recommendation.JsRecommendationApi
 import com.sap.ec.api.setup.JsSetup
 import com.sap.ec.api.setup.JsSetupApi
 import com.sap.ec.api.tracking.JSTracking
@@ -333,6 +335,7 @@ internal object WebInjection {
         single<JSDeepLinkApi> { JSDeepLink(deepLinkApi = get()) }
         single<JSInAppApi> { JSInApp(inAppApi = get()) }
         single<JsEmbeddedMessagingApi> { JsEmbeddedMessaging(embeddedMessaging = get()) }
+        single<JsRecommendationApi> { JsRecommendation(recommendationApi = get()) }
     }
 
     private fun getNavigatorData(): String {

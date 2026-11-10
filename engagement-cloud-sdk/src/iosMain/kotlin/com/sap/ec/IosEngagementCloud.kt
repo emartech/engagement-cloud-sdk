@@ -7,6 +7,7 @@ import com.sap.ec.api.embeddedmessaging.IosEmbeddedMessagingApi
 import com.sap.ec.api.event.model.EngagementCloudEvent
 import com.sap.ec.api.inapp.IosInAppApi
 import com.sap.ec.api.push.IosPushApi
+import com.sap.ec.api.recommendation.IosRecommendationApi
 import com.sap.ec.api.setup.IosSetupApi
 import com.sap.ec.api.tracking.IosTrackingApi
 import com.sap.ec.di.CoroutineScopeTypes
@@ -66,6 +67,8 @@ object IosEngagementCloud {
         get() = koin.get<IosDeepLinkApi>()
     val embeddedMessaging: IosEmbeddedMessagingApi
         get() = koin.get<IosEmbeddedMessagingApi>()
+    val recommendation: IosRecommendationApi
+        get() = koin.get<IosRecommendationApi>()
 
     /**
      * Initializes the SDK. This method must be called before using any other SDK functionality.

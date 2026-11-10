@@ -41,6 +41,7 @@ internal object InitInjection {
                 pushApi = get(),
                 inAppApi = get(),
                 embeddedMessagingApi = get(),
+                recommendationApi = get(),
                 sdkLogger = get { parametersOf(RegisterInstancesState::class.simpleName) },
             )
         }
@@ -95,6 +96,7 @@ internal object InitInjection {
                     get(named(EventBasedClientTypes.RemoteConfig)),
                     get(named(EventBasedClientTypes.Logging)),
                     get(named(EventBasedClientTypes.EmbeddedMessaging)),
+                    get(named(EventBasedClientTypes.Recommendation)),
                     get(named(EventBasedClientTypes.Reregistration)),
                 ),
             )

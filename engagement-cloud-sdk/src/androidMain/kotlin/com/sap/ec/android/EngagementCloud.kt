@@ -11,6 +11,7 @@ import com.sap.ec.di.EventFlowTypes
 import com.sap.ec.di.SdkKoinIsolationContext
 import com.sap.ec.di.SdkKoinIsolationContext.koin
 import com.sap.ec.api.event.model.EngagementCloudEvent
+import com.sap.ec.api.recommendation.RecommendationApi
 import com.sap.ec.tracking.TrackingApi
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -79,6 +80,12 @@ object EngagementCloud {
      */
     val embeddedMessaging: EmbeddedMessagingApi
         get() = koin.get<EmbeddedMessagingApi>()
+
+    /**
+     * Provides access to the Recommendation API, which allows access to Recommendation feature.
+     */
+    val recommendation: RecommendationApi
+        get() = koin.get<RecommendationApi>()
 
     /**
      * Initializes the SDK. This method must be called before using any other SDK functionality.

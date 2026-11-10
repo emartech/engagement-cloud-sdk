@@ -7,6 +7,7 @@ import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
+import dev.mokkery.verifySuspend
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.KSerializer
@@ -38,7 +39,8 @@ class ThreadSafePersistentStoreTests {
     fun constructor_shouldInitStore_withStoredList_ifPresent() = runTest {
         teachStorageGet(storedList)
 
-        threadSafePersistentStore = ThreadSafePersistentStore(TEST_ID, mockStorage, String.serializer())
+        threadSafePersistentStore =
+            ThreadSafePersistentStore(TEST_ID, mockStorage, String.serializer())
 
         threadSafePersistentStore.items.size shouldBe 3
         threadSafePersistentStore.items shouldBe storedList
@@ -49,7 +51,8 @@ class ThreadSafePersistentStoreTests {
     fun constructor_shouldInitStore_withEmptyList_ifStoredList_notFound() = runTest {
         teachStorageGet(null)
 
-        threadSafePersistentStore = ThreadSafePersistentStore(TEST_ID, mockStorage, String.serializer())
+        threadSafePersistentStore =
+            ThreadSafePersistentStore(TEST_ID, mockStorage, String.serializer())
 
         threadSafePersistentStore.items.size shouldBe 0
         threadSafePersistentStore.items shouldBe emptyList()
@@ -62,7 +65,8 @@ class ThreadSafePersistentStoreTests {
         teachStorageGet(null)
         teachStoragePut(listOf(testValue))
 
-        threadSafePersistentStore = ThreadSafePersistentStore(TEST_ID, mockStorage, String.serializer())
+        threadSafePersistentStore =
+            ThreadSafePersistentStore(TEST_ID, mockStorage, String.serializer())
 
         threadSafePersistentStore.add(testValue)
 
@@ -79,7 +83,8 @@ class ThreadSafePersistentStoreTests {
         teachStorageGet(storedList)
         teachStoragePut(storedList + listOf(testValue))
 
-        threadSafePersistentStore = ThreadSafePersistentStore(TEST_ID, mockStorage, String.serializer())
+        threadSafePersistentStore =
+            ThreadSafePersistentStore(TEST_ID, mockStorage, String.serializer())
 
         threadSafePersistentStore.add(testValue)
 
@@ -91,18 +96,51 @@ class ThreadSafePersistentStoreTests {
     }
 
     @Test
+    fun setAll_should_setItems_to_inputItems_andCallPutOnStore() = runTest {
+        val newItems = listOf("newItem1", "newItem2")
+        teachStorageGet(storedList)
+
+        threadSafePersistentStore =
+            ThreadSafePersistentStore(TEST_ID, mockStorage, String.serializer())
+
+        threadSafePersistentStore.items.size shouldBe 3
+        teachStoragePut(newItems)
+
+        threadSafePersistentStore.setAll(newItems)
+        verifySuspend { mockStorage.put(TEST_ID, any<KSerializer<List<String>>>(), newItems) }
+        threadSafePersistentStore.items.size shouldBe 2
+    }
+
+    @Test
     fun dequeue_shouldRemoveItems_andCallPutOnStore_whenDone() = runTest {
         teachStorageGet(storedList)
         teachStoragePut(emptyList())
         val processedItems = mutableListOf<String>()
 
-        threadSafePersistentStore = ThreadSafePersistentStore(TEST_ID, mockStorage, String.serializer())
+        threadSafePersistentStore =
+            ThreadSafePersistentStore(TEST_ID, mockStorage, String.serializer())
 
         threadSafePersistentStore.dequeue { item -> processedItems.add(item) }
 
         threadSafePersistentStore.items.size shouldBe 0
         processedItems.size shouldBe 3
         processedItems shouldBe storedList
+    }
+
+    @Test
+    fun clear_shouldRemoveItems_fromStorage_andCallPutOnStore_withEmptyList() = runTest {
+        teachStorageGet(storedList)
+
+        threadSafePersistentStore =
+            ThreadSafePersistentStore(TEST_ID, mockStorage, String.serializer())
+
+        threadSafePersistentStore.items.size shouldBe 3
+
+        teachStoragePut(emptyList())
+        threadSafePersistentStore.clear()
+
+        verifySuspend { mockStorage.put(TEST_ID, any<KSerializer<List<String>>>(), emptyList()) }
+        threadSafePersistentStore.items.size shouldBe 0
     }
 
     private fun teachStoragePut(elements: List<String>) {

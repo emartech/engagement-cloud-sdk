@@ -157,6 +157,16 @@ class UrlFactoryTests {
         every { mockDefaultUrls.eventServiceBaseUrl } returns "testEventServiceBaseUrl"
 
         val result = urlFactory.create(ECUrlType.FetchInlineInAppMessages)
+
         result shouldBe Url("testEventServiceBaseUrl/v5/apps/$APPLICATION_CODE/inline-messages")
+    }
+
+    @Test
+    fun testCreate_recommendation_should_return_recommendation_base_url_followed_by_applicationCode() = runTest {
+        every { mockDefaultUrls.recommendationBaseUrl } returns "testEventServiceBaseUrl"
+
+        val result = urlFactory.create(ECUrlType.Recommendation)
+
+        result shouldBe Url("testEventServiceBaseUrl/$APPLICATION_CODE")
     }
 }

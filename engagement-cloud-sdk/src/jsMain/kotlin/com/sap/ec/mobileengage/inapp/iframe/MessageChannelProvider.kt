@@ -15,6 +15,7 @@ import kotlinx.serialization.json.Json
 import web.events.EventHandler
 import web.messaging.MessageChannel
 
+@OptIn(ExperimentalWasmJsInterop::class)
 internal class MessageChannelProvider(
     private val eventActionFactory: EventActionFactoryApi,
     private val applicationScope: CoroutineScope,

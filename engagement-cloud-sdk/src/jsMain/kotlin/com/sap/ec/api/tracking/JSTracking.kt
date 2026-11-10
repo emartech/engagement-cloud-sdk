@@ -4,27 +4,25 @@ import com.sap.ec.api.event.model.CustomEvent
 import com.sap.ec.api.event.model.NavigateEvent
 import com.sap.ec.api.tracking.model.JsCustomEvent
 import com.sap.ec.api.tracking.model.JsCustomEventValidationData
-import com.sap.ec.api.tracking.model.JsTrackedEvent
 import com.sap.ec.api.tracking.model.JsEventType
-import com.sap.ec.api.tracking.model.JsEventValidationData
 import com.sap.ec.api.tracking.model.JsNavigateEvent
 import com.sap.ec.api.tracking.model.JsNavigateEventValidationData
+import com.sap.ec.api.tracking.model.JsRecommendationEvent
+import com.sap.ec.api.tracking.model.JsRecommendationEventValidationData
+import com.sap.ec.api.tracking.model.JsTrackedEvent
+import com.sap.ec.api.tracking.util.parseAttributesMap
+import com.sap.ec.api.tracking.util.parseRecommendationEvent
+import com.sap.ec.api.tracking.util.parseWithValidation
 import com.sap.ec.core.log.Logger
 import com.sap.ec.tracking.TrackingApi
-import com.sap.ec.util.JsonUtil
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.decodeFromDynamic
 
 internal class JSTracking(
     private val trackingApi: TrackingApi,
     private val sdkLogger: Logger
 ) : JSTrackingApi {
-
     private val possibleEventTypes = JsEventType.entries.map { it.toString() }
-
-    private val validEventTypesString = possibleEventTypes.joinToString(
-        ", "
-    ) { it.lowercase() }
+    private val validEventTypesString = possibleEventTypes.joinToString(", ") { it.lowercase() }
 
     /**
      * Tracks an event.
@@ -44,8 +42,8 @@ internal class JSTracking(
         val event = try {
             when (JsEventType.valueOf(eventType)) {
                 JsEventType.CUSTOM -> {
-                    validateJsEvent<JsCustomEventValidationData>(event)
-                    val jsCustomEvent = event.unsafeCast<JsCustomEvent>()
+                    val jsCustomEvent =
+                        event.parseWithValidation<JsCustomEventValidationData, JsCustomEvent>()
                     val attributesMap =
                         parseAttributesMap(jsCustomEvent.attributes)
                     CustomEvent(
@@ -55,9 +53,15 @@ internal class JSTracking(
                 }
 
                 JsEventType.NAVIGATE -> {
-                    validateJsEvent<JsNavigateEventValidationData>(event)
-                    val jsNavigateEvent = event.unsafeCast<JsNavigateEvent>()
+                    val jsNavigateEvent =
+                        event.parseWithValidation<JsNavigateEventValidationData, JsNavigateEvent>()
                     NavigateEvent(location = jsNavigateEvent.location)
+                }
+
+                JsEventType.RECOMMENDATION -> {
+                    val jsRecommendationEvent =
+                        event.parseWithValidation<JsRecommendationEventValidationData, JsRecommendationEvent>()
+                    parseRecommendationEvent(jsRecommendationEvent)
                 }
             }
         } catch (e: Exception) {
@@ -67,18 +71,4 @@ internal class JSTracking(
 
         trackingApi.track(event).getOrThrow()
     }
-
-    @OptIn(ExperimentalSerializationApi::class)
-    private fun parseAttributesMap(attributes: dynamic): Map<String, String> =
-        try {
-            JsonUtil.json.decodeFromDynamic<Map<String, String>>(attributes)
-        } catch (e: Exception) {
-            throw IllegalArgumentException("Failed to parse attributes map.", e)
-        }
-
-    @OptIn(ExperimentalSerializationApi::class)
-    private inline fun <reified T : JsEventValidationData> validateJsEvent(event: JsTrackedEvent) {
-        JsonUtil.json.decodeFromDynamic<T>(event)
-    }
-
 }

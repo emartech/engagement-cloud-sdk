@@ -5,7 +5,7 @@ import com.sap.ec.context.SdkContextApi
 import com.sap.ec.core.channel.SdkEventManagerApi
 import com.sap.ec.core.crypto.CryptoApi
 import com.sap.ec.core.db.events.EventsDaoApi
-import com.sap.ec.core.exceptions.SdkException.MissingEventUrl
+import com.sap.ec.core.exceptions.SdkException.MissingEventUrlException
 import com.sap.ec.core.exceptions.SdkException.NetworkIOException
 import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.clients.NetworkClientApi
@@ -424,7 +424,7 @@ class ContactClientTests {
 
         verifySuspend {
             mockClientExceptionHandler.handleException(
-                any<MissingEventUrl>(),
+                any<MissingEventUrlException>(),
                 "ContactClient - consumeContactChanges",
                 unlinkContactEvent
             )

@@ -2,6 +2,7 @@ package com.sap.ec.di
 
 import com.sap.ec.changeappcode.states.ClearLinkedContactState
 import com.sap.ec.core.channel.SdkEventEmitterApi
+import com.sap.ec.core.collections.ThreadSafePersistentStoreApi
 import com.sap.ec.core.state.State
 import com.sap.ec.core.state.StateMachine
 import com.sap.ec.core.state.StateMachineApi
@@ -10,6 +11,7 @@ import com.sap.ec.disable.DisableOrganizerApi
 import com.sap.ec.disable.states.ClearDeviceInfoState
 import com.sap.ec.disable.states.ClearEventsState
 import com.sap.ec.disable.states.ClearPushTokenOnDisableState
+import com.sap.ec.disable.states.ClearRecommendationCartState
 import com.sap.ec.disable.states.ClearStoredConfigState
 import com.sap.ec.disable.states.UnlinkContactState
 import com.sap.ec.enable.EnableOrganizer
@@ -26,6 +28,7 @@ import com.sap.ec.mobileengage.config.FollowUpChangeAppCodeOrganizer
 import com.sap.ec.mobileengage.config.FollowUpChangeAppCodeOrganizerApi
 import com.sap.ec.networking.clients.EventBasedClientApi
 import com.sap.ec.networking.clients.reregistration.ReregistrationClient
+import com.sap.ec.recommendation.models.CartItem
 import com.sap.ec.reregistration.states.ClearRequestContextTokensState
 import com.sap.ec.reregistration.states.LinkContactState
 import org.koin.core.parameter.parametersOf
@@ -85,6 +88,16 @@ internal object SetupInjection {
         single<State>(named(StateTypes.ClearDeviceInfo)) {
             ClearDeviceInfoState(
                 deviceInfoStorage = get()
+            )
+        }
+        single<State>(named(StateTypes.ClearRecommendationCart)) {
+            ClearRecommendationCartState(
+                cartItemStorage = get<ThreadSafePersistentStoreApi<CartItem>>(
+                    named(
+                        ThreadSafePersistentStoreTypes.RecommendationCartItems
+                    )
+                ),
+                sdkLogger = get { parametersOf(ClearRecommendationCartState::class.simpleName) }
             )
         }
         single<State>(named(StateTypes.ClearPushTokenOnDisable)) {
@@ -176,7 +189,8 @@ internal object SetupInjection {
                     get<State>(named(StateTypes.ClearPushTokenOnDisable)),
                     get<State>(named(StateTypes.ClearEvents)),
                     get<State>(named(StateTypes.ClearStoredConfig)),
-                    get<State>(named(StateTypes.ClearDeviceInfo))
+                    get<State>(named(StateTypes.ClearDeviceInfo)),
+                    get<State>(named(StateTypes.ClearRecommendationCart))
                 ),
                 name = StateMachineTypes.MobileEngageDisable.name,
                 logger = get { parametersOf(StateMachineTypes.MobileEngageDisable.name) }
@@ -235,6 +249,7 @@ internal enum class StateTypes {
     ClearStoredConfig,
     ClearEvents,
     ClearDeviceInfo,
+    ClearRecommendationCart,
     FetchEmbeddedMessagingMetaState,
     FetchJsBridge,
 }
