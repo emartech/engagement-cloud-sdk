@@ -12,7 +12,9 @@ internal class SdkEventWaiter(
 
     @Suppress("UNCHECKED_CAST")
     override suspend fun <T> await(): SdkEvent.Internal.Sdk.Answer.Response<T> {
-        return if (connectionStatus.value) {
+        return if (sdkEvent is SdkEvent.Internal.Sdk.Answer.Response<*>) {
+            sdkEvent as SdkEvent.Internal.Sdk.Answer.Response<T>
+        } else if (connectionStatus.value) {
             sdkEventDistributor.sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Answer && sdkEvent.id == it.originId } as SdkEvent.Internal.Sdk.Answer.Response<T>
         } else {
             SdkEvent.Internal.Sdk.Answer.Response(

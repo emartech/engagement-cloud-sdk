@@ -38,6 +38,21 @@ class SdkEventWaiterTests {
     }
 
     @Test
+    fun await_shouldReturn_answerResponse_immediately_whenSdkEvent_isAlreadyAnAnswerResponse() =
+        runTest {
+            val prebuiltResponse = SdkEvent.Internal.Sdk.Answer.Response(
+                ORIGIN_ID_1,
+                testEventResult2
+            )
+
+            val testWaiter = SdkEventWaiter(mockSdkEventDistributor, prebuiltResponse, mockConnectionStatus)
+
+            val result = testWaiter.await<Result<Unit>>()
+
+            result shouldBe prebuiltResponse
+        }
+
+    @Test
     fun await_shouldReturn_answerResponse_whenAMatchingEventIsEmitted_andConnectionStatus_isTrue() =
         runTest {
             sdkEvent = SdkEvent.Internal.Sdk.AppStart(id = ORIGIN_ID_1)
