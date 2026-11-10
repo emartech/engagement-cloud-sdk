@@ -439,12 +439,12 @@ jobs:
           git commit -m "Update Package.swift for SPM release $VERSION"
           git push origin HEAD:main
 
-      - name: Create and push release tag
-        if: github.event_name == 'workflow_dispatch' && env.DRY_RUN != 'true' && inputs.create_tag == true
+      - name: Create or move and push release tag
+        if: (github.event_name == 'workflow_dispatch' && env.DRY_RUN != 'true' && inputs.create_tag == true) || github.event_name == 'push'
         run: |
           VERSION="${{ needs.derive-version.outputs.version }}"
-          git tag "$VERSION"
-          git push origin "$VERSION"
+          git tag -f "$VERSION"
+          git push origin -f "$VERSION"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
