@@ -25,10 +25,8 @@ class SdkContextTests {
         val TEST_CONFIG = TestEngagementCloudSDKConfig("testAppCode")
     }
 
-    private var features: MutableSet<Features> = mutableSetOf()
     private lateinit var sdkDispatcher: CoroutineDispatcher
     private lateinit var mainDispatcher: CoroutineDispatcher
-    private lateinit var mockDefaultUrls: DefaultUrlsApi
     private lateinit var mockSdkConfigStore: SdkConfigStoreApi<SdkConfig>
     private lateinit var sdkContext: SdkContextApi
 
@@ -38,15 +36,14 @@ class SdkContextTests {
         sdkDispatcher = StandardTestDispatcher()
         mainDispatcher = StandardTestDispatcher()
         Dispatchers.setMain(mainDispatcher)
-        mockDefaultUrls = mock(MockMode.autofill)
         mockSdkConfigStore = mock(MockMode.autofill)
 
         sdkContext = SdkContext(
             sdkDispatcher = sdkDispatcher,
             mainDispatcher = mainDispatcher,
             onContactLinkingFailed = null,
-            defaultUrls = mockDefaultUrls,
-            features = features,
+            serviceUrls = ServiceUrls(remoteConfigBaseUrl = ""),
+            features = mutableSetOf(),
             sdkConfigStore = mockSdkConfigStore
         )
     }
