@@ -99,7 +99,7 @@ internal class WebInAppPresenter(
             this.style.right = "0"
             this.style.bottom = "0"
             this.style.backgroundColor = "rgba(0,0,0,0.5)"
-            this.style.zIndex = "2"
+            this.style.zIndex = "${Int.MAX_VALUE}"
             this.style.cursor = "pointer"
         }
     }
@@ -114,7 +114,7 @@ internal class WebInAppPresenter(
             this.style.right = "0"
             this.style.bottom = "0"
             this.style.backgroundColor = "rgba(0,0,0,0.5)"
-            this.style.zIndex = "2"
+            this.style.zIndex = "${Int.MAX_VALUE - 1}"
             this.style.cursor = "pointer"
         }
     }
