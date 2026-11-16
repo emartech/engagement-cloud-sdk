@@ -5,6 +5,7 @@ import androidx.compose.runtime.compositionLocalOf
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_ELEVATION
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ZERO_SPACING
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.Image.DEFAULT_IMAGE_CLIP_SHAPE
 import com.sap.ec.networking.clients.embedded.messaging.model.ShapeCornerRadius
 import org.jetbrains.compose.web.css.CSSSizeValue
 import org.jetbrains.compose.web.css.CSSUnit
@@ -26,7 +27,7 @@ internal data class EmbeddedMessagingDesignValues(
 
     val emptyStateImageUrl: String? = null,
     val messageItemImageHeight: CSSSizeValue<CSSUnit.px> = DEFAULT_PADDING,
-    val messageItemClipShape: String = "Rectangle", // e.g., "Rectangle", "Circle", "Rounded", "Custom"
+    val messageItemImageClipShape: String = DEFAULT_IMAGE_CLIP_SHAPE,
     val messageItemImageCornerRadius: CSSSizeValue<CSSUnit.px> = DEFAULT_PADDING,
     val messageItemCustomShape: ShapeCornerRadius? = null
 )

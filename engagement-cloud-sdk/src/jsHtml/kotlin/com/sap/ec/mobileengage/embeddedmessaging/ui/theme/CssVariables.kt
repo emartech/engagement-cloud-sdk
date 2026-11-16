@@ -140,6 +140,60 @@ internal object CssFontVars {
     var fontSizeLabelSmall: CSSNumeric = DefaultFontVars.fontSizeLabelSmall
 }
 
+internal object CssShapeVars {
+    var extraSmallTopStart: CSSNumeric = DefaultShapeVars.extraSmallTopStart
+    var extraSmallTopEnd: CSSNumeric = DefaultShapeVars.extraSmallTopEnd
+    var extraSmallBottomStart: CSSNumeric = DefaultShapeVars.extraSmallBottomStart
+    var extraSmallBottomEnd: CSSNumeric = DefaultShapeVars.extraSmallBottomEnd
+
+    var smallTopStart: CSSNumeric = DefaultShapeVars.smallTopStart
+    var smallTopEnd: CSSNumeric = DefaultShapeVars.smallTopEnd
+    var smallBottomStart: CSSNumeric = DefaultShapeVars.smallBottomStart
+    var smallBottomEnd: CSSNumeric = DefaultShapeVars.smallBottomEnd
+
+    var mediumTopStart: CSSNumeric = DefaultShapeVars.mediumTopStart
+    var mediumTopEnd: CSSNumeric = DefaultShapeVars.mediumTopEnd
+    var mediumBottomStart: CSSNumeric = DefaultShapeVars.mediumBottomStart
+    var mediumBottomEnd: CSSNumeric = DefaultShapeVars.mediumBottomEnd
+
+    var largeTopStart: CSSNumeric = DefaultShapeVars.largeTopStart
+    var largeTopEnd: CSSNumeric = DefaultShapeVars.largeTopEnd
+    var largeBottomStart: CSSNumeric = DefaultShapeVars.largeBottomStart
+    var largeBottomEnd: CSSNumeric = DefaultShapeVars.largeBottomEnd
+
+    var extraLargeTopStart: CSSNumeric = DefaultShapeVars.extraLargeTopStart
+    var extraLargeTopEnd: CSSNumeric = DefaultShapeVars.extraLargeTopEnd
+    var extraLargeBottomStart: CSSNumeric = DefaultShapeVars.extraLargeBottomStart
+    var extraLargeBottomEnd: CSSNumeric = DefaultShapeVars.extraLargeBottomEnd
+}
+
+internal object DefaultShapeVars {
+    val extraSmallTopStart: CSSNumeric = 4.px
+    val extraSmallTopEnd: CSSNumeric = 4.px
+    val extraSmallBottomStart: CSSNumeric = 4.px
+    val extraSmallBottomEnd: CSSNumeric = 4.px
+
+    val smallTopStart: CSSNumeric = 8.px
+    val smallTopEnd: CSSNumeric = 8.px
+    val smallBottomStart: CSSNumeric = 8.px
+    val smallBottomEnd: CSSNumeric = 8.px
+
+    val mediumTopStart: CSSNumeric = 12.px
+    val mediumTopEnd: CSSNumeric = 12.px
+    val mediumBottomStart: CSSNumeric = 12.px
+    val mediumBottomEnd: CSSNumeric = 12.px
+
+    val largeTopStart: CSSNumeric = 16.px
+    val largeTopEnd: CSSNumeric = 16.px
+    val largeBottomStart: CSSNumeric = 16.px
+    val largeBottomEnd: CSSNumeric = 16.px
+
+    val extraLargeTopStart: CSSNumeric = 28.px
+    val extraLargeTopEnd: CSSNumeric = 28.px
+    val extraLargeBottomStart: CSSNumeric = 28.px
+    val extraLargeBottomEnd: CSSNumeric = 28.px
+}
+
 internal object DefaultFontVars {
     val fontSizeDisplayLarge: CSSNumeric = 56.px
     val fontSizeDisplayMedium: CSSNumeric = 44.px

@@ -3,9 +3,11 @@ package com.sap.ec.mobileengage.embeddedmessaging.ui.theme
 import androidx.compose.runtime.Composable
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants
 import com.sap.ec.networking.clients.embedded.messaging.model.MetaData
+import com.sap.ec.networking.clients.embedded.messaging.model.ShapesData
 import com.sap.ec.networking.clients.embedded.messaging.model.TextMetaData
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Style
+import kotlin.math.roundToInt
 
 internal class ThemeMapper(private val metaData: MetaData?) {
 
@@ -13,6 +15,7 @@ internal class ThemeMapper(private val metaData: MetaData?) {
     fun generateThemeCSS() {
         val design = metaData?.design
         mapFontSizes(design?.text)
+        mapShapes(design?.shapes)
 
         val colors = design?.fillColor
 
@@ -243,40 +246,88 @@ internal class ThemeMapper(private val metaData: MetaData?) {
         }
     }
 
-    fun mapMisc(): EmbeddedMessagingDesignValues {
-        return EmbeddedMessagingDesignValues()
+    fun mapMisc(metaData: MetaData?): EmbeddedMessagingDesignValues {
+        val misc = metaData?.design?.misc
+
+        return misc?.let {
+            EmbeddedMessagingDesignValues(
+                messageItemMargin = it.messageItemMargin.roundToInt().px,
+                messageItemElevation = it.messageItemElevation.roundToInt().px,
+                buttonElevation = it.buttonElevation.roundToInt().px,
+                listContentPadding = it.listContentPadding.roundToInt().px,
+                listItemSpacing = it.listItemSpacing.roundToInt().px,
+                compactOverlayWidth = it.compactOverlayWidth.roundToInt().px,
+                compactOverlayMaxHeight = it.compactOverlayMaxHeight.roundToInt().px,
+                compactOverlayCornerRadius = it.compactOverlayCornerRadius.roundToInt().px,
+                compactOverlayElevation = it.compactOverlayElevation.roundToInt().px,
+                emptyStateImageUrl = it.emptyStateImageUrl,
+                messageItemImageHeight = it.messageItemImageHeight.roundToInt().px,
+                messageItemImageClipShape = it.messageItemImageClipShape,
+                messageItemImageCornerRadius = it.messageItemImageCornerRadius.roundToInt().px,
+                messageItemCustomShape = it.messageItemCustomShape
+            )
+        } ?: EmbeddedMessagingDesignValues()
+    }
+
+    private fun mapShapes(shapes: ShapesData?) {
+        shapes?.let {
+            CssShapeVars.extraSmallTopStart = it.extraSmall.topStart.roundToInt().px
+            CssShapeVars.extraSmallTopEnd = it.extraSmall.topEnd.roundToInt().px
+            CssShapeVars.extraSmallBottomStart = it.extraSmall.bottomStart.roundToInt().px
+            CssShapeVars.extraSmallBottomEnd = it.extraSmall.bottomEnd.roundToInt().px
+
+            CssShapeVars.smallTopStart = it.small.topStart.roundToInt().px
+            CssShapeVars.smallTopEnd = it.small.topEnd.roundToInt().px
+            CssShapeVars.smallBottomStart = it.small.bottomStart.roundToInt().px
+            CssShapeVars.smallBottomEnd = it.small.bottomEnd.roundToInt().px
+
+            CssShapeVars.mediumTopStart = it.medium.topStart.roundToInt().px
+            CssShapeVars.mediumTopEnd = it.medium.topEnd.roundToInt().px
+            CssShapeVars.mediumBottomStart = it.medium.bottomStart.roundToInt().px
+            CssShapeVars.mediumBottomEnd = it.medium.bottomEnd.roundToInt().px
+
+            CssShapeVars.largeTopStart = it.large.topStart.roundToInt().px
+            CssShapeVars.largeTopEnd = it.large.topEnd.roundToInt().px
+            CssShapeVars.largeBottomStart = it.large.bottomStart.roundToInt().px
+            CssShapeVars.largeBottomEnd = it.large.bottomEnd.roundToInt().px
+
+            CssShapeVars.extraLargeTopStart = it.extraLarge.topStart.roundToInt().px
+            CssShapeVars.extraLargeTopEnd = it.extraLarge.topEnd.roundToInt().px
+            CssShapeVars.extraLargeBottomStart = it.extraLarge.bottomStart.roundToInt().px
+            CssShapeVars.extraLargeBottomEnd = it.extraLarge.bottomEnd.roundToInt().px
+        }
     }
 
     private fun mapFontSizes(typography: TextMetaData?) {
         CssFontVars.fontSizeDisplayLarge =
-            typography?.displayLargeFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeDisplayLarge
+            typography?.displayLargeFontSize?.roundToInt()?.px ?: DefaultFontVars.fontSizeDisplayLarge
         CssFontVars.fontSizeDisplayMedium =
-            typography?.displayMediumFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeDisplayMedium
+            typography?.displayMediumFontSize?.roundToInt()?.px ?: DefaultFontVars.fontSizeDisplayMedium
         CssFontVars.fontSizeDisplaySmall =
-            typography?.displaySmallFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeDisplaySmall
+            typography?.displaySmallFontSize?.roundToInt()?.px ?: DefaultFontVars.fontSizeDisplaySmall
         CssFontVars.fontSizeHeadlineLarge =
-            typography?.headlineLargeFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeHeadlineLarge
-        CssFontVars.fontSizeHeadlineMedium = typography?.headlineMediumFontSize?.toInt()?.px
+            typography?.headlineLargeFontSize?.roundToInt()?.px ?: DefaultFontVars.fontSizeHeadlineLarge
+        CssFontVars.fontSizeHeadlineMedium = typography?.headlineMediumFontSize?.roundToInt()?.px
             ?: DefaultFontVars.fontSizeHeadlineMedium
         CssFontVars.fontSizeHeadlineSmall =
-            typography?.headlineSmallFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeHeadlineSmall
+            typography?.headlineSmallFontSize?.roundToInt()?.px ?: DefaultFontVars.fontSizeHeadlineSmall
         CssFontVars.fontSizeTitleLarge =
-            typography?.titleLargeFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeTitleLarge
+            typography?.titleLargeFontSize?.roundToInt()?.px ?: DefaultFontVars.fontSizeTitleLarge
         CssFontVars.fontSizeTitleMedium =
-            typography?.titleMediumFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeTitleMedium
+            typography?.titleMediumFontSize?.roundToInt()?.px ?: DefaultFontVars.fontSizeTitleMedium
         CssFontVars.fontSizeTitleSmall =
-            typography?.titleSmallFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeTitleSmall
+            typography?.titleSmallFontSize?.roundToInt()?.px ?: DefaultFontVars.fontSizeTitleSmall
         CssFontVars.fontSizeBodyLarge =
-            typography?.bodyLargeFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeBodyLarge
+            typography?.bodyLargeFontSize?.roundToInt()?.px ?: DefaultFontVars.fontSizeBodyLarge
         CssFontVars.fontSizeBodyMedium =
-            typography?.bodyMediumFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeBodyMedium
+            typography?.bodyMediumFontSize?.roundToInt()?.px ?: DefaultFontVars.fontSizeBodyMedium
         CssFontVars.fontSizeBodySmall =
-            typography?.bodySmallFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeBodySmall
+            typography?.bodySmallFontSize?.roundToInt()?.px ?: DefaultFontVars.fontSizeBodySmall
         CssFontVars.fontSizeLabelLarge =
-            typography?.labelLargeFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeLabelLarge
+            typography?.labelLargeFontSize?.roundToInt()?.px ?: DefaultFontVars.fontSizeLabelLarge
         CssFontVars.fontSizeLabelMedium =
-            typography?.labelMediumFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeLabelMedium
+            typography?.labelMediumFontSize?.roundToInt()?.px ?: DefaultFontVars.fontSizeLabelMedium
         CssFontVars.fontSizeLabelSmall =
-            typography?.labelSmallFontSize?.toInt()?.px ?: DefaultFontVars.fontSizeLabelSmall
+            typography?.labelSmallFontSize?.roundToInt()?.px ?: DefaultFontVars.fontSizeLabelSmall
     }
 }

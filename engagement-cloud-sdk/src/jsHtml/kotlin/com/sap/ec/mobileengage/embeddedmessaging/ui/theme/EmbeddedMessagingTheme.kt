@@ -19,9 +19,8 @@ internal fun EmbeddedMessagingTheme(content: @Composable () -> Unit) {
 
     embeddedMessagingContext?.let {
         val metaData by embeddedMessagingContext.metaData.collectAsState()
-        val themeMapper =
-            ThemeMapper(metaData)
-        val designValues = themeMapper.mapMisc()
+        val themeMapper = ThemeMapper(metaData)
+        val designValues = themeMapper.mapMisc(metaData)
         val translationMapper = TranslationMapper()
         val stringValues = translationMapper.map(metaData)
         themeMapper.generateThemeCSS()

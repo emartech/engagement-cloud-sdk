@@ -11,7 +11,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants
-import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.DEFAULT_ELEVATION
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Dimensions.ZERO_ELEVATION
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.Shapes.ZERO_CORNER_RADIUS
 import com.sap.ec.networking.clients.embedded.messaging.model.MetaData
@@ -144,7 +143,7 @@ internal class ThemeMapper(private val metaData: MetaData?) {
             EmbeddedMessagingDesignValues(
                 messageItemMargin = it.messageItemMargin.dp,
                 messageItemElevation = it.messageItemElevation.dp,
-                buttonElevation = DEFAULT_ELEVATION,
+                buttonElevation = it.buttonElevation.dp,
                 listContentPadding = it.listContentPadding.dp,
                 listItemSpacing = it.listItemSpacing.dp,
                 compactOverlayWidth = it.compactOverlayWidth.dp,
