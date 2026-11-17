@@ -1,0 +1,93 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>LibraryEntitiesShouldNotBePublic:DateTimeFormatTest.kt:DateTimeFormatTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DeviceCategoryProviderTests.js.kt:DeviceCategoryProviderTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DeviceInfoCollectorTests.js.kt:DeviceInfoCollectorTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EmarsysIndexedDbObjectStoreTest.kt:EmarsysIndexedDbObjectStoreTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EngagementCloudIndexedDbTest.kt:EngagementCloudIndexedDbTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EngagementCloudServiceWorkerTests.kt:EngagementCloudServiceWorkerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EventEmitterTests.kt:EventEmitterTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:FakeStringProvider.kt:FakeStringProvider : Provider</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IframeContainerResizerTests.kt:IframeContainerResizerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IframeFactoryTests.kt:IframeFactoryTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JSConfigTests.kt:JSConfigTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JSContactTests.kt:JSContactTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JSDeepLinkTests.kt:JSDeepLinkTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JSEventsDaoTest.kt:JSEventsDaoTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JSInAppTests.kt:JSInAppTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JSPushTests.kt:JSPushTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JSTrackingTests.kt:JSTrackingTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsEmbeddedMessagingTests.kt:JsEmbeddedMessagingTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsPushInternalTests.kt:JsPushInternalTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsSetupTests.kt:JsSetupTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LegacySDKMigrationStateTests.kt:LegacySDKMigrationStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:MessageChannelProviderTests.kt:MessageChannelProviderTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PageLocationProviderTests.kt:PageLocationProviderTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PlatformInitializerTests.kt:PlatformInitializerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushMessagePresenterTests.kt:PushMessagePresenterTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushMessageWebV2MapperTests.kt:PushMessageWebV2MapperTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushNotificationClickHandlerTests.kt:PushNotificationClickHandlerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushServiceTests.kt:PushServiceTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ServiceWorkerManagerTests.kt:ServiceWorkerManagerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:StringStorageTests.kt:StringStorageTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:WebBadgeCountHandlerTest.kt:WebBadgeCountHandlerTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:WebConnectionWatchDogTests.js.kt:WebConnectionWatchDogTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:WebInAppPresenterTests.kt:WebInAppPresenterTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:WebInAppViewProviderTests.kt:WebInAppViewProviderTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:WebInappViewTests.kt:WebInappViewTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:WebLanguageTagValidatorTests.js.kt:WebLanguageTagValidatorTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:WebLifeCycleWatchDogTests.js.kt:WebConnectionWatchDogTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:WebNotificationSettingsCollectorTests.kt:WebNotificationSettingsCollectorTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:WebPlatformInfoCollectorTests.js.kt:WebPlatformInfoCollectorTests</ID>
+    <ID>LongMethod:PushMessageWebV2MapperTests.kt:PushMessageWebV2MapperTests$@Test fun map_shouldCreate_jsPushMessage_fromRemotePayload</ID>
+    <ID>MatchingDeclarationName:WebLifeCycleWatchDogTests.js.kt:WebConnectionWatchDogTests</ID>
+    <ID>MaxLineLength:DeviceCategoryProviderTests.js.kt:DeviceCategoryProviderTests$"Mozilla/5.0 (Linux; Android 8.0; Pixel XL Build/OPP3.170518.006) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.0 Mobile Safari/537.36 EdgA/41.1.35.1"</ID>
+    <ID>MaxLineLength:DeviceCategoryProviderTests.js.kt:DeviceCategoryProviderTests$"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15"</ID>
+    <ID>MaxLineLength:DeviceCategoryProviderTests.js.kt:DeviceCategoryProviderTests$"Mozilla/5.0 (PlayBook; U; RIM Tablet OS 2.1.0; en-US) AppleWebKit/536.2+ (KHTML, like Gecko) Version/7.2.1.0 Safari/536.2+"</ID>
+    <ID>MaxLineLength:DeviceCategoryProviderTests.js.kt:DeviceCategoryProviderTests$"Mozilla/5.0 (SMART-TV; X11; Linux armv7l) AppleWebKit/537.42 (KHTML, like Gecko) Chromium/25.0.1349.2 Chrome/25.0.1349.2 Safari/537.42"</ID>
+    <ID>MaxLineLength:DeviceCategoryProviderTests.js.kt:DeviceCategoryProviderTests$"Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.17 Safari/537.36"</ID>
+    <ID>MaxLineLength:DeviceCategoryProviderTests.js.kt:DeviceCategoryProviderTests$"Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53"</ID>
+    <ID>MaxLineLength:EngagementCloudIndexedDbTest.kt:EngagementCloudIndexedDbTest$throwable.unsafeCast&lt;Error>().message shouldBe "Failed to execute 'transaction' on 'IDBDatabase': The database connection is closing."</ID>
+    <ID>MaxLineLength:JSTrackingTests.kt:JSTrackingTests$js("{ type: 'CUSTOM', name: testName, attributes: { 'testKey': 'testValue' } }").unsafeCast&lt;JsCustomEvent>()</ID>
+    <ID>MaxLineLength:JSTrackingTests.kt:JSTrackingTests$js("{ type: 'custom', name: testName, attributes: { 'testKey': 'testValue' } }").unsafeCast&lt;JsCustomEvent>()</ID>
+    <ID>MaxLineLength:PushNotificationClickHandlerTests.kt:PushNotificationClickHandlerTests$fun</ID>
+    <ID>MaxLineLength:PushServiceTests.kt:PushServiceTests$val exception = SdkException.ServiceWorkerUnavailableException("Service workers are not supported in this browser.")</ID>
+    <ID>NewLineAtEndOfFile:DateTimeFormatTest.kt:com.sap.ec.core.datetime.DateTimeFormatTest.kt</ID>
+    <ID>NewLineAtEndOfFile:DeviceInfoCollectorTests.js.kt:com.sap.ec.core.device.DeviceInfoCollectorTests.js.kt</ID>
+    <ID>NewLineAtEndOfFile:EmarsysIndexedDbObjectStoreTest.kt:com.sap.ec.core.db.EmarsysIndexedDbObjectStoreTest.kt</ID>
+    <ID>NewLineAtEndOfFile:EngagementCloudIndexedDbTest.kt:com.sap.ec.core.db.EngagementCloudIndexedDbTest.kt</ID>
+    <ID>NewLineAtEndOfFile:EngagementCloudServiceWorkerTests.kt:com.sap.ec.EngagementCloudServiceWorkerTests.kt</ID>
+    <ID>NewLineAtEndOfFile:EventEmitterTests.kt:com.sap.ec.api.events.EventEmitterTests.kt</ID>
+    <ID>NewLineAtEndOfFile:FakeStringProvider.kt:com.sap.ec.core.device.fakes.FakeStringProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:FakeWebPlatformInfoCollector.js.kt:com.sap.ec.core.device.fakes.FakeWebPlatformInfoCollector.js.kt</ID>
+    <ID>NewLineAtEndOfFile:IframeContainerResizerTests.kt:com.sap.ec.mobileengage.inapp.iframe.IframeContainerResizerTests.kt</ID>
+    <ID>NewLineAtEndOfFile:IframeFactoryTests.kt:com.sap.ec.mobileengage.inapp.iframe.IframeFactoryTests.kt</ID>
+    <ID>NewLineAtEndOfFile:JSConfigTests.kt:com.sap.ec.api.config.JSConfigTests.kt</ID>
+    <ID>NewLineAtEndOfFile:JSContactTests.kt:com.sap.ec.api.contact.JSContactTests.kt</ID>
+    <ID>NewLineAtEndOfFile:JSDeepLinkTests.kt:com.sap.ec.api.deeplink.JSDeepLinkTests.kt</ID>
+    <ID>NewLineAtEndOfFile:JSEventsDaoTest.kt:com.sap.ec.core.db.events.JSEventsDaoTest.kt</ID>
+    <ID>NewLineAtEndOfFile:JSInAppTests.kt:com.sap.ec.api.inapp.JSInAppTests.kt</ID>
+    <ID>NewLineAtEndOfFile:JSTrackingTests.kt:com.sap.ec.api.tracking.JSTrackingTests.kt</ID>
+    <ID>NewLineAtEndOfFile:JsEmbeddedMessagingTests.kt:com.sap.ec.api.embeddedmessaging.JsEmbeddedMessagingTests.kt</ID>
+    <ID>NewLineAtEndOfFile:MessageChannelProviderTests.kt:com.sap.ec.mobileengage.inapp.iframe.MessageChannelProviderTests.kt</ID>
+    <ID>NewLineAtEndOfFile:PageLocationProviderTests.kt:com.sap.ec.core.providers.pagelocation.PageLocationProviderTests.kt</ID>
+    <ID>NewLineAtEndOfFile:PlatformInitializerTests.kt:com.sap.ec.enable.PlatformInitializerTests.kt</ID>
+    <ID>NewLineAtEndOfFile:PushMessagePresenterTests.kt:com.sap.ec.mobileengage.push.presentation.PushMessagePresenterTests.kt</ID>
+    <ID>NewLineAtEndOfFile:PushMessageWebV2MapperTests.kt:com.sap.ec.mobileengage.push.mappers.PushMessageWebV2MapperTests.kt</ID>
+    <ID>NewLineAtEndOfFile:WebBadgeCountHandlerTest.kt:com.sap.ec.core.badge.WebBadgeCountHandlerTest.kt</ID>
+    <ID>NewLineAtEndOfFile:WebConnectionWatchDogTests.js.kt:com.sap.ec.watchdog.connection.WebConnectionWatchDogTests.js.kt</ID>
+    <ID>NewLineAtEndOfFile:WebInAppViewProviderTests.kt:com.sap.ec.mobileengage.inapp.WebInAppViewProviderTests.kt</ID>
+    <ID>NewLineAtEndOfFile:WebLanguageTagValidatorTests.js.kt:com.sap.ec.core.language.WebLanguageTagValidatorTests.js.kt</ID>
+    <ID>NewLineAtEndOfFile:WebLifeCycleWatchDogTests.js.kt:com.sap.ec.watchdog.lifecycle.WebLifeCycleWatchDogTests.js.kt</ID>
+    <ID>NewLineAtEndOfFile:WebNotificationSettingsCollectorTests.kt:com.sap.ec.core.device.notification.WebNotificationSettingsCollectorTests.kt</ID>
+    <ID>TooGenericExceptionThrown:EngagementCloudIndexedDbTest.kt:EngagementCloudIndexedDbTest$throw Exception(testExceptionMessage)</ID>
+    <ID>TooGenericExceptionThrown:LegacySDKMigrationStateTests.kt:LegacySDKMigrationStateTests$throw Exception("Failed to open legacy database")</ID>
+    <ID>TooGenericExceptionThrown:ServiceWorkerManagerTests.kt:ServiceWorkerManagerTests$throw RuntimeException("Registration failed")</ID>
+    <ID>UnusedParameter:LegacySDKMigrationStateTests.kt:LegacySDKMigrationStateTests$key: String</ID>
+    <ID>UnusedParameter:LegacySDKMigrationStateTests.kt:LegacySDKMigrationStateTests$value: String</ID>
+    <ID>VariableNaming:EmarsysIndexedDbObjectStoreTest.kt:EmarsysIndexedDbObjectStoreTest$val ECIndexedDbObjectStore = ECIndexedDbObjectStore( engagementCloudIndexedDb, objectStoreConfig, json, mockLogger, StandardTestDispatcher() )</ID>
+    <ID>VariableNaming:EmarsysIndexedDbObjectStoreTest.kt:EmarsysIndexedDbObjectStoreTest$val ECIndexedDbObjectStore = ECIndexedDbObjectStore( engagementCloudIndexedDb, objectStoreConfig, mockJson, mockLogger, StandardTestDispatcher() )</ID>
+  </CurrentIssues>
+</SmellBaseline>

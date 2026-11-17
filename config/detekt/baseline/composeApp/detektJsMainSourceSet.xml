@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>EmptyFunctionBlock:trackPushToken.js.kt:{ }</ID>
+    <ID>NewLineAtEndOfFile:enableTracking.js.kt:com.sap.ec.sample.enableTracking.js.kt</ID>
+    <ID>NewLineAtEndOfFile:main.kt:com.sap.ec.sample.main.kt</ID>
+    <ID>NewLineAtEndOfFile:trackPushToken.js.kt:com.sap.ec.sample.trackPushToken.js.kt</ID>
+  </CurrentIssues>
+</SmellBaseline>

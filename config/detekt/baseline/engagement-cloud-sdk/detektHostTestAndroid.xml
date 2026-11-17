@@ -1,0 +1,1112 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>DoubleMutabilityForCollection:SdkContextTests.kt:SdkContextTests$private var features: MutableSet&lt;Features> = mutableSetOf()</ID>
+    <ID>DoubleMutabilityForCollection:ThreadSafePersistentStoreTests.kt:ThreadSafePersistentStoreTests$private var storedList = mutableListOf("value1", "value2", "value3")</ID>
+    <ID>EmptyFunctionBlock:ECSdkSessionTests.kt:ECSdkSessionTests.&lt;no name provided>${}</ID>
+    <ID>EmptyFunctionBlock:FakeLogger.kt:FakeLogger${ }</ID>
+    <ID>ForbiddenPublicDataClass:JsonExtensionsTests.kt:JsonExtensionsTests$CustomClass</ID>
+    <ID>ForbiddenPublicDataClass:StorageTests.kt:SealedTestData$DataType1 : SealedTestData</ID>
+    <ID>ForbiddenPublicDataClass:StorageTests.kt:SealedTestData$DataType2 : SealedTestData</ID>
+    <ID>ForbiddenPublicDataClass:StorageTests.kt:TestData</ID>
+    <ID>ForbiddenPublicDataClass:TestDataClass.kt:TestDataClass</ID>
+    <ID>ForbiddenPublicDataClass:TestEngagementCloudSDKConfig.kt:TestEngagementCloudSDKConfig : SdkConfig</ID>
+    <ID>FunctionOnlyReturningConstant:InternalSdkApiTest.kt:InternalSdkApiTest$@InternalSdkApi fun sampleAnnotatedFunction: String</ID>
+    <ID>FunctionOnlyReturningConstant:InternalSdkApiTest.kt:InternalSdkApiTest.SampleAnnotatedClass$fun value: String</ID>
+    <ID>IgnoredReturnValue:ListPageViewModelTests.kt:ListPageViewModelTests$create( filterUnopenedOnly = false, selectedCategoryIds = listOf(TEST_ID), categories = any() )</ID>
+    <ID>IgnoredReturnValue:ListPageViewModelTests.kt:ListPageViewModelTests$create( filterUnopenedOnly = false, selectedCategoryIds = listOf(TEST_ID, testId2), categories = any() )</ID>
+    <ID>IgnoredReturnValue:ListPageViewModelTests.kt:ListPageViewModelTests$create( filterUnopenedOnly = true, selectedCategoryIds = viewModel.selectedCategoryIds.value.toList(), categories = any() )</ID>
+    <ID>IgnoredReturnValue:ListPageViewModelTests.kt:ListPageViewModelTests$create(any(), any(), any())</ID>
+    <ID>IgnoredReturnValue:NaturalBatchingTests.kt:NaturalBatchingTests$onEach { it.size shouldBe 0 counter++ }</ID>
+    <ID>IgnoredReturnValue:RestoreOperationalEventsStateTests.kt:RestoreOperationalEventsStateTests$getEvents()</ID>
+    <ID>IgnoredReturnValue:RestoreSavedSdkEventsStateTests.kt:RestoreSavedSdkEventsStateTests$getEvents()</ID>
+    <ID>InjectDispatcher:SdkLoggerTests.kt:SdkLoggerTests$Default</ID>
+    <ID>LargeClass:ListPageViewModelTests.kt:ListPageViewModelTests</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ActionHandlerTests.kt:ActionHandlerTests$@Test fun testHandleActions_shouldOnlyExecuteMandatoryActions_whenThereWasNoTriggeredAction</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ActionHandlerTests.kt:ActionHandlerTests$@Test fun testHandleActions_should_handle_actionsInOrder</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidClipboardHandlerTests.kt:AndroidClipboardHandlerTests$@Test fun copyToClipboard_shouldSetClipboardContent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidConnectionWatchDogTests.kt:AndroidConnectionWatchDogTests$@Test fun testStart_shouldRegisterItselfAsDefaultNetworkCallback</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidLanguageTagValidatorTests.android.kt:AndroidLanguageTagValidatorTests$@BeforeTest fun setup</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidLanguageTagValidatorTests.android.kt:AndroidLanguageTagValidatorTests$@Test fun testIsValid_shouldReturnFalse</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidLanguageTagValidatorTests.android.kt:AndroidLanguageTagValidatorTests$@Test fun testIsValid_shouldReturnTrue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidLifecycleWatchDogTests.kt:AndroidLifecycleWatchDogTests$@OptIn(ExperimentalCoroutinesApi::class) @Test fun testOnStart_shouldEmitOnForeGroundLifecycleEvent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidLifecycleWatchDogTests.kt:AndroidLifecycleWatchDogTests$@OptIn(ExperimentalCoroutinesApi::class) @Test fun testOnStop_shouldEmitOnBackGroundLifecycleEvent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidLifecycleWatchDogTests.kt:AndroidLifecycleWatchDogTests$@OptIn(ExperimentalCoroutinesApi::class) @Test fun testStart_shouldAddItselfAsLifecycleObserver</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidPermissionHandlerTests.kt:AndroidPermissionHandlerTests$@Test fun requestPushPermission_shouldNoRequestPermission_whenAndroidVersionIsAtLeastTiramisu_andPermissionIsAlreadyGranted</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidPermissionHandlerTests.kt:AndroidPermissionHandlerTests$@Test fun requestPushPermission_shouldNotDoAnything_whenAndroidVersionIsBelowTiramisu</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidPermissionHandlerTests.kt:AndroidPermissionHandlerTests$@Test fun requestPushPermission_shouldRequestPermission_whenAndroidVersionIsAtLeastTiramisu_andPermissionIsNotGranted</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AppEventActionTests.kt:AppEventActionTests$@Test fun invoke_shouldAddAttributes_toInvokedAction_ifActionModelPayload_isNotNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AppEventActionTests.kt:AppEventActionTests$@Test fun invoke_shouldNotAddAttributes_toInvokedAction_ifActionModelPayload_isNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AppEventActionTests.kt:AppEventActionTests$@Test fun invoke_shouldSetSource_toInapp_whenSdkEventIsInApp</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AppEventActionTests.kt:AppEventActionTests$@Test fun invoke_shouldSetSource_toNull_whenSdkEventIsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AppEventActionTests.kt:AppEventActionTests$@Test fun invoke_shouldSetSource_toOnEvent_whenSdkEventIsOnEventAction</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AppEventActionTests.kt:AppEventActionTests$@Test fun invoke_shouldSetSource_toPush_whenSdkEventIsPush</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AppStartStateTests.kt:AppStartStateTests$@Test fun testActivate_should_not_send_appStartEvent_with_eventClient_when_it_was_already_completed</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AppStartStateTests.kt:AppStartStateTests$@Test fun testActivate_should_send_appStartEvent_with_eventClient_when_it_was_not_completed_yet_andReturn_Failure</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AppStartStateTests.kt:AppStartStateTests$@Test fun testActivate_should_send_appStartEvent_with_eventClient_when_it_was_not_completed_yet_andReturn_Success</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AppStartStateTests.kt:AppStartStateTests$@Test fun testActivate_should_send_theSecond_appStartEvent_with_eventClient_when_the_firstAppStartEventRegistration_fails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ApplicationCodeTests.kt:ApplicationCodeTests$@Test fun validate_shouldPass_forMultiRegionV1Format</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ApplicationCodeTests.kt:ApplicationCodeTests$@Test fun validate_shouldPass_forMultiRegionV2Format_withPPrefix</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ApplicationCodeTests.kt:ApplicationCodeTests$@Test fun validate_shouldPass_forMultiRegionV2Format_withSPrefix</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ApplicationCodeTests.kt:ApplicationCodeTests$@Test fun validate_shouldPass_forRemoteConfigRegex_whenNullRegex</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ApplicationCodeTests.kt:ApplicationCodeTests$@Test fun validate_shouldPass_forStandardFormat</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ApplicationCodeTests.kt:ApplicationCodeTests$@Test fun validate_shouldPass_forStandardFormat_whenRemoteConfigRegexIsSet</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ApplicationCodeTests.kt:ApplicationCodeTests$@Test fun validate_shouldPass_whenMatchesRemoteConfigRegex</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ApplicationCodeTests.kt:ApplicationCodeTests$@Test fun validate_shouldThrow_forBlankAppCode</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ApplicationCodeTests.kt:ApplicationCodeTests$@Test fun validate_shouldThrow_forEmptyAppCode</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ApplicationCodeTests.kt:ApplicationCodeTests$@Test fun validate_shouldThrow_forInvalidFormat</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ApplicationCodeTests.kt:ApplicationCodeTests$@Test fun validate_shouldThrow_forLowercaseStandardFormat</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ApplicationCodeTests.kt:ApplicationCodeTests$@Test fun validate_shouldThrow_whenNotMatchingAnyRegex</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ApplyAppCodeBasedRemoteConfigStateTests.kt:ApplyAppCodeBasedRemoteConfigStateTests$@Test fun testActive_shouldReturn_failure_whenEventResult_containsFailure</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ApplyAppCodeBasedRemoteConfigStateTests.kt:ApplyAppCodeBasedRemoteConfigStateTests$@Test fun testActive_shouldReturn_success</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ApplyAppCodeBasedRemoteConfigStateTests.kt:ApplyAppCodeBasedRemoteConfigStateTests$@Test fun testName</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ApplyGlobalRemoteConfigStateTests.kt:ApplyGlobalRemoteConfigStateTests$@Test fun testActive_should_handleGlobal_with_remoteConfigHandler</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ApplyGlobalRemoteConfigStateTests.kt:ApplyGlobalRemoteConfigStateTests$@Test fun testName</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ClearDeviceInfoStateTests.kt:ClearDeviceInfoStateTests$@Test fun active_shouldCall_clearDeviceInfo_andReturnFailure_withTheError</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ClearDeviceInfoStateTests.kt:ClearDeviceInfoStateTests$@Test fun active_shouldCall_clearDeviceInfo_andReturnSuccess</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ClearEventsStateTests.kt:ClearEventsStateTests$@Test fun testActive_shouldClearAllEvents_fromDatabase_except_Log_and_Operational</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ClearEventsStateTests.kt:ClearEventsStateTests$@Test fun testActive_shouldReturn_failure_ifDBOperation_fails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ClearPushTokenOnDisableStateTests.kt:ClearPushTokenOnDisableStateTests$@Test fun active_shouldNOTRegisterClearPushTokenEvent_whenNoToken_isStored</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ClearPushTokenOnDisableStateTests.kt:ClearPushTokenOnDisableStateTests$@Test fun active_shouldRegisterClearPushTokenEvent_without_deletingTokenFromStorage_onFailure</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ClearPushTokenOnDisableStateTests.kt:ClearPushTokenOnDisableStateTests$@Test fun active_shouldRegisterClearPushTokenEvent_without_deletingTokenFromStorage_onSuccess</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ClearRequestContextTokensStateTests.kt:ClearRequestContextTokensStateTests$@Test fun active_shouldClearContactToken_andRefreshToken</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ClearStoredConfigStateTests.kt:ClearStoredConfigStateTests$@Test fun active_shouldCall_clear_onConfigStore_andReturn_success</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ClearStoredConfigStateTests.kt:ClearStoredConfigStateTests$@Test fun active_shouldCall_return_failure_ifStoreOperation_fails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ClientIdProviderTests.kt:ClientIdProviderTests$@Test fun testProvide_shouldGenerate_andStoreNewId_when_no_clientId_in_storage</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ClientIdProviderTests.kt:ClientIdProviderTests$@Test fun testProvide_shouldProvideClientId_from_storage</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:CollectDeviceInfoStateTests.kt:CollectDeviceInfoStateTests$@Test fun activate_should_collect_deviceInfo_and_set_sessionContext</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:CollectDeviceInfoStateTests.kt:CollectDeviceInfoStateTests$@Test fun activate_should_returnFailure_ifClientIdProvision_fails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigClientTests.kt:ConfigClientTests$@Test fun testConsumer_shouldPropagateCancellationException_whenCoroutineIsCancelled</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigClientTests.kt:ConfigClientTests$@Test fun testConsumer_should_call_clientExceptionHandler_when_exception_happens</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigClientTests.kt:ConfigClientTests$@Test fun testConsumer_should_call_client_with_change_appcode_request_and_ack_event</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigClientTests.kt:ConfigClientTests$@Test fun testConsumer_should_emit_failure_response_when_backend_error_occurs</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigClientTests.kt:ConfigClientTests$@Test fun testConsumer_should_not_persist_config_when_network_request_fails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigClientTests.kt:ConfigClientTests$@Test fun testConsumer_should_persist_config_to_store_after_successful_change</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigClientTests.kt:ConfigClientTests$@Test fun testConsumer_should_reEmit_events_into_flow_when_there_is_a_network_error</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigExtensionTests.kt:ConfigExtensionTests$@Test fun isValid_shouldReturnTrue_forMultiRegionV1Format</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigExtensionTests.kt:ConfigExtensionTests$@Test fun isValid_shouldReturnTrue_forMultiRegionV2Format_withPPrefix</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigExtensionTests.kt:ConfigExtensionTests$@Test fun isValid_shouldReturnTrue_forMultiRegionV2Format_withSPrefix</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigExtensionTests.kt:ConfigExtensionTests$@Test fun isValid_shouldReturnTrue_forStandardFormat</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigExtensionTests.kt:ConfigExtensionTests$@Test fun isValid_shouldReturnTrue_forStandardFormat_whenRemoteConfigRegexIsSet</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigExtensionTests.kt:ConfigExtensionTests$@Test fun isValid_shouldReturnTrue_whenMatchesRemoteConfigRegex</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigExtensionTests.kt:ConfigExtensionTests$@Test fun isValid_shouldThrow_forEmptyAppCode</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigExtensionTests.kt:ConfigExtensionTests$@Test fun isValid_shouldThrow_forInvalidAppCode</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigExtensionTests.kt:ConfigExtensionTests$@Test fun isValid_shouldThrow_whenNotMatchingRemoteConfigRegex_andNotStandardFormat</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigInternalTests.kt:ConfigInternalTests$@BeforeTest fun setUp</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigInternalTests.kt:ConfigInternalTests$@Test fun testActivate_shouldReplayStoredCallsFromConfigContext_inTheRightOrder</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigInternalTests.kt:ConfigInternalTests$@Test fun testChangeApplicationCode_shouldAcceptMultiRegionV2AppCode</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigInternalTests.kt:ConfigInternalTests$@Test fun testChangeApplicationCode_shouldEmitChangeApplicationCodeEvent_toSdkEventFlow</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigInternalTests.kt:ConfigInternalTests$@Test fun testChangeApplicationCode_shouldEmitChangeApplicationCodeEvent_toSdkEventFlow_whenMultiRegionAppCode_isUsed</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigInternalTests.kt:ConfigInternalTests$@Test fun testChangeApplicationCode_shouldNotRegisterChangeAppCodeEvent_whenAppCode_hasNotChanged</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigInternalTests.kt:ConfigInternalTests$@Test fun testChangeApplicationCode_shouldNotRegisterChangeAppCodeEvent_whenAppCode_isEmpty</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigInternalTests.kt:ConfigInternalTests$@Test fun testChangeApplicationCode_shouldRejectCode_notMatchingRemoteConfigRegex_whenProvided</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigInternalTests.kt:ConfigInternalTests$@Test fun testChangeApplicationCode_shouldThrow_whenAppCode_isInvalid</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigInternalTests.kt:ConfigInternalTests$@Test fun testChangeApplicationCode_shouldUseFallbackMultiRegionRegex_whenRemoteConfigRegexIsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigInternalTests.kt:ConfigInternalTests$@Test fun testChangeApplicationCode_shouldUseRemoteConfigRegex_whenProvided</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigInternalTests.kt:ConfigInternalTests$@Test fun testChangeApplicationCode_shouldWaitForResponse_andSucceedOnSuccess</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigInternalTests.kt:ConfigInternalTests$@Test fun testChangeApplicationCode_shouldWaitForResponse_andThrowOnFailure</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigInternalTests.kt:ConfigInternalTests$@Test fun testResetLanguage_shouldCallHandleLanguage_withNull_inLanguageHandler</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigInternalTests.kt:ConfigInternalTests$@Test fun testSetLanguage_shouldCallHandleLanguage_onLanguageHandler</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigTests.kt:ConfigTest$@Test fun changeApplicationCode_shouldPropagateCancellationException</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigTests.kt:ConfigTest$@Test fun testApplicationCode_whenActiveState_returnsApplicationCode</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigTests.kt:ConfigTest$@Test fun testApplicationCode_whenInitializedState_returnsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigTests.kt:ConfigTest$@Test fun testApplicationCode_whenOnHoldState_awaitsAndReturnsApplicationCodeWhenSdkBecomesActive</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigTests.kt:ConfigTest$@Test fun testApplicationCode_whenOnHoldState_awaitsAndReturnsApplicationCodeWhenSdkBecomesInitialized</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigTests.kt:ConfigTest$@Test fun testApplicationCode_whenUnInitializedState_returnsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigTests.kt:ConfigTest$@Test fun testChangeApplicationCode_delegatesToCorrectInstance</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigTests.kt:ConfigTest$@Test fun testClientId_returnsCorrectValue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigTests.kt:ConfigTest$@Test fun testCurrentSdkState_returnsCorrectValue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigTests.kt:ConfigTest$@Test fun testGetNotificationSettings_returnsCorrectValue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigTests.kt:ConfigTest$@Test fun testLanguageCode_returnsCorrectValue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigTests.kt:ConfigTest$@Test fun testResetLanguage_delegatesToCorrectInstance</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConfigTests.kt:ConfigTest$@Test fun testSdkVersion_returnsCorrectValue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactClientTests.kt:ContactClientTests$@Test fun testConsumer_not_should_call_handleTokens_and_use_clientExceptionHandler_on_exception</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactClientTests.kt:ContactClientTests$@Test fun testConsumer_should_call_client_with_linkAuthenticatedContact_request</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactClientTests.kt:ContactClientTests$@Test fun testConsumer_should_call_client_with_linkContact_request_andAckEvent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactClientTests.kt:ContactClientTests$@Test fun testConsumer_should_call_client_with_unlinkContact_request</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactClientTests.kt:ContactClientTests$@Test fun testConsumer_should_emit_failure_response_when_non_network_exception_occurs</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactClientTests.kt:ContactClientTests$@Test fun testConsumer_should_not_call_contactTokenHandler_when_client_responds_with_204</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactClientTests.kt:ContactClientTests$@Test fun testConsumer_should_reEmit_events_into_flow_when_there_is_a_network_error</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactGathererTests.kt:ContactGathererTests$@Test fun testGathering</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactInternalTests.kt:ContactInternalTests$@Test fun testActivate_should_emit_stored_calls_as_events_to_event_flow</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactInternalTests.kt:ContactInternalTests$@Test fun testLinkAuthenticatedContact_should_emit_linkAuthenticatedContact_event_into_sdkFlow</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactInternalTests.kt:ContactInternalTests$@Test fun testLinkContact_should_emit_linkContact_event_into_sdkFlow</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactInternalTests.kt:ContactInternalTests$@Test fun testUnlinkContact_should_emit_unlinkContact_event_into_sdkFlow_if_isContactLinked_is_true</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactInternalTests.kt:ContactInternalTests$@Test fun testUnlinkContact_should_not_emit_unlinkContact_event_into_sdkFlow_if_isContactLinked_is_false</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactTests.kt:ContactTests$@Test fun link_shouldPropagateCancellationException_whenInternalApiThrowsCancellationException</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactTests.kt:ContactTests$@Test fun testLinkAuthenticated_activeState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactTests.kt:ContactTests$@Test fun testLinkAuthenticated_activeState_throws</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactTests.kt:ContactTests$@Test fun testLinkAuthenticated_onHoldState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactTests.kt:ContactTests$@Test fun testLinkAuthenticated_unInitializedState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactTests.kt:ContactTests$@Test fun testLink_activeState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactTests.kt:ContactTests$@Test fun testLink_activeState_throws</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactTests.kt:ContactTests$@Test fun testLink_onHoldState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactTests.kt:ContactTests$@Test fun testLink_unInitializedState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactTests.kt:ContactTests$@Test fun testUnlink_UnInitializedState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactTests.kt:ContactTests$@Test fun testUnlink_onHoldState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactTests.kt:ContactTests$@Test fun test_unlink_activeState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactTests.kt:ContactTests$@Test fun test_unlink_activeState_throws</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactTokenHandlerTests.kt:ContactTokenHandlerTests$@Test fun testHandleContactTokens_should_not_crash_when_response_does_not_contain_tokens</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContactTokenHandlerTests.kt:ContactTokenHandlerTests$@Test fun testHandleContactTokens_should_set_tokens_to_sessionContext</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContentReplacerTests.kt:ContentReplacerTests$@Test fun replace_shouldAdd_scriptSrcTag_toTheContent_whenInjectionAllowed_andReplaceInOrder</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContentReplacerTests.kt:ContentReplacerTests$@Test fun replace_shouldAdd_theSdkVersion_toTheContent_byReplacing_thePlaceholder</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContentReplacerTests.kt:ContentReplacerTests$@Test fun replace_shouldRemovePlaceholder_whenVerifierReturnsFailure</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ContentReplacerTests.kt:ContentReplacerTests$@Test fun replace_shouldReturn_contentUnchanged_ifPlaceholdersAreMissing</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:CryptoTests.kt:CryptoTests$@Test fun testDecrypt_should_throw_anException_whenSecretIsWrong</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:CryptoTests.kt:CryptoTests$@Test fun testEncryptAndDecrypt</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:CryptoTests.kt:CryptoTests$@Test fun testVerify_should_returnFalse</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:CryptoTests.kt:CryptoTests$@Test fun testVerify_should_returnTrue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:CustomEventActionTests.kt:CustomEventActionTests$@Test fun invoke_shouldAddAttributes_toInvokedAction_ifActionModelPayload_isNotNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:CustomEventActionTests.kt:CustomEventActionTests$@Test fun invoke_shouldNotAddAttributes_toInvokedAction_ifActionModelPayload_isNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeepLinkClientTests.kt:DeepLinkClientTests$@Test fun testConsumer_shouldNotAckEvent_inCaseOfUnknownException</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeepLinkClientTests.kt:DeepLinkClientTests$@Test fun testConsumer_shouldReEmitEvent_throughSdkEventDistributor_inCaseOfNetworkError</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeepLinkClientTests.kt:DeepLinkClientTests$@Test fun testConsumer_should_call_clientExceptionHandler_when_exception_happens</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeepLinkClientTests.kt:DeepLinkClientTests$@Test fun testConsumer_should_call_client_with_trackDeepLink_request_and_ack_event</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeepLinkClientTests.kt:DeepLinkClientTests$@Test fun testConsumer_should_emit_failure_response_when_non_network_exception_occurs</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeepLinkInternalTests.kt:DeepLinkInternalTests$@Test fun testTrack_should_emit_trackEvent_into_sdkEventFlow_and_return_true_if_url_contains_ems_dl_param</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeepLinkInternalTests.kt:DeepLinkInternalTests$@Test fun testTrack_should_return_false_if_url_doesnt_contain_ems_dl_param</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DefaultClientExceptionHandlerTests.kt:DefaultClientExceptionHandlerTests$@Test fun handleException_shouldAckEvent_onKnownError</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DefaultClientExceptionHandlerTests.kt:DefaultClientExceptionHandlerTests$@Test fun handleException_shouldNackEvent_onUnknownException</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DefaultClientExceptionHandlerTests.kt:DefaultClientExceptionHandlerTests$@Test fun handleException_shouldNackEvent_onUnknownException_whenCalledWithMultipleEvents</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DefaultClientExceptionHandlerTests.kt:DefaultClientExceptionHandlerTests$@Test fun transformException_shouldNotTransformException_forErrorCode_1000_UnknowError</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DefaultClientExceptionHandlerTests.kt:DefaultClientExceptionHandlerTests$@Test fun transformException_shouldNotTransformException_forUnknownError</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DefaultClientExceptionHandlerTests.kt:DefaultClientExceptionHandlerTests$@Test fun transformException_shouldTransformException_forPredefinedErrorCodes</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DefaultUrlTests.kt:DefaultUrlTests$@Test fun testCopyWith</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeviceClientTests.kt:DeviceClientTests$@Test fun testConsumer_shouldPropagateCancellationException_whenCoroutineIsCancelled</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeviceClientTests.kt:DeviceClientTests$@Test fun testConsumer_should_callClientExceptionHandler_when_exception_happens</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeviceClientTests.kt:DeviceClientTests$@Test fun testConsumer_should_collectDeviceInfo_andAckTheEvent_ifDeviceInfoHasNotChanged</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeviceClientTests.kt:DeviceClientTests$@Test fun testConsumer_should_emit_failure_response_when_non_network_exception_occurs</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeviceClientTests.kt:DeviceClientTests$@Test fun testConsumer_should_not_call_contactTokenHandler_when_response_is_204</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeviceClientTests.kt:DeviceClientTests$@Test fun testConsumer_should_reEmit_events_on_network_error</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeviceClientTests.kt:DeviceClientTests$@Test fun testConsumer_should_send_deviceInfo_to_client_service_when_ChangeLanguage_event_received</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeviceClientTests.kt:DeviceClientTests$@Test fun testConsumer_should_send_deviceInfo_to_client_service_when_DeviceInfo_changed</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeviceInfoStorageTests.kt:DeviceInfoStorageTests$@Test fun hasDeviceInfoChanged_shouldReturnFalse_ifActualDeviceInfo_isTheSame_asTheStored</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeviceInfoStorageTests.kt:DeviceInfoStorageTests$@Test fun hasDeviceInfoChanged_shouldReturnTrue_ifActualDeviceInfo_isDifferent_fromTheStored</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DisableOrganizerTests.kt:DisableOrganizerTests$@Test fun testDisableWithValidation_shouldActivateMEDisableStateMachine</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DisableOrganizerTests.kt:DisableOrganizerTests$@Test fun testDisableWithValidation_shouldThrowException_whenSdkIsNotEnabled</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DisableOrganizerTests.kt:DisableOrganizerTests$@Test fun testDisableWithValidation_shouldThrowException_whenStateMachineActivation_fails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DisableOrganizerTests.kt:DisableOrganizerTests$@Test fun testDisable_shouldActivate_MEDisableStateMachine_andEndSession</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DisableOrganizerTests.kt:DisableOrganizerTests$@Test fun testDisable_shouldThrowException_whenStateMachineActivation_fails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DownloaderTests.kt:DownloaderTests$@Test fun download_shouldReturn_downloadedByteArray</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DownloaderTests.kt:DownloaderTests$@Test fun download_shouldReturn_null_ifDownload_fails_andNoCacheIsAvailable_andNoFallbackIsProvided</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DownloaderTests.kt:DownloaderTests$@Test fun download_shouldReturn_null_ifReadingFromCacheFails_andNoFallbackIsProvided</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DownloaderTests.kt:DownloaderTests$@Test fun download_shouldReturn_theCachedArray_ifAvailable</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DownloaderTests.kt:DownloaderTests$@Test fun download_shouldReturn_theFallbackValue_ifAvailable_andDownload_fails_andNoCacheIsAvailable</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DownloaderTests.kt:DownloaderTests$@Test fun download_shouldReturn_theFallbackValue_ifReadingFromCacheFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECClientTests.kt:ECClientTests$@Test fun testSend_should_addEcHeaders</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECClientTests.kt:ECClientTests$@Test fun testSend_should_emit_RemoteConfigUpdateRequiredEvent_toSdkEventFlow_whenStatusCodeIs_inRange_400_504_andErrorCodeIsInRange_1200_1299</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECClientTests.kt:ECClientTests$@Test fun testSend_should_emit_ReregistrationRequiredEvent_toSdkEventFlow_whenStatusCodeIs_inRange_400_504_andErrorCodeIsInRange_1100_1199</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECClientTests.kt:ECClientTests$@Test fun testSend_should_not_crash_and_log_when_errorCode_cant_be_parsed_toInt</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECClientTests.kt:ECClientTests$@Test fun testSend_should_retry_on401_and_try_to_get_refreshToken</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECSdkSessionTests.kt:ECSdkSessionTests$@BeforeTest fun setUp</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECSdkSessionTests.kt:ECSdkSessionTests$@Test fun testEndSession_shouldNotDoAnything_whenContactTokenIsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECSdkSessionTests.kt:ECSdkSessionTests$@Test fun testEndSession_shouldNotDoAnything_whenSessionIdIsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECSdkSessionTests.kt:ECSdkSessionTests$@Test fun testEndSession_shouldNotDoAnything_whenSessionStartIsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECSdkSessionTests.kt:ECSdkSessionTests$@Test fun testEndSession_shouldResetSession_evenWhenRegisteringEventFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECSdkSessionTests.kt:ECSdkSessionTests$@Test fun testEndSession_shouldTrackSessionEndEvent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECSdkSessionTests.kt:ECSdkSessionTests$@Test fun testRestartSession_shouldEndCurrentSessionAndStartNew_whenSessionIsActive</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECSdkSessionTests.kt:ECSdkSessionTests$@Test fun testRestartSession_shouldStartSession_whenNoSessionIsActive</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECSdkSessionTests.kt:ECSdkSessionTests$@Test fun testStartSession_shouldNotDoAnything_whenConfigIsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECSdkSessionTests.kt:ECSdkSessionTests$@Test fun testStartSession_shouldNotDoAnything_whenContactTokenIsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECSdkSessionTests.kt:ECSdkSessionTests$@Test fun testStartSession_shouldNotDoAnything_whenSessionIdIsNotNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECSdkSessionTests.kt:ECSdkSessionTests$@Test fun testStartSession_shouldNotDoAnything_whenSessionStartIsNotNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECSdkSessionTests.kt:ECSdkSessionTests$@Test fun testStartSession_shouldSetSession_evenWhenRegisteringEventFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECSdkSessionTests.kt:ECSdkSessionTests$@Test fun testStartSession_shouldTrackSessionStartEvent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECSdkSessionTests.kt:ECSdkSessionTests$@Test fun testSubscribe_shouldCallEndSession</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ECSdkSessionTests.kt:ECSdkSessionTests$@Test fun testSubscribe_shouldCallStartSession</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmarsysConfigTests.kt:EngagementCloudSDKConfigTest$@Test fun testEngagementCloudSDKConfig_isValid_shouldBe_false</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmarsysConfigTests.kt:EngagementCloudSDKConfigTest$@Test fun testEngagementCloudSDKConfig_isValid_shouldBe_true</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$@Test fun createBatched_should_return_request_for_updateTagsForMessages</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$@Test fun create_fetchMessages_should_return_request_for_fetchMessages_endpoint</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$@Test fun create_should_return_request_for_fetchBadgeCount</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$@Test fun create_should_return_request_for_fetchMessages_endpoint_whenOffset_isSmallerThanZero</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$@Test fun create_should_return_request_for_fetchMessages_withFilterUnopenedTrue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$@Test fun create_should_return_request_for_fetchMessages_withOffsetAndCategoryIds</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$@Test fun create_should_return_request_for_fetchMeta</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$@Test fun create_should_return_request_for_fetchNextPage</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$@Test fun create_should_return_request_for_fetchNextPage_withFilterUnopenedTrue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$@Test fun create_should_return_request_for_fetchNextPage_withFilterUnopenedTrue_and_NotEmptyCategoryIds</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$@Test fun create_should_return_request_for_fetchNextPage_withNotEmptyCategoryIds</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$@Test fun create_should_return_request_for_updateTagsForMessages</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingClientTest.kt:EmbeddedMessagingClientTest$@BeforeTest fun setup</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingClientTest.kt:EmbeddedMessagingClientTest$@Test fun testBatchedTagsConsumer_shouldCallClientExceptionHandler_andEmitFailureResponseForEach_onException</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingClientTest.kt:EmbeddedMessagingClientTest$@Test fun testBatchedTagsConsumer_shouldNotUseSingleCreateForUpdateTagsEvents_areNotConsumedByUnbatchedCollector</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingClientTest.kt:EmbeddedMessagingClientTest$@Test fun testBatchedTagsConsumer_shouldReEmitAllEventsIndividually_whenThereIsANetworkError</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingClientTest.kt:EmbeddedMessagingClientTest$@Test fun testBatchedTagsConsumer_shouldSendBatchedRequest_andAckAllEvents_andEmitResponseForEach_whenBatchSizeReached</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingClientTest.kt:EmbeddedMessagingClientTest$@Test fun testBatchedTagsConsumer_shouldSendBatchedRequest_andAckAllEvents_andEmitResponseForEach_whenBatchTimeIntervalReached</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingClientTest.kt:EmbeddedMessagingClientTest$@Test fun testConsumer_shouldCallClientExceptionHandler_whenExceptionHappens</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingClientTest.kt:EmbeddedMessagingClientTest$@Test fun testConsumer_shouldConsumeOnlyEmbeddedMessagingEvents</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingClientTest.kt:EmbeddedMessagingClientTest$@Test fun testConsumer_shouldGetFetchBadgeCountEventFromFlow_andSendHttpRequest_andAckEvent_andEmitResponse</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingClientTest.kt:EmbeddedMessagingClientTest$@Test fun testConsumer_shouldGetFetchMetaEventFromFlow_andSendHttpRequest_andStoreMetaData_andAckEvent_andEmitResponse</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingClientTest.kt:EmbeddedMessagingClientTest$@Test fun testConsumer_shouldPropagateCancellationException_whenCoroutineIsCancelled</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingClientTest.kt:EmbeddedMessagingClientTest$@Test fun testConsumer_shouldReEmitEventsIntoFlow_whenThereIsANetworkError</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingInternalTests.kt:EmbeddedMessagingInternalTests$@Test fun activate_shouldLog</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingPagingSourceTests.kt:EmbeddedMessagingPagingSourceTests$@Test fun testGetRefreshKey_should_return_0</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingPagingSourceTests.kt:EmbeddedMessagingPagingSourceTests$@Test fun testLoad_shouldNot_call_fetchMessagesWithCategories_when_SdkIsNotActive</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingPagingSourceTests.kt:EmbeddedMessagingPagingSourceTests$@Test fun testLoad_shouldNot_call_fetchMessagesWithCategories_when_contactTokenIsNotAvailable</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingPagingSourceTests.kt:EmbeddedMessagingPagingSourceTests$@Test fun testLoad_shouldPropagateCancellationException_whenFetchNextPageThrowsCancellationException</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingPagingSourceTests.kt:EmbeddedMessagingPagingSourceTests$@Test fun testLoad_shouldPropagateCancellationException_whenFetchThrowsCancellationException</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingPagingSourceTests.kt:EmbeddedMessagingPagingSourceTests$@Test fun testLoad_should_call_fetchMessagesWithCategories_when_invokedFirstTime</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingPagingSourceTests.kt:EmbeddedMessagingPagingSourceTests$@Test fun testLoad_should_call_fetchMessagesWithCategories_when_invokedFirstTime_and_HandleErrors_WhenResultFailed</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingPagingSourceTests.kt:EmbeddedMessagingPagingSourceTests$@Test fun testLoad_should_call_fetchNextPage_when_notOnFirstPage</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingPagingSourceTests.kt:EmbeddedMessagingPagingSourceTests$@Test fun testLoad_should_call_fetchNextPage_when_notOnFirstPage_andHandleError_whenResultFailed</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingPagingSourceTests.kt:EmbeddedMessagingPagingSourceTests$@Test fun testLoad_should_catch_Exception_onFailure</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingPagingSourceTests.kt:EmbeddedMessagingPagingSourceTests$@Test fun testLoad_should_return_EmptyLoadResultPageWithNullNextKeyAndEmptyData_when_LastPageReachedExceptionThrown</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingTests.kt:EmbeddedMessagingTests$@Test fun activeCategoryFilters_shouldGetValue_fromActiveInstance_activeSDK</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingTests.kt:EmbeddedMessagingTests$@Test fun activeCategoryFilters_shouldGetValue_fromActiveInstance_initializedSDK</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingTests.kt:EmbeddedMessagingTests$@Test fun categories_shouldGetCategories_fromActiveInstance_activeSDK</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingTests.kt:EmbeddedMessagingTests$@Test fun categories_shouldGetCategories_fromActiveInstance_initializedSDK</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingTests.kt:EmbeddedMessagingTests$@Test fun filterByCategories_shouldCallMethod_onActiveInstance_activeSDK</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingTests.kt:EmbeddedMessagingTests$@Test fun filterByCategories_shouldCallMethod_onActiveInstance_initializedSDK</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingTests.kt:EmbeddedMessagingTests$@Test fun filterUnreadOnly_shouldCallMethod_onActiveInstance_activeSDK</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingTests.kt:EmbeddedMessagingTests$@Test fun filterUnreadOnly_shouldCallMethod_onActiveInstance_initializedSDK</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingTests.kt:EmbeddedMessagingTests$@Test fun isUnreadFilterActive_shouldGetValue_fromActiveInstance_activeSDK</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingTests.kt:EmbeddedMessagingTests$@Test fun isUnreadFilterActive_shouldGetValue_fromActiveInstance_initializedSDK</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EnableOrganizerTests.kt:EnableOrganizerTests$@Test fun enable_should_call_activate_onMeStateMachine_and_store_config_and_set_config_and_state_on_context</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EnableOrganizerTests.kt:EnableOrganizerTests$@Test fun testEnableWithValidation_should_call_setup_whenNoConfigWasStored</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EnableOrganizerTests.kt:EnableOrganizerTests$@Test fun testEnableWithValidation_should_throwException_whenStateMachineActivation_returnsFailure</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EnableOrganizerTests.kt:EnableOrganizerTests$@Test fun testEnableWithValidation_should_throw_whenAConfigWasAlreadyStored</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventActionFactoryTests.kt:EventActionFactoryTests$@Test fun testCreate_withAppEventActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventActionFactoryTests.kt:EventActionFactoryTests$@Test fun testCreate_withAskForPushPermissionActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventActionFactoryTests.kt:EventActionFactoryTests$@Test fun testCreate_withBasicRichContentDisplayModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventActionFactoryTests.kt:EventActionFactoryTests$@Test fun testCreate_withCustomEventActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventActionFactoryTests.kt:EventActionFactoryTests$@Test fun testCreate_withDismissActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventActionFactoryTests.kt:EventActionFactoryTests$@Test fun testCreate_withOpenExternalUrlActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventClientTests.kt:EventClientTests$@Test fun testConsumer_shouldAckEvents_andEmitAnswerResponses_whenResponseStatusCodeIs204</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventClientTests.kt:EventClientTests$@Test fun testConsumer_shouldCallClientExceptionHandler_whenExceptionIsThrown</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventClientTests.kt:EventClientTests$@Test fun testConsumer_shouldEmitPresentEvent_whenContent_isPresent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventClientTests.kt:EventClientTests$@Test fun testConsumer_shouldExecuteAllActions_whenSomeActionsFail</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventClientTests.kt:EventClientTests$@Test fun testConsumer_shouldHandleDeviceEventState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventClientTests.kt:EventClientTests$@Test fun testConsumer_shouldHandleOnEventActionCampaigns_executeActions_andReportThem_whenPresent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventClientTests.kt:EventClientTests$@Test fun testConsumer_shouldNotHandleInApp_whenHtml_IsEmpty</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventClientTests.kt:EventClientTests$@Test fun testConsumer_shouldPropagateCancellationException_whenCoroutineIsCancelled</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventClientTests.kt:EventClientTests$@Test fun testConsumer_shouldReEmitEventsToEventFlow_whenOnRecoverCallbackIsCalled</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventClientTests.kt:EventClientTests$@Test fun testConsumer_should_call_client_with_correct_request</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventClientTests.kt:EventClientTests$@Test fun testRegister_should_start_consume_on_channel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventTests.kt:EventTests$@Test fun ack_onList_shouldAckAllEvents</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventTests.kt:EventTests$@Test fun ack_shouldLogError_onlyLocally_whenRemovingLogEventEventFromDbFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventTests.kt:EventTests$@Test fun ack_shouldLogError_whenRemovingEventFromDb</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventTests.kt:EventTests$@Test fun ack_shouldRemoveEventFromDB</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventTests.kt:EventTests$@Test fun nack_onList_shouldNackAllEvents</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventTests.kt:EventTests$@Test fun nack_shouldIncrementNackCount_andUpsertIntoDb_whenNackCountIsUnderThreshold</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventTests.kt:EventTests$@Test fun nack_shouldLogError_whenDbOperationFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventTests.kt:EventTests$@Test fun nack_shouldRemoveFromDb_whenNackCountReachesThreshold</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventTrackerGathererTests.kt:EventTrackerGathererTests$@Test fun testGathering</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventTrackerGathererTests.kt:EventTrackerGathererTests$@Test fun testGathering_shouldThrowIllegalArgumentException_ifEventName_isBlank</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventTrackerInternalTests.kt:EventTrackerInternalTests$@Test fun testActivate_should_send_calls_to_client</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventTrackerInternalTests.kt:EventTrackerInternalTests$@Test fun testTrackEvent_shouldMakeCall_onClient</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventTrackerInternalTests.kt:EventTrackerInternalTests$@Test fun testTrackEvent_shouldThrowIllegalArgumentException_ifEventName_isBlank</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventTrackerTests.kt:EventTrackerTests$@Test fun testTrackEvent_activeState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventTrackerTests.kt:EventTrackerTests$@Test fun testTrackEvent_activeState_shouldReturnErrorInResult</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventTrackerTests.kt:EventTrackerTests$@Test fun testTrackEvent_inactiveState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EventTrackerTests.kt:EventTrackerTests$@Test fun testTrackEvent_onHoldState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:FetchEmbeddedMessagingMetaStateTests.kt:FetchEmbeddedMessagingMetaStateTests$@Test fun testActive_shouldEmitFetchMetaEvent_andReturnSuccessUnit_whenMetaResponseResultIsSuccess</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:FetchEmbeddedMessagingMetaStateTests.kt:FetchEmbeddedMessagingMetaStateTests$@Test fun testActive_shouldEmitFetchMetaEvent_andReturnSuccess_evenWhenMetaResponseResultIsFailure</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:FetchEmbeddedMessagingMetaStateTests.kt:FetchEmbeddedMessagingMetaStateTests$@Test fun testActive_shouldNotCallEmitFetchMetaEvent_andReturnSuccess_whenEmbeddedMessagingContextIsDisabled</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:FetchJsBridgeStateTests.kt:FetchJsBridgeStateTests$@Test fun active_shouldReturnFailure_whenFetchAndVerifyFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:FetchJsBridgeStateTests.kt:FetchJsBridgeStateTests$@Test fun active_shouldReturnSuccess_whenFetchAndVerifySucceeds</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:FollowUpChangeAppCodeOrganizerTests.kt:FollowUpChangeAppCodeOrganizerTests$@Test fun testOrganize_should_setSdkToOnHold_active_ChangeAppCodeStateMachine_thenReactivateSdk</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:FollowUpChangeAppCodeOrganizerTests.kt:FollowUpChangeAppCodeOrganizerTests$@Test fun testOrganize_should_setSdkToOnHold_active_ChangeAppCodeStateMachine_thenReactivateSdkAndLogFailure</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GathererConfigTests.kt:GathererConfigTests$@BeforeTest fun setUp</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GathererConfigTests.kt:GathererConfigTests$@Test fun testChangeApplicationCode_shouldStoreCall</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GathererConfigTests.kt:GathererConfigTests$@Test fun testResetLanguage_shouldStoreCall</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GathererConfigTests.kt:GathererConfigTests$@Test fun testSetLanguage_shouldStoreCall</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GathererInAppTests.kt:GathererInAppTests$@BeforeTest fun setup</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GathererInAppTests.kt:GathererInAppTests$@Test fun testIsPaused</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GathererInAppTests.kt:GathererInAppTests$@Test fun testPause_shouldAddCallToContext</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GathererInAppTests.kt:GathererInAppTests$@Test fun testResume_shouldAddCallToContext</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GeneralBatchingTests.kt:GeneralBatchingTests$@Test fun testBatchingMechanism_should_batch_event_based_on_time</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GeneralBatchingTests.kt:GeneralBatchingTests$@Test fun testBatchingMechanism_should_batch_events_based_on_count</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GeneralBatchingTests.kt:GeneralBatchingTests$@Test fun testBatching_should_handle_spaced_Events_and_flushesCorrectly</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GenericApiTests.kt:GenericApiTests$@Test fun testActive_whenSdkState_isActive</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GenericApiTests.kt:GenericApiTests$@Test fun testActive_whenSdkState_isInitialized</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GenericApiTests.kt:GenericApiTests$@Test fun testActive_whenSdkState_isOnHold</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GenericApiTests.kt:GenericApiTests$@Test fun testActive_whenSdkState_isUnInitialized</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GenericNetworkClientTests.kt:GenericNetworkClientTests$@Test fun testSend_returnWithFailureResultWithNetworkIOException_whenThereIsNoInternetConnection_andIOExceptionIsThrown</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GenericNetworkClientTests.kt:GenericNetworkClientTests$@Test fun testSend_returnWithFailureResultWithNetworkIOException_whenThereIsNoInternetConnection_andThrowableIsThrown</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GenericNetworkClientTests.kt:GenericNetworkClientTests$@Test fun testSend_returnWithFailureResult_whenThereIsNoInternetConnection_andExceptionIsThrown</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GenericNetworkClientTests.kt:GenericNetworkClientTests$@Test fun testSend_should_send_request_that_fails_withRetries</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GenericNetworkClientTests.kt:GenericNetworkClientTests$@Test fun testSend_should_send_request_that_fails_withoutRetries</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GenericNetworkClientTests.kt:GenericNetworkClientTests$@Test fun testSend_should_send_request_that_is_successful</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GenericNetworkClientTests.kt:GenericNetworkClientTests$@Test fun testSend_should_send_request_that_is_successful_without_body</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GenericNetworkClientTests.kt:GenericNetworkClientTests$@Test fun testSend_should_send_request_that_is_successful_without_headers</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:GenericNetworkClientTests.kt:GenericNetworkClientTests$@Test fun testSend_should_send_request_that_succeeds_after_retries</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppDownloaderTests.kt:InAppDownloaderTests$@Test fun download_shouldReturn_null_ifDownloadReturnsFailedRequestException</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppDownloaderTests.kt:InAppDownloaderTests$@Test fun download_shouldReturn_null_ifDownloadReturnsIoException</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppDownloaderTests.kt:InAppDownloaderTests$@Test fun download_shouldReturn_theResponse_asInAppMessage</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppEventConsumerTest.kt:InAppEventConsumerTest$@BeforeTest fun setup</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppEventConsumerTest.kt:InAppEventConsumerTest$@Test fun testEventConsumer_shouldCallPresentWithCorrectParameters</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppEventConsumerTest.kt:InAppEventConsumerTest$@Test fun testRegister_should_start_consume_on_channel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppInternalTests.kt:InAppInternalTests$@Test fun testActivate_shouldNotSetInAppDnd_if_callsListIsEmpty</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppInternalTests.kt:InAppInternalTests$@Test fun testActivate_shouldSetInAppDndToTheLastInAppCallValue_if_lastCallIsPause</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppInternalTests.kt:InAppInternalTests$@Test fun testActivate_shouldSetInAppDndToTheLastInAppCallValue_if_lastCallIsResume</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppInternalTests.kt:InAppInternalTests$@Test fun testPause_shouldSetDND_true</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppInternalTests.kt:InAppInternalTests$@Test fun testResume_shouldSetDND_false</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppJsBridgeFactoryTest.kt:InAppJsBridgeFactoryTest$@Test fun provide_shouldReturn_inAppJsBridgeApi</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppJsBridgeTests.kt:InAppJsBridgeTests$@Test fun actions_shouldExecuteSequentially_dismissWaitsForPrecedingAction</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppJsBridgeTests.kt:InAppJsBridgeTests$@Test fun buttonClicked_shouldCall_actionFactory_withBasicButtonClickedActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppJsBridgeTests.kt:InAppJsBridgeTests$@Test fun close_shouldCall_actionFactory_withBasicDismissActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppJsBridgeTests.kt:InAppJsBridgeTests$@Test fun copyToClipboard_shouldCall_actionFactory_withBasicCopyToClipboardActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppJsBridgeTests.kt:InAppJsBridgeTests$@Test fun handleInAppAction_shouldCall_actionFactory_withBasicAppEventActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppJsBridgeTests.kt:InAppJsBridgeTests$@Test fun handleInAppAction_shouldCall_actionFactory_withBasicButtonClickedActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppJsBridgeTests.kt:InAppJsBridgeTests$@Test fun handleInAppAction_shouldCall_actionFactory_withBasicCopyToClipboardActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppJsBridgeTests.kt:InAppJsBridgeTests$@Test fun handleInAppAction_shouldCall_actionFactory_withBasicCustomEventActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppJsBridgeTests.kt:InAppJsBridgeTests$@Test fun handleInAppAction_shouldCall_actionFactory_withBasicDismissActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppJsBridgeTests.kt:InAppJsBridgeTests$@Test fun handleInAppAction_shouldCall_actionFactory_withBasicOpenExternalUrlActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppJsBridgeTests.kt:InAppJsBridgeTests$@Test fun handleInAppAction_shouldCall_actionFactory_withRequestPushPermissionActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppJsBridgeTests.kt:InAppJsBridgeTests$@Test fun handleInAppAction_shouldCreateErrorLog_ifActionModelCannotBeParsed</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppJsBridgeTests.kt:InAppJsBridgeTests$@Test fun openExternalLink_shouldCall_actionFactory_withBasicOpenExternalUrlActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppJsBridgeTests.kt:InAppJsBridgeTests$@Test fun requestPushPermission_shouldCall_actionFactory_withRequestPushPermissionActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppJsBridgeTests.kt:InAppJsBridgeTests$@Test fun triggerAppEvent_shouldCall_actionFactory_withBasicAppEventActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppJsBridgeTests.kt:InAppJsBridgeTests$@Test fun triggerMEEvent_shouldCall_actionFactory_withBasicCustomEventActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppPresenterTests.kt:InAppPresenterTests$@Test fun present_shouldAddInAppDialog_inFragmentTransaction_whenFragmentManagerIsAvailable</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppPresenterTests.kt:InAppPresenterTests$@Test fun present_shouldDismissActiveDialog_whenActiveDialogFoundAfterDismissEvent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppPresenterTests.kt:InAppPresenterTests$@Test fun present_shouldDismissOriginalDialog_whenCurrentActivityIsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppPresenterTests.kt:InAppPresenterTests$@Test fun present_shouldDismissOriginalDialog_whenNoActiveDialogFound</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppPresenterTests.kt:InAppPresenterTests$@Test fun present_shouldLogMetrics</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppPresenterTests.kt:InAppPresenterTests$@Test fun present_shouldNotAddInAppDialog_whenActivityIsNotFragmentActivity</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppPresenterTests.kt:InAppPresenterTests$@Test fun present_shouldRegisterViewedEvent_afterFragmentCommit</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InappTests.kt:InappTests$@Test fun testIsPaused_when_activeState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InappTests.kt:InappTests$@Test fun testIsPaused_when_inactiveState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InappTests.kt:InappTests$@Test fun testIsPaused_when_onHoldState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InappTests.kt:InappTests$@Test fun testPause_when_activeState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InappTests.kt:InappTests$@Test fun testPause_when_activeState_throws</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InappTests.kt:InappTests$@Test fun testPause_when_inactiveState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InappTests.kt:InappTests$@Test fun testPause_when_onHoldState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InappTests.kt:InappTests$@Test fun testResume_when_activeState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InappTests.kt:InappTests$@Test fun testResume_when_activeState_throws</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InappTests.kt:InappTests$@Test fun testResume_when_inactiveState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InappTests.kt:InappTests$@Test fun testResume_when_onHoldState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InitOrganizerTests.kt:InitOrganizerTests$@Test fun init_should_call_activate_onStateMachine_and_set_config_and_state_on_context</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InitOrganizerTests.kt:InitOrganizerTests$@Test fun init_should_not_move_sdkState_backwards_whenInitStateMachine_alreadyActivatedTheSDK</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InitOrganizerTests.kt:InitOrganizerTests$@Test fun init_should_only_call_activate_onStateMachine_when_the_sdkState_is_unInitialized</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InitOrganizerTests.kt:InitOrganizerTests$@Test fun init_should_throwException_ifStateMachineActivation_throws</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InitializerStateTests.kt:InitializerStateTests$@Test fun active_shouldCallInit_onPlatformInitializer_andReturn_failure</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InitializerStateTests.kt:InitializerStateTests$@Test fun active_shouldCallInit_onPlatformInitializer_andReturn_success</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InlineInAppMessageFetcherTests.kt:InlineInAppMessageFetcherTests$@Test fun fetchByUrl_shouldReturnMessage_whenResponseIsSuccessful</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InlineInAppMessageFetcherTests.kt:InlineInAppMessageFetcherTests$@Test fun fetchByUrl_shouldReturnNull_whenNetworkRequestFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InlineInAppMessageFetcherTests.kt:InlineInAppMessageFetcherTests$@Test fun fetchByUrl_shouldReturnNull_whenResponseBodyIsEmpty</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InlineInAppMessageFetcherTests.kt:InlineInAppMessageFetcherTests$@Test fun fetchByUrl_shouldReturnNull_whenRichContentFetchingFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InlineInAppMessageFetcherTests.kt:InlineInAppMessageFetcherTests$@Test fun fetchByUrl_shouldReturnNull_whenRichContentResponse_containsInvalidUrl</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InlineInAppMessageFetcherTests.kt:InlineInAppMessageFetcherTests$@Test fun fetchByUrl_shouldReturnNull_whenRichContentUrlResponseCannotBeParsed_asUrlHolder</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InlineInAppMessageFetcherTests.kt:InlineInAppMessageFetcherTests$@Test fun fetchByUrl_shouldSendRichContentRequest_withContentTypeTextHtmlHeader</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InlineInAppMessageFetcherTests.kt:InlineInAppMessageFetcherTests$@Test fun fetch_byUrl_shouldPropagateCancellationException_whenCoroutineIsCancelled</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InlineInAppMessageFetcherTests.kt:InlineInAppMessageFetcherTests$@Test fun fetch_byViewId_shouldPropagateCancellationException_whenCoroutineIsCancelled</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InlineInAppMessageFetcherTests.kt:InlineInAppMessageFetcherTests$@Test fun fetch_shouldParseOverlayType_correctly</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InlineInAppMessageFetcherTests.kt:InlineInAppMessageFetcherTests$@Test fun fetch_shouldReturnMessage_whenViewIdMatchesAndContentIsNotEmpty</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InlineInAppMessageFetcherTests.kt:InlineInAppMessageFetcherTests$@Test fun fetch_shouldReturnNull_whenContentIsEmpty</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InlineInAppMessageFetcherTests.kt:InlineInAppMessageFetcherTests$@Test fun fetch_shouldReturnNull_whenNetworkRequestFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InlineInAppMessageFetcherTests.kt:InlineInAppMessageFetcherTests$@Test fun fetch_shouldReturnNull_whenResponseDecodingFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InlineInAppMessageFetcherTests.kt:InlineInAppMessageFetcherTests$@Test fun fetch_shouldReturnNull_whenResponseIsEmpty</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InlineInAppMessageFetcherTests.kt:InlineInAppMessageFetcherTests$@Test fun fetch_shouldReturnNull_whenViewIdDoesNotMatch</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeClientTests.kt:JsBridgeClientTests$@Test fun fetchServerMd5_shouldReturnFailure_whenHeaderMissing</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeClientTests.kt:JsBridgeClientTests$@Test fun fetchServerMd5_shouldReturnFailure_whenNetworkFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeClientTests.kt:JsBridgeClientTests$@Test fun fetchServerMd5_shouldReturnMd5_whenGoogHashReturnedAsSeparateHeaders</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeClientTests.kt:JsBridgeClientTests$@Test fun fetchServerMd5_shouldReturnMd5_whenHeaderPresent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeClientTests.kt:JsBridgeClientTests$@Test fun testFetchJSBridge_shouldCacheJsBody_whenBodyIsNotEmpty</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeClientTests.kt:JsBridgeClientTests$@Test fun testFetchJSBridge_shouldCacheJsBody_whenFeatureIsOff_andBodyIsNotEmpty</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeClientTests.kt:JsBridgeClientTests$@Test fun testFetchJSBridge_shouldCacheMd5_whenFeatureIsOff</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeClientTests.kt:JsBridgeClientTests$@Test fun testFetchJSBridge_shouldFetchJsOnly_whenFeatureIsOff</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeClientTests.kt:JsBridgeClientTests$@Test fun testFetchJSBridge_shouldNotCacheJsBody_whenBodyIsEmpty</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeClientTests.kt:JsBridgeClientTests$@Test fun testFetchJSBridge_shouldNotCacheJsBody_whenBodyIsEmpty_andFeatureIsOff</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeClientTests.kt:JsBridgeClientTests$@Test fun testFetchJSBridge_shouldNotCacheJsBody_whenVerificationFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeClientTests.kt:JsBridgeClientTests$@Test fun testFetchJSBridge_shouldNotVerifySignature_whenFeatureIsOff</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeClientTests.kt:JsBridgeClientTests$@Test fun testFetchJSBridge_shouldParseMd5Only_fromGoogHashHeader</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeClientTests.kt:JsBridgeClientTests$@Test fun testFetchJSBridge_shouldParseMd5_whenGoogHashReturnedAsSeparateHeaders</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeClientTests.kt:JsBridgeClientTests$@Test fun testFetchJSBridge_shouldReturnFailure_andClearHash_whenVerificationFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeClientTests.kt:JsBridgeClientTests$@Test fun testFetchJSBridge_shouldReturnFailure_whenFeatureIsOff_andJsFetchFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeClientTests.kt:JsBridgeClientTests$@Test fun testFetchJSBridge_shouldReturnFailure_whenJsFetchFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeClientTests.kt:JsBridgeClientTests$@Test fun testFetchJSBridge_shouldReturnFailure_whenSignatureFetchFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeClientTests.kt:JsBridgeClientTests$@Test fun testFetchJSBridge_shouldReturnSuccess_andCacheMd5_whenVerificationSucceeds</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeClientTests.kt:JsBridgeClientTests$@Test fun testFetchJSBridge_shouldReturnSuccess_andCacheNull_whenHeaderMissing</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeVerifierTests.kt:JsBridgeVerifierTests$@Test fun verifyJsBridge_shouldReDownload_whenMd5DoesNotMatchCache</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeVerifierTests.kt:JsBridgeVerifierTests$@Test fun verifyJsBridge_shouldReDownload_whenNoCachedMd5</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeVerifierTests.kt:JsBridgeVerifierTests$@Test fun verifyJsBridge_shouldReturnFailure_whenFetchServerMd5Fails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeVerifierTests.kt:JsBridgeVerifierTests$@Test fun verifyJsBridge_shouldReturnFailure_whenNoGoogHashHeader</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeVerifierTests.kt:JsBridgeVerifierTests$@Test fun verifyJsBridge_shouldReturnFailure_whenReDownloadFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsBridgeVerifierTests.kt:JsBridgeVerifierTests$@Test fun verifyJsBridge_shouldReturnSuccess_true_whenMd5MatchesCache</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LanguageHandlerTests.kt:LanguageHandlerTests$@BeforeTest fun setUp</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LanguageHandlerTests.kt:LanguageHandlerTests$@Test fun testHandleLanguage_shouldClearStorage_andEmitRegisterDeviceInfoEvent_whenLanguageIsNull_andNotRegisterFetchMetaEvent_onFailureResult</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LanguageHandlerTests.kt:LanguageHandlerTests$@Test fun testHandleLanguage_shouldClearStorage_andEmitRegisterDeviceInfoEvent_whenLanguageIsNull_andNotRegisterFetchMetaEvent_onSuccessResult_whenSdkContextDoesntContainEMFeature</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LanguageHandlerTests.kt:LanguageHandlerTests$@Test fun testHandleLanguage_shouldClearStorage_andEmitRegisterDeviceInfoEvent_whenLanguageIsNull_andRegisterFetchMetaEvent_onSuccessResult</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LanguageHandlerTests.kt:LanguageHandlerTests$@Test fun testHandleLanguage_shouldUpdateStorage_andEmitRegisterDeviceInfoEvent_whenLanguageIsNotNull_andNotRegisterFetchMetaEvent_onFailureResult</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LanguageHandlerTests.kt:LanguageHandlerTests$@Test fun testHandleLanguage_shouldUpdateStorage_andEmitRegisterDeviceInfoEvent_whenLanguageIsNotNull_andNotRegisterFetchMetaEvent_onSuccessResult_whenSdkContextDoesntContainEMFeature</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LanguageHandlerTests.kt:LanguageHandlerTests$@Test fun testHandleLanguage_shouldUpdateStorage_andEmitRegisterDeviceInfoEvent_whenLanguageIsNotNull_andRegisterFetchMetaEvent_onSuccessResult</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LanguageHandlerTests.kt:LanguageHandlerTests$@Test fun testHandleLanguage_should_throw_exception_when_language_is_not_supported</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LaunchApplicationActionTests.kt:LaunchApplicationActionTests$@Test fun testInvoke_shouldCall_launchApplicationHandler</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LegacySharedPreferencesWrapperTest.kt:LegacySharedPreferencesWrapperTest$@Test fun getDecryptedString_shouldReturnDecryptedValue_whenKeyIsFoundAndDecrypted</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LegacySharedPreferencesWrapperTest.kt:LegacySharedPreferencesWrapperTest$@Test fun getDecryptedString_shouldReturnNull_whenDecryptReturnsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LegacySharedPreferencesWrapperTest.kt:LegacySharedPreferencesWrapperTest$@Test fun getDecryptedString_shouldReturnNull_whenKeyDoesNotExist</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LinkContactStateTests.kt:LinkContactStateTests$@Test fun active_shouldNotRegisterAnyEvent_whenOnContactLinkingFailedCallback_isNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LinkContactStateTests.kt:LinkContactStateTests$@Test fun active_shouldPropagateCancellationException_whenCoroutineIsCancelledDuringCallback</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LinkContactStateTests.kt:LinkContactStateTests$@Test fun active_shouldRegisterLinkAuthenticatedContactEvent_throughSdkEventDistributor_whenOnContactLinking_returnsOpenIdToken</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LinkContactStateTests.kt:LinkContactStateTests$@Test fun active_shouldRegisterLinkContactEvent_throughSdkEventDistributor_whenOnContactLinking_returnsContactFieldValue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LinkContactStateTests.kt:LinkContactStateTests$@Test fun active_shouldReturnFailure_whenOnContactLinkingFailedCallback_ThrowsException</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LinkContactStateTests.kt:LinkContactStateTests$@Test fun active_shouldReturnFailure_whenRegisteringEvent_returnsError</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageModelTests.kt:ListPageModelTests$@Test fun fetchBadgeCount_shouldLogAndReturnZero_onException</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageModelTests.kt:ListPageModelTests$@Test fun fetchBadgeCount_shouldPropagateCancellationException_whenCoroutineIsCancelled</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageModelTests.kt:ListPageModelTests$@Test fun fetchBadgeCount_shouldReturnZero_whenResponseFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageModelTests.kt:ListPageModelTests$@Test fun fetchBadgeCount_shouldSendFetchBadgeCountEvent_andReturnBadgeCountFromResponse</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageModelTests.kt:ListPageModelTests$@Test fun fetchMessagesWithCategories_shouldLogAndReturnFailureResult_onException</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageModelTests.kt:ListPageModelTests$@Test fun fetchMessagesWithCategories_shouldPropagateCancellationException_whenCoroutineIsCancelled</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageModelTests.kt:ListPageModelTests$@Test fun fetchMessagesWithCategories_shouldReturnFailureResult_whenResponseFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageModelTests.kt:ListPageModelTests$@Test fun fetchMessagesWithCategories_shouldSendFetchMessagesEvent_andReturnsMessagesWithCategoriesResult_WithEndReachedFalse_onSuccess_WhenMorePagesAvailable</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageModelTests.kt:ListPageModelTests$@Test fun fetchMessagesWithCategories_shouldSendFetchMessagesEvent_andReturnsMessagesWithCategoriesResult_WithEndReachedTrue_onSuccess_WhenNoMorePagesCanBeFetched</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageModelTests.kt:ListPageModelTests$@Test fun fetchMessagesWithCategories_shouldSendFetchMessagesEvent_withFilterUnopenedMessagesFalse_whenFilterUnopenedOnlyIsFalse</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageModelTests.kt:ListPageModelTests$@Test fun fetchMessagesWithCategories_shouldSendFetchMessagesEvent_withFilterUnopenedMessagesTrue_whenFilterUnopenedOnlyIsTrue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageModelTests.kt:ListPageModelTests$@Test fun fetchNextPage_shouldNotSendNextPageEvent_andReturnFailureResult_whenPaginationStateEndReachedIsTrue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageModelTests.kt:ListPageModelTests$@Test fun fetchNextPage_shouldPropagateCancellationException_whenCoroutineIsCancelled</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageModelTests.kt:ListPageModelTests$@Test fun fetchNextPage_shouldReturnFailureResult_onException</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageModelTests.kt:ListPageModelTests$@Test fun fetchNextPage_shouldReturnFailureResult_onFailure</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageModelTests.kt:ListPageModelTests$@Test fun fetchNextPage_shouldSendNextPageEvent_andReturnResultWithEndReachedFalse_onSuccess_whenMorePagesAvailable</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageModelTests.kt:ListPageModelTests$@Test fun fetchNextPage_shouldSendNextPageEvent_andReturnResultWithEndReachedTrue_onSuccess_whenLastPageReceived</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@OptIn(ExperimentalTime::class) @Test fun testRefreshMessages_WithThrottling_shouldApplyThrottling_whenRequestIsTooFrequent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testApplyCategorySelection_shouldSetCategoryIdsAndCloseDialog</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testClearMessageSelection_shouldCancelInFlightSelectionCoroutine</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testClearSelection_shouldSetSelectedMessageAndCacheToNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testCloseCategorySelector_shouldSetShowCategorySelectorToFalse</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testCurrentSdkStateChange_shouldTriggerPagerRecreation</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testDeleteMessage_shouldCallMessageViewModel_deleteMessage_andUpdateDeletedMessageIdsFilter</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testDeleteMessage_shouldClearMessageSelection_whenDeleteSucceeded_andSelectedMessageWasDeleted</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testHasFiltersApplied_shouldReturnFalse_whenNoFiltersAreApplied</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testHasFiltersApplied_shouldReturnTrue_whenBothFiltersAreApplied</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testHasFiltersApplied_shouldReturnTrue_whenFilterUnopenedOnlyIsTrue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testHasFiltersApplied_shouldReturnTrue_whenSelectedCategoryIdsIsNotEmpty</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testOpenCategorySelector_shouldSetShowCategorySelectorToTrue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testSelectMessage_shouldCallNavigationCallback_whenMessageShouldNavigateToDetailView_andNotHandleDefaultAction</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testSelectMessage_shouldCall_tagMessageRead_ifTheMessage_isNotOpened_andNotInLocallyOpened</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testSelectMessage_shouldCancelPreviousSelection_andOnlyApplyLastMessageSideEffects_whenCalledRapidly</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testSelectMessage_shouldNotCall_tagMessageRead_ifTheMessage_isNotOpened_butIncludedInLocallyOpened</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testSelectMessage_shouldNotCall_tagMessageRead_ifTheMessage_read</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testSelectMessage_shouldNotCorruptLocallyOpenedMessageIds_whenStaleTagMessageOpenedCompletes</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testSelectMessage_shouldNotInvokeHandleDefaultAction_whenMessageDeselectedBeforeActionRuns</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testSelectMessage_shouldUpdateSelectedMessageAndCache_withoutNavigation_andHandleDefaultAction</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testSetFilterUnopenedOnly_shouldCallPagerFactory_withFilterUnopenedOnlyTrue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testSetSelectCategoryIds_shouldCallPagerFactory_withCorrectSelectedCategoryIds</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testSetSelectCategoryIds_shouldClearMessageSelection_ifMessageCategoriesAreNotIncluded_inTheSet</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testSetSelectCategoryIds_shouldOmit_nonExistingCategoryIds</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testTagMessageRead_shouldReturnSuccess_whenAlreadyRead</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testTagMessageRead_shouldTagMessageRead_whenNotAlreadyRead</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests$@Test fun testTriggerEmbeddedMessagingRefresh_shouldTriggerPagerRecreation_andClearSelectedMessage</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests.Companion$const val PLATFORM_CATEGORY = "testCategory"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests.Companion$const val TEST_ID = "testId"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests.Companion$const val TEST_MESSAGE_ID = "test-message-id"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ListPageViewModelTests.kt:ListPageViewModelTests.Companion$val testCategory = Category(TEST_ID, "testValue")</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LogEventRegistryTests.kt:LogEventRegistryTests$@Test fun registerLogEvent_shouldRegisterEvent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingClientTests.kt:LoggingClientTests$@BeforeTest fun setup</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingClientTests.kt:LoggingClientTests$@Test fun testConsumer_should_callClientExceptionHandler_when_exception_happens</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingClientTests.kt:LoggingClientTests$@Test fun testConsumer_should_call_client_with_logEvent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingClientTests.kt:LoggingClientTests$@Test fun testConsumer_should_call_client_with_metricEvent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingClientTests.kt:LoggingClientTests$@Test fun testConsumer_should_reEmit_events_into_flow_when_there_is_a_network_error</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingContactTests.kt:LoggingContactTests$@BeforeTest fun setup</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingContactTests.kt:LoggingContactTests$@Test fun testActive</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingContactTests.kt:LoggingContactTests$@Test fun testLinkAuthenticatedContact</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingContactTests.kt:LoggingContactTests$@Test fun testLinkContact</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingContactTests.kt:LoggingContactTests$@Test fun testUnlinkContact</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingContactTests.kt:LoggingContactTests.Companion$const val CONTACT_FIELD_VALUE = "testContactFieldValue"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingContactTests.kt:LoggingContactTests.Companion$const val OPEN_ID_TOKEN = "testOpenIdToken"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingEmbeddedMessagingTests.kt:LoggingEmbeddedMessagingTests$@Test fun activate_shouldLog_debugInfo</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingEmbeddedMessagingTests.kt:LoggingEmbeddedMessagingTests$@Test fun activeCategoryFilters_shouldReturn_emptySet_andLog_logMethodNotAllowed</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingEmbeddedMessagingTests.kt:LoggingEmbeddedMessagingTests$@Test fun categories_shouldReturn_emptyList_andLog_logMethodNotAllowed</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingEmbeddedMessagingTests.kt:LoggingEmbeddedMessagingTests$@Test fun filterByCategories_shouldLog_logMethodNotAllowed</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingEmbeddedMessagingTests.kt:LoggingEmbeddedMessagingTests$@Test fun filterUnreadOnly_shouldLog_logMethodNotAllowed</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingEmbeddedMessagingTests.kt:LoggingEmbeddedMessagingTests$@Test fun isUnreadFilterActive_shouldReturn_false_andLog_logMethodNotAllowed</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingEventTrackerTests.kt:LoggingEventTrackerTests$@BeforeTest fun setup</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingEventTrackerTests.kt:LoggingEventTrackerTests$@Test fun activate_shouldLog_debugInfo</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingEventTrackerTests.kt:LoggingEventTrackerTests$@Test fun testTrackEvent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingEventTrackerTests.kt:LoggingEventTrackerTests.Companion$val event = CustomEvent("testEvent", mapOf("testAttribute" to "testValue"))</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingPushTests.kt:LoggingPushTests$@BeforeTest fun setup</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingPushTests.kt:LoggingPushTests$@Test fun activate_shouldLog_debugInfo</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingPushTests.kt:LoggingPushTests$@Test fun testClearPushToken</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingPushTests.kt:LoggingPushTests$@Test fun testPushToken</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LoggingPushTests.kt:LoggingPushTests$@Test fun testSetPushToken</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemModelTests.kt:MessageItemModelTests$@Ignore @Test fun downloadImage_shouldReturn_Null_when_ImageUrlIsMissing</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemModelTests.kt:MessageItemModelTests$@OptIn(ExperimentalTime::class) @Test fun messageTagging_shouldSendUpdateTagsForMessagesEvent_andReturnSuccess</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemModelTests.kt:MessageItemModelTests$@Test fun copyAsOpenedLocally_shouldCreateNewInstance_andLeaveExcludedLocallyAsFalse</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemModelTests.kt:MessageItemModelTests$@Test fun deleteMessage_shouldPropagateCancellationException</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemModelTests.kt:MessageItemModelTests$@Test fun downloadImage_shouldCall_downloaderApi</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemModelTests.kt:MessageItemModelTests$@Test fun handleDefaultAction_shouldCreateActionWithFactory_andInvoke</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemModelTests.kt:MessageItemModelTests$@Test fun isNotOpened_shouldReturnFalse_whenTagsContainingOpened</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemModelTests.kt:MessageItemModelTests$@Test fun isNotOpened_shouldReturnFalse_whenTagsContainsOpened_caseInsensitively</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemModelTests.kt:MessageItemModelTests$@Test fun isNotOpened_shouldReturnTrue_whenTagsDontContainOpened</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemModelTests.kt:MessageItemModelTests$@Test fun isPinned_shouldReturnFalse_whenTagsNotContainingPinned</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemModelTests.kt:MessageItemModelTests$@Test fun isPinned_shouldReturnTrue_whenTagsContainsPinned</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemModelTests.kt:MessageItemModelTests$@Test fun isPinned_shouldReturnTrue_whenTagsContainsPinned_caseInsensitively</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemModelTests.kt:MessageItemModelTests$@Test fun isRead_shouldReturnFalse_whenTagsDontContainRead</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemModelTests.kt:MessageItemModelTests$@Test fun isRead_shouldReturnTrue_whenTagsContainRead_caseInsensitively</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemModelTests.kt:MessageItemModelTests$@Test fun isRead_shouldReturnTrue_whenTagsContainingRead</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemModelTests.kt:MessageItemModelTests$@Test fun shouldNavigate_shouldReturnFalse_whenDefaultActionIsNotRichContentDisplayAction</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemModelTests.kt:MessageItemModelTests$@Test fun shouldNavigate_shouldReturnTrue_whenMessageContainsRichContentDisplayActionAsDefaultAction</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemModelTests.kt:MessageItemModelTests$@Test fun tagMessageOpened_shouldPropagateCancellationException</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemModelTests.kt:MessageItemModelTests$@Test fun tagMessageRead_shouldPropagateCancellationException</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemModelTests.kt:MessageItemModelTests$@Test fun updateTagsForMessage_shouldPropagateCancellationException_whenCoroutineIsCancelled</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemViewModelTests.kt:MessageItemViewModelTests$@Test fun copyAsExcludedLocally_shouldCreateNewInstance_andLeaveExcludedLocallyAsTrue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemViewModelTests.kt:MessageItemViewModelTests$@Test fun copyAsExcludedLocally_shouldCreateNewInstance_withUpdatedIsExcludedLocally</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemViewModelTests.kt:MessageItemViewModelTests$@Test fun copyAsOpenedLocally_shouldCreateNewInstance_withUpdatedModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemViewModelTests.kt:MessageItemViewModelTests$@Test fun deleteMessage_shouldCall_ModelDeleteMessage</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemViewModelTests.kt:MessageItemViewModelTests$@Test fun deleteMessage_shouldCall_ModelTagMessageRead</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemViewModelTests.kt:MessageItemViewModelTests$@Test fun fetchImage_shouldCallDownloadImage_onTheModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemViewModelTests.kt:MessageItemViewModelTests$@Test fun handleDefaultAction_shouldCall_ModelHandleDefaultAction</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MessageItemViewModelTests.kt:MessageItemViewModelTests$@Test fun tagMessageRead_shouldCall_ModelTagMessageOpened</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MutableListTests.kt:MutableListTests$@Test fun testDequeue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:MutableListTests.kt:MutableListTests$@Test fun testDequeue_backward</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NaturalBatchingTests.kt:NaturalBatchingTests$@Test fun testNaturalBatching_should_create_equal_sized_chunks</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NaturalBatchingTests.kt:NaturalBatchingTests$@Test fun testNaturalBatching_should_do_nothing_when_flow_is_empty</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NaturalBatchingTests.kt:NaturalBatchingTests$@Test fun testNaturalBatching_should_not_wait_for_a_chunk_to_be_max_sized</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:OpenExternalUrlActionTests.kt:OpenExternalUrlActionTests$@Test fun invoke_shouldCallExternalUrlOpener</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PlatformInitializerTest.kt:PlatformInitializerTest$@Test fun init_should_cancelNotification_whenSdkEvent_isDismiss</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PlatformInitializerTest.kt:PlatformInitializerTest$@Test fun init_should_doNothing_whenSdkEvent_isNotDismiss</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushActionFactoryTests.kt:PushActionFactoryTests$@Test fun create_shouldReturn_LaunchApplicationAction_fromLaunchApplicationActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushActionFactoryTests.kt:PushActionFactoryTests$@Test fun create_shouldReturn_pushToInAppAction</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushActionFactoryTests.kt:PushActionFactoryTests$@Test fun create_shouldReturn_pushToInAppAction_fromBasicPushToInAppActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushActionFactoryTests.kt:PushActionFactoryTests$@Test fun create_should_callCreate_on_eventActionFactory</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushClientTests.kt:PushClientTests$@Test fun testClearPushToken</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushClientTests.kt:PushClientTests$@Test fun testConsumer_should_callClientExceptionHandler_when_exception_happens</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushClientTests.kt:PushClientTests$@Test fun testConsumer_should_reEmit_events_on_network_error</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushClientTests.kt:PushClientTests$@Test fun testRegisterPushToken</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushGathererTests.kt:PushGathererTests$@Test fun testGathering</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushGathererTests.kt:PushGathererTests$@Test fun testPushToken</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushInternalTests.kt:PushInternalTests$@Test fun testActivate_should_sendCalls_toPushClient</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushInternalTests.kt:PushInternalTests$@Test fun testClearPushToken_shouldRegisterEventOnSdkDistributor_andClear_lastSentPushToken_fromStorage</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushInternalTests.kt:PushInternalTests$@Test fun testRegisterPushToken_shouldNotDoAnything_whenTokenStoredAlready</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushInternalTests.kt:PushInternalTests$@Test fun testRegisterPushToken_shouldNotRegisterPushToken_whenStoredTokenIsTheSame</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushInternalTests.kt:PushInternalTests$@Test fun testRegisterPushToken_shouldRegisterPushToken_whenPushTokenWasNotStoredPreviously_andStoreToken_onNetworkSuccess</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushInternalTests.kt:PushInternalTests$@Test fun testRegisterPushToken_shouldRegisterPushToken_whenStoredPushTokenIsDifferent_andShouldNotStoreToken_onNetworkFailure</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushInternalTests.kt:PushInternalTests$@Test fun testRegisterPushToken_shouldRegisterPushToken_whenStoredPushTokenIsDifferent_andStoreToken_onNetworkSuccess</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushTests.kt:PushTests$@Test fun registerToken_shouldPropagateCancellationException</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushTests.kt:PushTests$@Test fun testClearToken_activeState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushTests.kt:PushTests$@Test fun testClearToken_activeState_when_throws</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushTests.kt:PushTests$@Test fun testClearToken_inactiveState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushTests.kt:PushTests$@Test fun testClearToken_onHoldState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushTests.kt:PushTests$@Test fun testPushToken_activeState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushTests.kt:PushTests$@Test fun testPushToken_inactiveState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushTests.kt:PushTests$@Test fun testPushToken_onHoldState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushTests.kt:PushTests$@Test fun testRegisterToken_activeState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushTests.kt:PushTests$@Test fun testRegisterToken_activeState_when_throws</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushTests.kt:PushTests$@Test fun testRegisterToken_inactiveState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushTests.kt:PushTests$@Test fun testRegisterToken_onHoldState</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushToInAppHandlerTest.kt:PushToInAppHandlerTests$@Test fun handle_shouldCall_downLoad_andEmitPresentEvent_ifDownload_succeeds</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushToInAppHandlerTest.kt:PushToInAppHandlerTests$@Test fun handle_shouldNot_emitPresentEvent_ifDownload_returnsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushToInAppHandlerTest.kt:PushToInAppHandlerTests$@Test fun handle_shouldNot_emitPresentEvent_ifDownload_succeeds_but_contentIsEmpty</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RandomProviderTests.kt:RandomProviderTests$@BeforeTest fun setup</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RandomProviderTests.kt:RandomProviderTests$@Test fun testProvide_shouldGenerate_differentValues_everyTime</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RegisterClientStateTests.kt:RegisterClientStateTests$@BeforeTest fun setup</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RegisterClientStateTests.kt:RegisterClientStateTests$@Test fun testActive_should_callDeviceClient</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RegisterClientStateTests.kt:RegisterClientStateTests$@Test fun testActive_should_callDeviceClient_andReturnFailureResult_whenRequestFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RegisterEventBasedClientsStateTests.kt:RegisterEventBasedClientsStateTests$@Test fun testActive_should_registerAllClients</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RegisterEventConsumersStateTests.kt:RegisterEventConsumersStateTests$@Test fun testActive_should_registerAllConsumers</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RegisterInstancesStateTests.kt:RegisterInstancesStateTests$@Test fun testActive_should_call_registerOnContext_on_instances</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RegisterInstancesStateTests.kt:RegisterInstancesStateTests$@Test fun testName</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RegisterPushTokenStateTests.kt:RegisterPushTokenStateTests$@Test fun active_shouldReturnFailure_when_registerTokenFails_andShouldNotStoreToken</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RegisterPushTokenStateTests.kt:RegisterPushTokenStateTests$@Test fun active_shouldReturnFailure_when_storingFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RegisterPushTokenStateTests.kt:RegisterPushTokenStateTests$@Test fun active_shouldStorePushToken_andCallRegisterEvent_withRegisterPushToken_whenLastSentPushTokenIsMissing_TokenIsAvailable</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RegisterPushTokenStateTests.kt:RegisterPushTokenStateTests$@Test fun active_shouldStorePushToken_andCallRegisterEvent_withRegisterToken_whenBothAvailable_butNotTheSame</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RegisterPushTokenStateTests.kt:RegisterPushTokenStateTests$@Test fun testActive_shouldNotStorePushToken_andNotCallRegisterEvent_withRegisterToken_whenBothAvailable_andTheSame</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RegisterSdkEventDistributorStateTests.kt:RegisterSdkEventDistributorStateTests$@Test fun testActive_should_registerAllConsumers</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RegisterWatchdogsStateTests.kt:RegisterWatchdogsStateTests$@Test fun testActive_should_call_register_on_watchdogs_and_returnSuccessResult</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RegisterWatchdogsStateTests.kt:RegisterWatchdogsStateTests$@Test fun testActive_should_return_failureResult_ifRegistrationFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RegisterWatchdogsStateTests.kt:RegisterWatchdogsStateTests$@Test fun testName</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigClientTests.kt:RemoteConfigClientTests$@Test fun testConsumer_shouldCall_responseHandler_withAppCodeBasedRemoteConfig</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigClientTests.kt:RemoteConfigClientTests$@Test fun testConsumer_shouldCall_responseHandler_withGlobalRemoteConfig</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigClientTests.kt:RemoteConfigClientTests$@Test fun testConsumer_shouldNotCall_responseHandler_andCallClientExceptionHandler_whenFetchingSignatureThrows</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigClientTests.kt:RemoteConfigClientTests$@Test fun testConsumer_shouldNotCall_responseHandler_butAckEvent_andNotReemitEvent_whenConfigAndSignatureAreNotFound</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigClientTests.kt:RemoteConfigClientTests$@Test fun testConsumer_shouldNotCall_responseHandler_butAckEvent_andNotReemitEvent_whenConfigIsNotFound</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigClientTests.kt:RemoteConfigClientTests$@Test fun testConsumer_shouldNotCall_responseHandler_butAckEvent_whenSignatureIsNotFound</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigClientTests.kt:RemoteConfigClientTests$@Test fun testConsumer_shouldNotCall_responseHandler_butAckEvent_whenVerification_fails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigClientTests.kt:RemoteConfigClientTests$@Test fun testConsumer_should_reEmit_events_on_network_error</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigClientTests.kt:RemoteConfigClientTests$@Test fun testConsumer_should_reEmit_events_once_on_network_error</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigResponseHandlerTests.kt:RemoteConfigResponseHandlerTests$@Test fun testHandleAppCodeBasedConfigs</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigResponseHandlerTests.kt:RemoteConfigResponseHandlerTests$@Test fun testHandleAppCodeBasedConfigs_shouldFallbackToJsBridgeSignatureCheck_evenIfJsBridgeIsNotDefined</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigResponseHandlerTests.kt:RemoteConfigResponseHandlerTests$@Test fun testHandleEmbeddedMessagingConfig_shouldApplyBothProperties</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigResponseHandlerTests.kt:RemoteConfigResponseHandlerTests$@Test fun testHandleEmbeddedMessagingConfig_shouldApplyOnlyBatchSize</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigResponseHandlerTests.kt:RemoteConfigResponseHandlerTests$@Test fun testHandleEmbeddedMessagingConfig_shouldApplyOnlyFrequencyCap</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigResponseHandlerTests.kt:RemoteConfigResponseHandlerTests$@Test fun testHandleEmbeddedMessagingConfig_shouldApplyOnlyOverrideBatchSize</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigResponseHandlerTests.kt:RemoteConfigResponseHandlerTests$@Test fun testHandleEmbeddedMessagingConfig_shouldApplyOverride</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigResponseHandlerTests.kt:RemoteConfigResponseHandlerTests$@Test fun testHandleEmbeddedMessagingConfig_shouldNotApplyWhenConfigIsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigResponseHandlerTests.kt:RemoteConfigResponseHandlerTests$@Test fun testHandleGlobalConfig</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigResponseHandlerTests.kt:RemoteConfigResponseHandlerTests$@Test fun testHandle_shouldAssignSdkManagementApplicationCodeValidationRegex_toSdkContext</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigResponseHandlerTests.kt:RemoteConfigResponseHandlerTests$@Test fun testHandle_shouldDiscardInvalidRegex_andAssignNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteConfigResponseHandlerTests.kt:RemoteConfigResponseHandlerTests$@Test fun testHandle_shouldNotResetRegex_whenFieldIsAbsentFromResponse</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteLoggerTests.kt:RemoteLoggerTests$@Test fun testLogToRemote_shouldNotRegisterLogEvent_whenRemoteLogLevelIsHigher</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteLoggerTests.kt:RemoteLoggerTests$@Test fun testLogToRemote_shouldRegisterLogEvent_whenRemoteLogLevelEqualsLogLevel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteLoggerTests.kt:RemoteLoggerTests$@Test fun testLogToRemote_shouldRegisterLogEvent_whenRemoteLogLevelIsLowerThanLogLevel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RemoteLoggerTests.kt:RemoteLoggerTests$@Test fun testLogToRemote_shouldRegisterMetricEvent_whenLogLevelIsMetric</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ReportingActionTests.kt:ReportingActionTests$@BeforeTest fun setUp</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ReportingActionTests.kt:ReportingActionTests$@Test fun testInvoke_shouldSendEventWithDefaultReportingAction_whenReporting_isEmptyString</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ReportingActionTests.kt:ReportingActionTests$@Test fun testInvoke_shouldSendEventWithDefaultReportingAction_whenReporting_isNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ReportingActionTests.kt:ReportingActionTests$@Test fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_EmbeddedMessagingButtonClicked</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ReportingActionTests.kt:ReportingActionTests$@Test fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_inAppButtonClicked</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ReportingActionTests.kt:ReportingActionTests$@Test fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_isNotificationOpenedActionModel</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ReportingActionTests.kt:ReportingActionTests$@Test fun testInvoke_shouldSendEventWithProperPayload_whenActionModel_pushButtonClicked</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RequestContextTests.kt:RequestContextTests.Companion$const val CONTACT_TOKEN = "testContactToken"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RequestContextTests.kt:RequestContextTests.Companion$const val REFRESH_TOKEN = "testRefreshToken"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RequestPushPermissionActionTests.kt:RequestPushPermissionActionTests$@Test fun invoke_shouldCallPermissionHandler</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ReregistrationClientTests.kt:ReregistrationClientTests$@Test fun testRegister_shouldSubscribeToOnlineSdkEvents</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ReregistrationClientTests.kt:ReregistrationClientTests$@Test fun testStartEventConsumer_shouldCatchExceptions_andLog</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ReregistrationClientTests.kt:ReregistrationClientTests$@Test fun testStartEventConsumer_shouldSetSdkState_toOnHold_activateMobileEngageStateMachine_andSetSdkStateToOnActive</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ReregistrationClientTests.kt:ReregistrationClientTests$@Test fun testStartEventConsumer_should_notSetStateToActive_andLog_whenStateMachine_returnsFailure</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RestoreOperationalEventsStateTests.kt:RestoreOperationalEventsStateTests$@Test fun active_shouldReEmit_operationalAndLogEvents_toEventFlow</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RestoreSavedSdkEventsStateTests.kt:RestoreSavedSdkEventsStateTests$@Test fun testActive_shouldGetEventsFromDao_andEmitThem</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RestoreSavedSdkEventsStateTests.kt:RestoreSavedSdkEventsStateTests$@Test fun testActive_shouldStillContinueEmittingEvents_whenEmitFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RestoreSavedSdkEventsStateTests.kt:RestoreSavedSdkEventsStateTests.Companion$val testEvent1 = SdkEvent.External.Custom( "testId1", "testName1")</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RestoreSavedSdkEventsStateTests.kt:RestoreSavedSdkEventsStateTests.Companion$val testEvent2 = SdkEvent.External.Custom( "testId2", "testName2")</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RunCatchingWithoutCancellationTests.kt:RunCatchingWithoutCancellationTests$@Test fun runCatchingWithoutCancellation_shouldRethrow_cancellationExceptions</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RunCatchingWithoutCancellationTests.kt:RunCatchingWithoutCancellationTests$@Test fun runCatchingWithoutCancellation_shouldReturn_failure_whenBlockThrowsException</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:RunCatchingWithoutCancellationTests.kt:RunCatchingWithoutCancellationTests$@Test fun runCatchingWithoutCancellation_shouldReturn_theResultOfTheProvidedBlock</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConfigLoaderStateTests.kt:SdkConfigLoaderStateTests$@Test fun testActive_should_loadSdkConfig_andDoNothing_whenNoConfigIsSaved</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConfigLoaderStateTests.kt:SdkConfigLoaderStateTests$@Test fun testActive_should_loadSdkConfig_andSetup_whenConfigIsSaved</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConfigLoaderStateTests.kt:SdkConfigLoaderStateTests$@Test fun testActive_should_returnFailure_whenEnableThrowsException</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkContextTests.kt:SdkContextTests$@Test fun testGetSdkConfig_shouldReturnCachedConfigOnSecondCall</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkContextTests.kt:SdkContextTests$@Test fun testGetSdkConfig_shouldReturnConfigFromStore</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkContextTests.kt:SdkContextTests$@Test fun testGetSdkConfig_shouldReturnNullWhenStoreReturnsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkContextTests.kt:SdkContextTests$@Test fun testSetSdkConfig_shouldClearStoreWhenConfigToSetIsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkContextTests.kt:SdkContextTests$@Test fun testSetSdkConfig_shouldReturnCachedConfigWithoutCallingStore</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkContextTests.kt:SdkContextTests$@Test fun testSetSdkConfig_shouldStoreConfig</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkEventDistributorTests.kt:SdkEventDistributorTests$@OptIn(FlowPreview::class) @Test fun distributor_shouldPauseOnlineEvents_whenSdkStateIsActive_andConnection_isOffline</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkEventDistributorTests.kt:SdkEventDistributorTests$@OptIn(FlowPreview::class) @Test fun distributor_shouldPauseOnlineEvents_whenSdkStateIsOnHold_andConnection_isOffline</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkEventDistributorTests.kt:SdkEventDistributorTests$@Test fun distributor_shouldSendAllEvents_toOnlineFlow_whenConnection_isOnline_andSdkState_isActive</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkEventDistributorTests.kt:SdkEventDistributorTests$@Test fun distributor_shouldSendEvent_toOnlineFlow_whenConnection_isOnline_andSdkState_isOnHold_andEventIsSetupFlowEvent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkEventDistributorTests.kt:SdkEventDistributorTests$@Test fun emitEvent_shouldEmitSdkEvent_toSdkEventFlow</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkEventDistributorTests.kt:SdkEventDistributorTests$@Test fun registerAndStoreEvent_shouldLogError_andNotEmitIntoSdkEventFlow_whenPersistingEventFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkEventDistributorTests.kt:SdkEventDistributorTests$@Test fun registerAndStoreEvent_shouldPersistOnlineEventsToDb_andEmitSdkEvent_toSdkEventFlow</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkEventDistributorTests.kt:SdkEventDistributorTests$@Test fun registerAndStoreLogEvent_shouldLogError_andNotEmitIntoSdkEventFlow_whenPersistingEventFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkEventDistributorTests.kt:SdkEventDistributorTests$@Test fun registerPublicEvent_shouldEmitEvent_toSdkPublicEventFlow</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkEventDistributorTests.kt:SdkEventDistributorTests$@Test fun register_shouldCollectLogEvents_andRegisterThem</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkEventWaiterTests.kt:SdkEventWaiterTests$@Test fun await_shouldReturn_answerResponse_whenAMatchingEventIsEmitted_andConnectionStatus_isTrue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkEventWaiterTests.kt:SdkEventWaiterTests$@Test fun await_shouldReturn_answerResponse_whenAMatchingEventIsEmitted_andIgnoreOtherResults_andConnectionStatus_isTrue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkEventWaiterTests.kt:SdkEventWaiterTests$@Test fun await_shouldReturn_answerResponse_withFailureResult_whenEventIsWaited_andConnectionStatus_isFalse</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkLoggerTests.kt:SdkLoggerTests$@AfterTest fun tearDown</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkLoggerTests.kt:SdkLoggerTests$@BeforeTest fun setup</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkLoggerTests.kt:SdkLoggerTests$@Test fun logToRemote_shouldContainAllAttributes</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkLoggerTests.kt:SdkLoggerTests$@Test fun sdkLogger_shouldNotCollectBreadcrumbs_inCaseThereIsNoRemoteLogger</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkLoggerTests.kt:SdkLoggerTests$@Test fun sdkLogger_shouldNotLogToRemote_ifIsRemoteLogFlag_isFalse</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkLoggerTests.kt:SdkLoggerTests$@Test fun testBreadCrumbsQueue_shouldContainLatestArrivingLogs</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkLoggerTests.kt:SdkLoggerTests$@Test fun testBreadCrumbsQueue_shouldFillUp_whenThereIsMoreThanConfiguredParallelLogs</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkLoggerTests.kt:SdkLoggerTests$@Test fun testContext</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkLoggerTests.kt:SdkLoggerTests$@Test fun testContext2</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkLoggerTests.kt:SdkLoggerTests$@Test fun testLogger</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SessionSubscriptionStateTests.kt:SessionSubscriptionStateTests$@Test fun testActive_should_call_subscribe_on_mobileEngageSession</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SessionSubscriptionStateTests.kt:SessionSubscriptionStateTests$@Test fun testName</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SetupTests.kt:SetupTests$@Test fun disableTracking_shouldReturnFailure_ifDisableOrganizer_fails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SetupTests.kt:SetupTests$@Test fun disableTracking_shouldReturnSuccess_ifDisableOrganizer_succeeds</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SetupTests.kt:SetupTests$@Test fun enableTracking_shouldReturnFailure_ifEnableOrganizer_fails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SetupTests.kt:SetupTests$@Test fun enableTracking_shouldReturnSuccess_ifEnableOrganizer_succeeds</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SetupTests.kt:SetupTests$@Test fun enable_shouldAcceptMultiRegionV1AppCode</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SetupTests.kt:SetupTests$@Test fun enable_shouldAcceptMultiRegionV2AppCode</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SetupTests.kt:SetupTests$@Test fun enable_shouldAcceptMultiRegionV2AppCode_withPPrefix</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SetupTests.kt:SetupTests$@Test fun enable_shouldRejectAppCode_notMatchingRemoteConfigRegex</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SetupTests.kt:SetupTests$@Test fun enable_shouldRejectEmptyAppCode</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SetupTests.kt:SetupTests$@Test fun enable_shouldRejectInvalidAppCode_withNoMatch</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SetupTests.kt:SetupTests$@Test fun enable_shouldStillAcceptStandardFormat_whenRemoteConfigRegexIsSet</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SetupTests.kt:SetupTests$@Test fun enable_shouldUseRemoteConfigRegex_forValidation</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SetupTests.kt:SetupTests$@Test fun enable_shouldValidate_theConfig_andReturnFailure_ifValidationFails</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SetupTests.kt:SetupTests$@Test fun testIsEnabled_shouldReturnTrue_ifAppCode_is_set</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:StorageTests.kt:StorageTests$@Test fun testStorage_withBoolean</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:StorageTests.kt:StorageTests$@Test fun testStorage_withDouble</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:StorageTests.kt:StorageTests$@Test fun testStorage_withInt</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:StorageTests.kt:StorageTests$@Test fun testStorage_withList</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:StorageTests.kt:StorageTests$@Test fun testStorage_withMap</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:StorageTests.kt:StorageTests$@Test fun testStorage_withSerializableDataClass</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:StorageTests.kt:StorageTests$@Test fun testStorage_withSerializableSealedClasses</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:StorageTests.kt:StorageTests$@Test fun testStorage_withString</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:StorageTests.kt:StorageTests.Companion$const val KEY = "testKey"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:StringStorageTests.kt:StringStorageTests$@Test fun testStorage_withString</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ThreadSafePersistentStoreTests.kt:ThreadSafePersistentStoreTests$@AfterTest fun tearDown</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ThreadSafePersistentStoreTests.kt:ThreadSafePersistentStoreTests$@Test fun add_shouldAddElementToItems_andCallPutOnStore_withAllItems</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ThreadSafePersistentStoreTests.kt:ThreadSafePersistentStoreTests$@Test fun add_shouldAddElementToItems_andCallPut_onStore</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ThreadSafePersistentStoreTests.kt:ThreadSafePersistentStoreTests$@Test fun constructor_shouldInitStore_withEmptyList_ifStoredList_notFound</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ThreadSafePersistentStoreTests.kt:ThreadSafePersistentStoreTests$@Test fun constructor_shouldInitStore_withStoredList_ifPresent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ThreadSafePersistentStoreTests.kt:ThreadSafePersistentStoreTests$@Test fun dequeue_shouldRemoveItems_andCallPutOnStore_whenDone</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ThreadSafePersistentStoreTests.kt:ThreadSafePersistentStoreTests.Companion$const val TEST_ID = "testId"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:TypedStorageTests.kt:TypedStorageTests$@Test fun testGet_shouldNotCrashOnErrorAndLog</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:TypedStorageTests.kt:TypedStorageTests$@Test fun testRemove_shouldDelegateToStringStorage</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:TypedStorageTests.kt:TypedStorageTests$@Test fun testTypedStorage</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UUIDProviderTests.kt:UUIDProviderTests$@BeforeTest fun setup</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UUIDProviderTests.kt:UUIDProviderTests$@Test fun testProvide_resultShouldBeInUUIDFormat</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UUIDProviderTests.kt:UUIDProviderTests$@Test fun testProvide_resultShouldNotBeNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UUIDProviderTests.kt:UUIDProviderTests.Companion$val uuidRegex = """[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}""".toRegex(RegexOption.IGNORE_CASE)</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UnlinkContactStateTests.kt:UnlinkContactStateTests$@Test fun activate_shouldNotRegister_unlinkContactEvent_andReturnSuccess_ifIsContactLinked_isFalse</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UnlinkContactStateTests.kt:UnlinkContactStateTests$@Test fun activate_shouldRegister_unlinkContactEvent_andReturnFailure_ifErrorHappened</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UnlinkContactStateTests.kt:UnlinkContactStateTests$@Test fun activate_shouldRegister_unlinkContactEvent_andReturnSuccess_ifIsContactLinked_isTrue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UrlFactoryTests.kt:UrlFactoryTests$@Test fun testCreate_changeApplicationCode_should_return_url</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UrlFactoryTests.kt:UrlFactoryTests$@Test fun testCreate_clearPushToken_should_return_url</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UrlFactoryTests.kt:UrlFactoryTests$@Test fun testCreate_deepLink_should_return_url_for_trackDeepLink</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UrlFactoryTests.kt:UrlFactoryTests$@Test fun testCreate_embeddedMessaging_should_return_url_for_badgeCount</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UrlFactoryTests.kt:UrlFactoryTests$@Test fun testCreate_embeddedMessaging_should_return_url_for_fetchMessages</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UrlFactoryTests.kt:UrlFactoryTests$@Test fun testCreate_embeddedMessaging_should_return_url_for_fetchMeta</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UrlFactoryTests.kt:UrlFactoryTests$@Test fun testCreate_embeddedMessaging_should_return_url_for_updateTagsForMessages</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UrlFactoryTests.kt:UrlFactoryTests$@Test fun testCreate_inlineInAppMessages_should_return_url</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UrlFactoryTests.kt:UrlFactoryTests$@Test fun testCreate_linkContact_should_return_url_withAppCode</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UrlFactoryTests.kt:UrlFactoryTests$@Test fun testCreate_refreshTokenUrl_should_return_url_with_appCode</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UrlFactoryTests.kt:UrlFactoryTests$@Test fun testCreate_registerDeviceInfo_should_return_url</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UrlFactoryTests.kt:UrlFactoryTests$@Test fun testCreate_registerPushToken_should_return_url</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UrlFactoryTests.kt:UrlFactoryTests$@Test fun testCreate_remoteConfig_should_return_url_for_remoteConfig</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UrlFactoryTests.kt:UrlFactoryTests$@Test fun testCreate_remoteConfig_should_return_url_for_remoteConfigSignature</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UrlFactoryTests.kt:UrlFactoryTests$@Test fun testCreate_unlinkContact_should_return_url_withAppCode</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UserAgentProviderTests.kt:UserAgentProviderTests$@Test fun testHeaderName</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:UserAgentProviderTests.kt:UserAgentProviderTests$@Test fun testProvide</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ActionHandlerTests.kt:ActionHandlerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidApplicationVersionProviderTest.kt:AndroidApplicationVersionProviderTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidClipboardHandlerTests.kt:AndroidClipboardHandlerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidConnectionWatchDogTests.kt:AndroidConnectionWatchDogTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidEngagementCloudConfigTests.kt:AndroidEngagementCloudSDKConfigTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidLanguageProviderTests.kt:AndroidLanguageProviderTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidLanguageTagValidatorTests.android.kt:AndroidLanguageTagValidatorTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidLifecycleWatchDogTests.kt:AndroidLifecycleWatchDogTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidPermissionHandlerTests.kt:AndroidPermissionHandlerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AppEventActionTests.kt:AppEventActionTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AppEventSerializerTests.kt:AppEventSerializerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AppStartStateTests.kt:AppStartStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ApplicationCodeTests.kt:ApplicationCodeTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ApplyAppCodeBasedRemoteConfigStateTests.kt:ApplyAppCodeBasedRemoteConfigStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ApplyGlobalRemoteConfigStateTests.kt:ApplyGlobalRemoteConfigStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ClearDeviceInfoStateTests.kt:ClearDeviceInfoStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ClearEventsStateTests.kt:ClearEventsStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ClearPushTokenOnDisableStateTests.kt:ClearPushTokenOnDisableStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ClearRequestContextTokensStateTests.kt:ClearRequestContextTokensStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ClearStoredConfigStateTests.kt:ClearStoredConfigStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ClientIdProviderTests.kt:ClientIdProviderTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:CollectDeviceInfoStateTests.kt:CollectDeviceInfoStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ConfigClientTests.kt:ConfigClientTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ConfigExtensionTests.kt:ConfigExtensionTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ConfigInternalTests.kt:ConfigInternalTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ConfigTests.kt:ConfigTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ContactClientTests.kt:ContactClientTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ContactGathererTests.kt:ContactGathererTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ContactInternalTests.kt:ContactInternalTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ContactTests.kt:ContactTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ContactTokenHandlerTests.kt:ContactTokenHandlerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ContentReplacerTests.kt:ContentReplacerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:CryptoTests.kt:CryptoTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:CustomEventActionTests.kt:CustomEventActionTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:CustomEventTests.kt:CustomEventTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DeepLinkClientTests.kt:DeepLinkClientTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DeepLinkInternalTests.kt:DeepLinkInternalTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DefaultClientExceptionHandlerTests.kt:DefaultClientExceptionHandlerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DefaultUrlTests.kt:DefaultUrlTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DeviceClientTests.kt:DeviceClientTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DeviceEventTests.kt:DeviceEventTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DeviceInfoStorageTests.kt:DeviceInfoStorageTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DisableOrganizerTests.kt:DisableOrganizerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DownloaderTests.kt:DownloaderTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ECClientTests.kt:ECClientTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ECSdkSessionTests.kt:ECSdkSessionTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EmarsysConfigTests.kt:EngagementCloudSDKConfigTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EmbeddedMessagingClientTest.kt:EmbeddedMessagingClientTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EmbeddedMessagingInternalTests.kt:EmbeddedMessagingInternalTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EmbeddedMessagingPagingSourceTests.kt:EmbeddedMessagingPagingSourceTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EmbeddedMessagingTests.kt:EmbeddedMessagingTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EnableOrganizerTests.kt:EnableOrganizerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EventActionFactoryTests.kt:EventActionFactoryTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EventClientTests.kt:EventClientTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EventTests.kt:EventTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EventTrackerGathererTests.kt:EventTrackerGathererTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EventTrackerInternalTests.kt:EventTrackerInternalTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EventTrackerTests.kt:EventTrackerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:FakeLogger.kt:FakeLogger : Logger</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:FakeStringStorage.kt:FakeStringStorage : StringStorageApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:FetchEmbeddedMessagingMetaStateTests.kt:FetchEmbeddedMessagingMetaStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:FetchJsBridgeStateTests.kt:FetchJsBridgeStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:FollowUpChangeAppCodeOrganizerTests.kt:FollowUpChangeAppCodeOrganizerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GathererConfigTests.kt:GathererConfigTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GathererInAppTests.kt:GathererInAppTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GeneralBatchingTests.kt:GeneralBatchingTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GenericApiTests.kt:GenericApiTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:GenericNetworkClientTests.kt:GenericNetworkClientTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InAppDialogTests.kt:InAppDialogTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InAppDownloaderTests.kt:InAppDownloaderTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InAppEventConsumerTest.kt:InAppEventConsumerTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InAppInternalTests.kt:InAppInternalTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InAppJsBridgeFactoryTest.kt:InAppJsBridgeFactoryTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InAppJsBridgeTests.kt:InAppJsBridgeTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InAppPresenterTests.kt:InAppPresenterTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InappTests.kt:InappTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InitOrganizerTests.kt:InitOrganizerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InitializerStateTests.kt:InitializerStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InlineInAppMessageFetcherTests.kt:InlineInAppMessageFetcherTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InternalSdkApiTest.kt:InternalSdkApiTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosNotificationConstantTests.kt:IosNotificationConstantTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsBridgeClientTests.kt:JsBridgeClientTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsBridgeUtilsTests.kt:JsBridgeUtilsTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsBridgeVerifierTests.kt:JsBridgeVerifierTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsonExtensionsTests.kt:JsonExtensionsTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LanguageHandlerTests.kt:LanguageHandlerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LaunchApplicationActionTests.kt:LaunchApplicationActionTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LegacySharedPreferencesWrapperTest.kt:LegacySharedPreferencesWrapperTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LinkContactStateTests.kt:LinkContactStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ListPageModelTests.kt:ListPageModelTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ListPageViewModelTests.kt:ListPageViewModelTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LogEventRegistryTests.kt:LogEventRegistryTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LoggingClientTests.kt:LoggingClientTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LoggingContactTests.kt:LoggingContactTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LoggingEmbeddedMessagingTests.kt:LoggingEmbeddedMessagingTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LoggingEventTrackerTests.kt:LoggingEventTrackerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LoggingPushTests.kt:LoggingPushTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:MessageItemModelTests.kt:MessageItemModelTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:MessageItemViewModelTests.kt:MessageItemViewModelTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:MessagesResponseSerializerTests.kt:MessagesResponseSerializerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:MockHttpClientFactory.kt:MockHttpClientFactory</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:MutableListTests.kt:MutableListTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:NaturalBatchingTests.kt:NaturalBatchingTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:OpenExternalUrlActionTests.kt:OpenExternalUrlActionTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PageLocationProviderTests.kt:PageLocationProviderTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PlatformInitializerTest.kt:PlatformInitializerTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushActionFactoryTests.kt:PushActionFactoryTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushClientTests.kt:PushClientTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushGathererTests.kt:PushGathererTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushInternalTests.kt:PushInternalTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushTests.kt:PushTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushToInAppHandlerTest.kt:PushToInAppHandlerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:RandomProviderTests.kt:RandomProviderTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:RegisterClientStateTests.kt:RegisterClientStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:RegisterEventBasedClientsStateTests.kt:RegisterEventBasedClientsStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:RegisterEventConsumersStateTests.kt:RegisterEventConsumersStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:RegisterInstancesStateTests.kt:RegisterInstancesStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:RegisterPushTokenStateTests.kt:RegisterPushTokenStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:RegisterSdkEventDistributorStateTests.kt:RegisterSdkEventDistributorStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:RegisterWatchdogsStateTests.kt:RegisterWatchdogsStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:RemoteConfigClientTests.kt:RemoteConfigClientTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:RemoteConfigResponseHandlerTests.kt:RemoteConfigResponseHandlerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:RemoteLoggerTests.kt:RemoteLoggerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ReportingActionTests.kt:ReportingActionTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:RequestContextTests.kt:RequestContextTests : KoinTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:RequestPushPermissionActionTests.kt:RequestPushPermissionActionTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ReregistrationClientTests.kt:ReregistrationClientTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ResponseExtensionTests.kt:ResponseExtensionTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:RestoreOperationalEventsStateTests.kt:RestoreOperationalEventsStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:RestoreSavedSdkEventsStateTests.kt:RestoreSavedSdkEventsStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:RunCatchingWithoutCancellationTests.kt:RunCatchingWithoutCancellationTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SdkConfigLoaderStateTests.kt:SdkConfigLoaderStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SdkContextTests.kt:SdkContextTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SdkEventDistributorTests.kt:SdkEventDistributorTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SdkEventWaiterTests.kt:SdkEventWaiterTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SdkLoggerTests.kt:SdkLoggerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SessionSubscriptionStateTests.kt:SessionSubscriptionStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SetupTests.kt:SetupTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:StorageTests.kt:SealedTestData</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:StorageTests.kt:StorageTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:StorageTests.kt:TestData</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:StoreTests.kt:StoreTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:StringStorageTests.kt:StringStorageTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:TestClass.kt:TestClass : Activity</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:TestDataClass.kt:TestDataClass</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:TestEngagementCloudSDKConfig.kt:TestEngagementCloudSDKConfig : SdkConfig</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ThreadSafePersistentStoreTests.kt:ThreadSafePersistentStoreTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:TranslationMapperTests.kt:TranslationMapperTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:TypedStorageTests.kt:TypedStorageTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:UUIDProviderTests.kt:UUIDProviderTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:UnlinkContactStateTests.kt:UnlinkContactStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:UrlFactoryTests.kt:UrlFactoryTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:UserAgentProviderTests.kt:UserAgentProviderTests</ID>
+    <ID>LongMethod:ECClientTests.kt:ECClientTests$@Test fun testSend_should_retry_on401_and_try_to_get_refreshToken</ID>
+    <ID>LongMethod:EmbeddedMessagingClientTest.kt:EmbeddedMessagingClientTest$@Test fun testConsumer_shouldConsumeOnlyEmbeddedMessagingEvents</ID>
+    <ID>LongMethod:EmbeddedMessagingClientTest.kt:EmbeddedMessagingClientTest$private fun createMetaDataResponseString: String</ID>
+    <ID>LongMethod:EventClientTests.kt:EventClientTests$@Test fun testConsumer_shouldExecuteAllActions_whenSomeActionsFail</ID>
+    <ID>LongMethod:EventClientTests.kt:EventClientTests$@Test fun testConsumer_shouldHandleOnEventActionCampaigns_executeActions_andReportThem_whenPresent</ID>
+    <ID>LongMethod:FetchEmbeddedMessagingMetaStateTests.kt:FetchEmbeddedMessagingMetaStateTests$@Test fun testActive_shouldEmitFetchMetaEvent_andReturnSuccessUnit_whenMetaResponseResultIsSuccess</ID>
+    <ID>MatchingDeclarationName:AndroidEngagementCloudConfigTests.kt:AndroidEngagementCloudSDKConfigTests</ID>
+    <ID>MatchingDeclarationName:ConfigTests.kt:ConfigTest</ID>
+    <ID>MatchingDeclarationName:EmarsysConfigTests.kt:EngagementCloudSDKConfigTest</ID>
+    <ID>MatchingDeclarationName:PushToInAppHandlerTest.kt:PushToInAppHandlerTests</ID>
+    <ID>MaxLineLength:AndroidApplicationVersionProviderTest.kt:AndroidApplicationVersionProviderTest$every { mockContext.packageManager.getPackageInfo(any&lt;String>(), any&lt;Int>()) } throws PackageManager.NameNotFoundException()</ID>
+    <ID>MaxLineLength:AndroidPermissionHandlerTests.kt:AndroidPermissionHandlerTests$fun</ID>
+    <ID>MaxLineLength:AppStartStateTests.kt:AppStartStateTests$fun</ID>
+    <ID>MaxLineLength:ConfigInternalTests.kt:ConfigInternalTests$private</ID>
+    <ID>MaxLineLength:ConfigTests.kt:ConfigTest$everySuspend { mockInternalConfig.changeApplicationCode("newAppCode") } throws CancellationException("test cancellation")</ID>
+    <ID>MaxLineLength:ContactClientTests.kt:ContactClientTests$val unlinkContactEvent = SdkEvent.Internal.Sdk.UnlinkContact("unlinkContact", applicationCode = APPLICATION_CODE)</ID>
+    <ID>MaxLineLength:ContactInternalTests.kt:ContactInternalTests$private</ID>
+    <ID>MaxLineLength:ContactTests.kt:ContactTests$everySuspend { mockContactInternal.link(CONTACT_FIELD_VALUE) } throws CancellationException("test cancellation")</ID>
+    <ID>MaxLineLength:ECClientTests.kt:ECClientTests$fun</ID>
+    <ID>MaxLineLength:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$everySuspend { mockUrlFactory.create(ECUrlType.FetchBadgeCount) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/badge-count")</ID>
+    <ID>MaxLineLength:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$everySuspend { mockUrlFactory.create(ECUrlType.FetchEmbeddedMessages) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages")</ID>
+    <ID>MaxLineLength:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$everySuspend { mockUrlFactory.create(ECUrlType.FetchMeta) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/meta")</ID>
+    <ID>MaxLineLength:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$everySuspend { mockUrlFactory.create(ECUrlType.UpdateTagsForMessages) } returns Url("https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/tags")</ID>
+    <ID>MaxLineLength:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/badge-count"</ID>
+    <ID>MaxLineLength:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages"</ID>
+    <ID>MaxLineLength:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=$offset"</ID>
+    <ID>MaxLineLength:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=$offset&amp;filterCategoryIds=1%2C2"</ID>
+    <ID>MaxLineLength:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=$offset&amp;filterCategoryIds=1%2C2&amp;filterUnopened=$filterUnopenedMessages"</ID>
+    <ID>MaxLineLength:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=$offset&amp;filterUnopened=$filterUnopenedMessages"</ID>
+    <ID>MaxLineLength:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=40&amp;filterCategoryIds=1%2C2"</ID>
+    <ID>MaxLineLength:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/messages?%24skip=40&amp;filterCategoryIds=1%2C2&amp;filterUnopened=true"</ID>
+    <ID>MaxLineLength:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/meta"</ID>
+    <ID>MaxLineLength:EmbeddedMessagesRequestFactoryTests.kt:EmbeddedMessagesRequestFactoryTests$result.url.toString() shouldBe "https://embedded-messaging.gservice.emarsys.net/embedded-messaging/fake-api/v1/testAppCode/tags"</ID>
+    <ID>MaxLineLength:EmbeddedMessagingClientTest.kt:EmbeddedMessagingClientTest$fun</ID>
+    <ID>MaxLineLength:EmbeddedMessagingTests.kt:EmbeddedMessagingTests$verify { mockInternalInstance.filterByCategories(setOf(Category("1", "Category 1"), Category("2", "Category 2"))) }</ID>
+    <ID>MaxLineLength:EmbeddedMessagingTests.kt:EmbeddedMessagingTests$verify { mockLoggingInstance.filterByCategories(setOf(Category("1", "Category 1"), Category("2", "Category 2"))) }</ID>
+    <ID>MaxLineLength:EventClientTests.kt:EventClientTests$"""{"dnd":$IN_APP_DND,"events":[{"type":"custom","name":"${testEvent.name}","timestamp":"$TIMESTAMP","attributes":{"key":"value","key1":"5"}}],"deviceEventState":"$DEVICE_EVENT_STATE"}"""</ID>
+    <ID>MaxLineLength:EventClientTests.kt:EventClientTests$"""{"dnd":$IN_APP_DND,"events":[{"type":"custom","name":"${testEvent.name}","timestamp":"$TIMESTAMP","attributes":{"key":"value","key1":"5"}}]}"""</ID>
+    <ID>MaxLineLength:EventClientTests.kt:EventClientTests$onEventActionExecutedEventCaptureContainer.values[0].trackingInfo shouldBe onEventActionCampaign1.trackingInfo</ID>
+    <ID>MaxLineLength:EventClientTests.kt:EventClientTests$onEventActionExecutedEventCaptureContainer.values[1].trackingInfo shouldBe onEventActionCampaign1.trackingInfo</ID>
+    <ID>MaxLineLength:EventClientTests.kt:EventClientTests$onEventActionExecutedEventCaptureContainer.values[2].trackingInfo shouldBe onEventActionCampaign2.trackingInfo</ID>
+    <ID>MaxLineLength:EventTrackerInternalTests.kt:EventTrackerInternalTests$private</ID>
+    <ID>MaxLineLength:FetchEmbeddedMessagingMetaStateTests.kt:FetchEmbeddedMessagingMetaStateTests$everySuspend { mockSdkEventDistributor.registerEvent(any&lt;SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) } returns mockSdkEventWaiter</ID>
+    <ID>MaxLineLength:FetchEmbeddedMessagingMetaStateTests.kt:FetchEmbeddedMessagingMetaStateTests$verifySuspend { mockSdkEventDistributor.registerEvent(any&lt;SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) }</ID>
+    <ID>MaxLineLength:FetchEmbeddedMessagingMetaStateTests.kt:FetchEmbeddedMessagingMetaStateTests$verifySuspend(VerifyMode.exactly(0)) { mockSdkEventDistributor.registerEvent(any&lt;SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) }</ID>
+    <ID>MaxLineLength:GenericNetworkClientTests.kt:GenericNetworkClientTests$fun</ID>
+    <ID>MaxLineLength:InAppJsBridgeTests.kt:InAppJsBridgeTests$val expectedActionModel = BasicAppEventActionModel(reporting, eventName, payloadMap, source = EventSource.InlineInApp)</ID>
+    <ID>MaxLineLength:JsBridgeClientTests.kt:JsBridgeClientTests$returns(Result.success(createResponse(JS_CONTENT, googHashHeaders = listOf("crc32c=abc", "md5=$SERVER_MD5"))))</ID>
+    <ID>MaxLineLength:LanguageHandlerTests.kt:LanguageHandlerTests$everySuspend { mockSdkEventManager.registerEvent(any&lt;SdkEvent.Internal.Sdk.ChangeLanguage>()) } returns mockEventWaiter</ID>
+    <ID>MaxLineLength:LanguageHandlerTests.kt:LanguageHandlerTests$fun</ID>
+    <ID>MaxLineLength:LanguageHandlerTests.kt:LanguageHandlerTests$verifySuspend(VerifyMode.exactly(0)) { mockSdkEventManager.emitEvent(any&lt;SdkEvent.Internal.EmbeddedMessaging.TriggerRefresh>()) }</ID>
+    <ID>MaxLineLength:LanguageHandlerTests.kt:LanguageHandlerTests$verifySuspend(VerifyMode.exactly(0)) { mockSdkEventManager.registerEvent(any&lt;SdkEvent.Internal.EmbeddedMessaging.FetchMeta>()) }</ID>
+    <ID>MaxLineLength:LinkContactStateTests.kt:LinkContactStateTests$fun</ID>
+    <ID>MaxLineLength:ListPageModelTests.kt:ListPageModelTests$everySuspend { mockSdkEventDistributor.registerEvent(any&lt;SdkEvent.Internal.EmbeddedMessaging.FetchMessages>()) } returns mockSdkEventWaiter</ID>
+    <ID>MaxLineLength:ListPageModelTests.kt:ListPageModelTests$everySuspend { mockSdkEventDistributor.registerEvent(any&lt;SdkEvent.Internal.EmbeddedMessaging.FetchMessages>()) } throws testException</ID>
+    <ID>MaxLineLength:ListPageModelTests.kt:ListPageModelTests$everySuspend { mockSdkEventDistributor.registerEvent(any&lt;SdkEvent.Internal.EmbeddedMessaging.FetchNextPage>()) } returns mockSdkEventWaiter</ID>
+    <ID>MaxLineLength:ListPageModelTests.kt:ListPageModelTests$fun</ID>
+    <ID>MaxLineLength:ListPageViewModelTests.kt:ListPageViewModelTests$fun</ID>
+    <ID>MaxLineLength:MessageItemModelTests.kt:MessageItemModelTests$everySuspend { mockSdkEventDistributor.registerEvent(any()) } throws CancellationException("coroutine cancelled")</ID>
+    <ID>MaxLineLength:PushInternalTests.kt:PushInternalTests$fun</ID>
+    <ID>MaxLineLength:PushInternalTests.kt:PushInternalTests$private</ID>
+    <ID>MaxLineLength:PushTests.kt:PushTests$everySuspend { mockPushInternal.registerPushToken(PUSH_TOKEN) } throws CancellationException("test cancellation")</ID>
+    <ID>MaxLineLength:RegisterPushTokenStateTests.kt:RegisterPushTokenStateTests$fun</ID>
+    <ID>MaxLineLength:ReportingActionTests.kt:ReportingActionTests.Companion$if (currentPlatform == KotlinPlatform.JS) SdkConstants.WEB_BUTTON_CLICKED_EVENT_NAME else SdkConstants.IN_APP_BUTTON_CLICKED_EVENT_NAME</ID>
+    <ID>MaxLineLength:SdkEventDistributorTests.kt:SdkEventDistributorTests$fun</ID>
+    <ID>MaxLineLength:SdkEventWaiterTests.kt:SdkEventWaiterTests$fun</ID>
+    <ID>MaxLineLength:SdkEventWaiterTests.kt:SdkEventWaiterTests$result.result.exceptionOrNull()?.message shouldBe "No internet connection. Event: ${sdkEvent.type} is stored and will be processed when connection is restored."</ID>
+    <ID>MaxLineLength:SessionSubscriptionStateTests.kt:SessionSubscriptionStateTests$SessionSubscriptionState(mockMobileEngageSession, mockLifecycleWatchDog, SdkLogger("TestLoggerName", mock(MockMode.autofill), logConfigHolder = mock()))</ID>
+    <ID>MaxLineLength:TypedStorageTests.kt:TypedStorageTests$every { mockStringStorage.get(key) } returns """{"notValidKey": "testApplicationCode", "applicationCode": {1234}}"""</ID>
+    <ID>MaxLineLength:UUIDProviderTests.kt:UUIDProviderTests.Companion$val uuidRegex = """[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}""".toRegex(RegexOption.IGNORE_CASE)</ID>
+    <ID>NewLineAtEndOfFile:ActionHandlerTests.kt:com.sap.ec.core.actions.ActionHandlerTests.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidApplicationVersionProviderTest.kt:com.sap.ec.core.providers.AndroidApplicationVersionProviderTest.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidClipboardHandlerTests.kt:com.sap.ec.core.clipboard.AndroidClipboardHandlerTests.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidConnectionWatchDogTests.kt:com.sap.ec.watchdog.connection.AndroidConnectionWatchDogTests.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidEngagementCloudConfigTests.kt:com.sap.ec.api.config.AndroidEngagementCloudConfigTests.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidLanguageProviderTests.kt:com.sap.ec.core.device.AndroidLanguageProviderTests.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidLanguageTagValidatorTests.android.kt:com.sap.ec.core.language.AndroidLanguageTagValidatorTests.android.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidLifecycleWatchDogTests.kt:com.sap.ec.watchdog.lifecycle.AndroidLifecycleWatchDogTests.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidPermissionHandlerTests.kt:com.sap.ec.core.permission.AndroidPermissionHandlerTests.kt</ID>
+    <ID>NewLineAtEndOfFile:AppStartStateTests.kt:com.sap.ec.enable.states.AppStartStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ApplyAppCodeBasedRemoteConfigStateTests.kt:com.sap.ec.enable.states.ApplyAppCodeBasedRemoteConfigStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ApplyGlobalRemoteConfigStateTests.kt:com.sap.ec.init.states.ApplyGlobalRemoteConfigStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ClearDeviceInfoStateTests.kt:com.sap.ec.disable.states.ClearDeviceInfoStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ClearEventsStateTests.kt:com.sap.ec.disable.states.ClearEventsStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ClearPushTokenOnDisableStateTests.kt:com.sap.ec.disable.states.ClearPushTokenOnDisableStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ClearRequestContextTokensStateTests.kt:com.sap.ec.reregistration.states.ClearRequestContextTokensStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ClearStoredConfigStateTests.kt:com.sap.ec.disable.states.ClearStoredConfigStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ClientIdProviderTests.kt:com.sap.ec.core.providers.ClientIdProviderTests.kt</ID>
+    <ID>NewLineAtEndOfFile:CollectDeviceInfoStateTests.kt:com.sap.ec.enable.states.CollectDeviceInfoStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ConfigExtensionTests.kt:com.sap.ec.config.ConfigExtensionTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ConfigInternalTests.kt:com.sap.ec.api.config.ConfigInternalTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ConfigTests.kt:com.sap.ec.api.config.ConfigTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ContactClientTests.kt:com.sap.ec.networking.clients.contact.ContactClientTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ContactInternalTests.kt:com.sap.ec.api.contact.ContactInternalTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ContactTests.kt:com.sap.ec.api.contact.ContactTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ContactTokenHandlerTests.kt:com.sap.ec.networking.clients.contact.ContactTokenHandlerTests.kt</ID>
+    <ID>NewLineAtEndOfFile:CryptoTests.kt:com.sap.ec.core.crypto.CryptoTests.kt</ID>
+    <ID>NewLineAtEndOfFile:CustomEventActionTests.kt:com.sap.ec.mobileengage.action.actions.CustomEventActionTests.kt</ID>
+    <ID>NewLineAtEndOfFile:CustomEventTests.kt:com.sap.ec.api.event.model.CustomEventTests.kt</ID>
+    <ID>NewLineAtEndOfFile:DefaultClientExceptionHandlerTests.kt:com.sap.ec.networking.clients.error.DefaultClientExceptionHandlerTests.kt</ID>
+    <ID>NewLineAtEndOfFile:DefaultUrlTests.kt:com.sap.ec.context.DefaultUrlTests.kt</ID>
+    <ID>NewLineAtEndOfFile:DeviceEventTests.kt:com.sap.ec.networking.clients.event.DeviceEventTests.kt</ID>
+    <ID>NewLineAtEndOfFile:DeviceInfoStorageTests.kt:com.sap.ec.core.device.DeviceInfoStorageTests.kt</ID>
+    <ID>NewLineAtEndOfFile:DisableOrganizerTests.kt:com.sap.ec.disable.DisableOrganizerTests.kt</ID>
+    <ID>NewLineAtEndOfFile:DownloaderTests.kt:com.sap.ec.util.DownloaderTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ECClientTests.kt:com.sap.ec.networking.ECClientTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ECSdkSessionTests.kt:com.sap.ec.mobileengage.session.ECSdkSessionTests.kt</ID>
+    <ID>NewLineAtEndOfFile:EmarsysConfigTests.kt:com.sap.ec.EmarsysConfigTests.kt</ID>
+    <ID>NewLineAtEndOfFile:EmbeddedMessagesRequestFactoryTests.kt:com.sap.ec.mobileengage.embeddedmessaging.networking.EmbeddedMessagesRequestFactoryTests.kt</ID>
+    <ID>NewLineAtEndOfFile:EmbeddedMessagingInternalTests.kt:com.sap.ec.api.embeddedmessaging.EmbeddedMessagingInternalTests.kt</ID>
+    <ID>NewLineAtEndOfFile:EmbeddedMessagingPagingSourceTests.kt:com.sap.ec.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPagingSourceTests.kt</ID>
+    <ID>NewLineAtEndOfFile:EmbeddedMessagingTests.kt:com.sap.ec.api.embeddedmessaging.EmbeddedMessagingTests.kt</ID>
+    <ID>NewLineAtEndOfFile:EnableOrganizerTests.kt:com.sap.ec.enable.EnableOrganizerTests.kt</ID>
+    <ID>NewLineAtEndOfFile:EventActionFactoryTests.kt:com.sap.ec.mobileengage.action.EventActionFactoryTests.kt</ID>
+    <ID>NewLineAtEndOfFile:EventClientTests.kt:com.sap.ec.networking.clients.event.EventClientTests.kt</ID>
+    <ID>NewLineAtEndOfFile:EventTests.kt:com.sap.ec.networking.clients.event.EventTests.kt</ID>
+    <ID>NewLineAtEndOfFile:EventTrackerInternalTests.kt:com.sap.ec.api.event.EventTrackerInternalTests.kt</ID>
+    <ID>NewLineAtEndOfFile:EventTrackerTests.kt:com.sap.ec.api.event.EventTrackerTests.kt</ID>
+    <ID>NewLineAtEndOfFile:FakeLogger.kt:com.sap.ec.fake.FakeLogger.kt</ID>
+    <ID>NewLineAtEndOfFile:FakeStringStorage.kt:com.sap.ec.fake.FakeStringStorage.kt</ID>
+    <ID>NewLineAtEndOfFile:FetchEmbeddedMessagingMetaStateTests.kt:com.sap.ec.init.states.FetchEmbeddedMessagingMetaStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:FollowUpChangeAppCodeOrganizerTests.kt:com.sap.ec.mobileengage.config.FollowUpChangeAppCodeOrganizerTests.kt</ID>
+    <ID>NewLineAtEndOfFile:GathererConfigTests.kt:com.sap.ec.api.config.GathererConfigTests.kt</ID>
+    <ID>NewLineAtEndOfFile:GathererInAppTests.kt:com.sap.ec.api.inapp.GathererInAppTests.kt</ID>
+    <ID>NewLineAtEndOfFile:GeneralBatchingTests.kt:com.sap.ec.core.channel.GeneralBatchingTests.kt</ID>
+    <ID>NewLineAtEndOfFile:GenericApiTests.kt:com.sap.ec.api.generic.GenericApiTests.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppDownloaderTests.kt:com.sap.ec.mobileengage.inapp.networking.download.InAppDownloaderTests.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppEventConsumerTest.kt:com.sap.ec.mobileengage.inapp.presentation.InAppEventConsumerTest.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppInternalTests.kt:com.sap.ec.api.inapp.InAppInternalTests.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppJsBridgeFactoryTest.kt:com.sap.ec.mobileengage.inapp.InAppJsBridgeFactoryTest.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppJsBridgeTests.kt:com.sap.ec.mobileengage.inapp.InAppJsBridgeTests.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppPresenterTests.kt:com.sap.ec.mobileengage.inapp.InAppPresenterTests.kt</ID>
+    <ID>NewLineAtEndOfFile:InappTests.kt:com.sap.ec.api.inapp.InappTests.kt</ID>
+    <ID>NewLineAtEndOfFile:InitializerStateTests.kt:com.sap.ec.init.states.InitializerStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:InlineInAppMessageFetcherTests.kt:com.sap.ec.mobileengage.inapp.networking.download.InlineInAppMessageFetcherTests.kt</ID>
+    <ID>NewLineAtEndOfFile:IosNotificationConstantTests.kt:com.sap.ec.core.device.IosNotificationConstantTests.kt</ID>
+    <ID>NewLineAtEndOfFile:JsBridgeUtilsTests.kt:com.sap.ec.networking.clients.jsbridge.JsBridgeUtilsTests.kt</ID>
+    <ID>NewLineAtEndOfFile:JsonExtensionsTests.kt:com.sap.ec.util.JsonExtensionsTests.kt</ID>
+    <ID>NewLineAtEndOfFile:LanguageHandlerTests.kt:com.sap.ec.core.language.LanguageHandlerTests.kt</ID>
+    <ID>NewLineAtEndOfFile:LaunchApplicationActionTests.kt:com.sap.ec.core.actions.LaunchApplicationActionTests.kt</ID>
+    <ID>NewLineAtEndOfFile:LegacySharedPreferencesWrapperTest.kt:com.sap.ec.db_migration.LegacySharedPreferencesWrapperTest.kt</ID>
+    <ID>NewLineAtEndOfFile:LinkContactStateTests.kt:com.sap.ec.reregistration.states.LinkContactStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ListPageModelTests.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.list.ListPageModelTests.kt</ID>
+    <ID>NewLineAtEndOfFile:LogEventRegistryTests.kt:com.sap.ec.core.log.LogEventRegistryTests.kt</ID>
+    <ID>NewLineAtEndOfFile:LoggingClientTests.kt:com.sap.ec.networking.clients.logging.LoggingClientTests.kt</ID>
+    <ID>NewLineAtEndOfFile:LoggingContactTests.kt:com.sap.ec.api.contact.LoggingContactTests.kt</ID>
+    <ID>NewLineAtEndOfFile:LoggingEmbeddedMessagingTests.kt:com.sap.ec.api.embeddedmessaging.LoggingEmbeddedMessagingTests.kt</ID>
+    <ID>NewLineAtEndOfFile:LoggingEventTrackerTests.kt:com.sap.ec.api.event.LoggingEventTrackerTests.kt</ID>
+    <ID>NewLineAtEndOfFile:LoggingPushTests.kt:com.sap.ec.api.push.LoggingPushTests.kt</ID>
+    <ID>NewLineAtEndOfFile:MessageItemModelTests.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemModelTests.kt</ID>
+    <ID>NewLineAtEndOfFile:MessageItemViewModelTests.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelTests.kt</ID>
+    <ID>NewLineAtEndOfFile:MockHttpClientFactory.kt:com.sap.ec.testutil.MockHttpClientFactory.kt</ID>
+    <ID>NewLineAtEndOfFile:MutableListTests.kt:com.sap.ec.core.collections.MutableListTests.kt</ID>
+    <ID>NewLineAtEndOfFile:NaturalBatchingTests.kt:com.sap.ec.core.channel.NaturalBatchingTests.kt</ID>
+    <ID>NewLineAtEndOfFile:OpenExternalUrlActionTests.kt:com.sap.ec.mobileengage.action.actions.OpenExternalUrlActionTests.kt</ID>
+    <ID>NewLineAtEndOfFile:PageLocationProviderTests.kt:com.sap.ec.core.providers.pagelocation.PageLocationProviderTests.kt</ID>
+    <ID>NewLineAtEndOfFile:PlatformInitializerTest.kt:com.sap.ec.enable.PlatformInitializerTest.kt</ID>
+    <ID>NewLineAtEndOfFile:PushActionFactoryTests.kt:com.sap.ec.mobileengage.action.PushActionFactoryTests.kt</ID>
+    <ID>NewLineAtEndOfFile:PushGathererTests.kt:com.sap.ec.api.push.PushGathererTests.kt</ID>
+    <ID>NewLineAtEndOfFile:PushToInAppHandlerTest.kt:com.sap.ec.mobileengage.pushtoinapp.PushToInAppHandlerTest.kt</ID>
+    <ID>NewLineAtEndOfFile:RandomProviderTests.kt:com.sap.ec.core.providers.RandomProviderTests.kt</ID>
+    <ID>NewLineAtEndOfFile:RegisterClientStateTests.kt:com.sap.ec.enable.states.RegisterClientStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:RegisterEventBasedClientsStateTests.kt:com.sap.ec.enable.states.RegisterEventBasedClientsStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:RegisterEventConsumersStateTests.kt:com.sap.ec.init.states.RegisterEventConsumersStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:RegisterInstancesStateTests.kt:com.sap.ec.init.states.RegisterInstancesStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:RegisterSdkEventDistributorStateTests.kt:com.sap.ec.init.states.RegisterSdkEventDistributorStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:RegisterWatchdogsStateTests.kt:com.sap.ec.init.states.RegisterWatchdogsStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:RemoteConfigClientTests.kt:com.sap.ec.networking.clients.remoteConfig.RemoteConfigClientTests.kt</ID>
+    <ID>NewLineAtEndOfFile:RemoteConfigResponseHandlerTests.kt:com.sap.ec.remoteConfig.RemoteConfigResponseHandlerTests.kt</ID>
+    <ID>NewLineAtEndOfFile:RemoteLoggerTests.kt:com.sap.ec.core.log.RemoteLoggerTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ReportingActionTests.kt:com.sap.ec.mobileengage.action.actions.ReportingActionTests.kt</ID>
+    <ID>NewLineAtEndOfFile:RequestContextTests.kt:com.sap.ec.core.networking.context.RequestContextTests.kt</ID>
+    <ID>NewLineAtEndOfFile:RequestPushPermissionActionTests.kt:com.sap.ec.mobileengage.action.actions.RequestPushPermissionActionTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ReregistrationClientTests.kt:com.sap.ec.networking.clients.reregistration.ReregistrationClientTests.kt</ID>
+    <ID>NewLineAtEndOfFile:ResponseExtensionTests.kt:com.sap.ec.response.ResponseExtensionTests.kt</ID>
+    <ID>NewLineAtEndOfFile:RestoreOperationalEventsStateTests.kt:com.sap.ec.init.states.RestoreOperationalEventsStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:RestoreSavedSdkEventsStateTests.kt:com.sap.ec.enable.states.RestoreSavedSdkEventsStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:RunCatchingWithoutCancellationTests.kt:com.sap.ec.util.RunCatchingWithoutCancellationTests.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkConfigLoaderStateTests.kt:com.sap.ec.init.states.SdkConfigLoaderStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkContextTests.kt:com.sap.ec.context.SdkContextTests.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkEventDistributorTests.kt:com.sap.ec.core.channel.SdkEventDistributorTests.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkEventWaiterTests.kt:com.sap.ec.core.channel.SdkEventWaiterTests.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkLoggerTests.kt:com.sap.ec.core.log.SdkLoggerTests.kt</ID>
+    <ID>NewLineAtEndOfFile:SessionSubscriptionStateTests.kt:com.sap.ec.init.states.SessionSubscriptionStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:SetupTests.kt:com.sap.ec.api.setup.SetupTests.kt</ID>
+    <ID>NewLineAtEndOfFile:StorageTests.kt:com.sap.ec.core.storage.StorageTests.kt</ID>
+    <ID>NewLineAtEndOfFile:StoreTests.kt:com.sap.ec.core.storage.StoreTests.kt</ID>
+    <ID>NewLineAtEndOfFile:StringStorageTests.kt:com.sap.ec.core.storage.StringStorageTests.kt</ID>
+    <ID>NewLineAtEndOfFile:TestClass.kt:com.sap.ec.TestClass.kt</ID>
+    <ID>NewLineAtEndOfFile:TestDataClass.kt:com.sap.ec.model.TestDataClass.kt</ID>
+    <ID>NewLineAtEndOfFile:TestEngagementCloudSDKConfig.kt:com.sap.ec.TestEngagementCloudSDKConfig.kt</ID>
+    <ID>NewLineAtEndOfFile:ThreadSafePersistentStoreTests.kt:com.sap.ec.core.collections.ThreadSafePersistentStoreTests.kt</ID>
+    <ID>NewLineAtEndOfFile:TranslationMapperTests.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.translation.TranslationMapperTests.kt</ID>
+    <ID>NewLineAtEndOfFile:TypedStorageTests.kt:com.sap.ec.core.storage.TypedStorageTests.kt</ID>
+    <ID>NewLineAtEndOfFile:UUIDProviderTests.kt:com.sap.ec.core.providers.UUIDProviderTests.kt</ID>
+    <ID>NewLineAtEndOfFile:UnlinkContactStateTests.kt:com.sap.ec.disable.states.UnlinkContactStateTests.kt</ID>
+    <ID>NewLineAtEndOfFile:UrlFactoryTests.kt:com.sap.ec.core.url.UrlFactoryTests.kt</ID>
+    <ID>PackageNaming:LegacySharedPreferencesWrapperTest.kt:package com.sap.ec.db_migration</ID>
+    <ID>SwallowedException:SdkEventDistributorTests.kt:SdkEventDistributorTests$e: TimeoutCancellationException</ID>
+    <ID>TooGenericExceptionThrown:GenericNetworkClientTests.kt:GenericNetworkClientTests$throw Exception("No internet connection")</ID>
+    <ID>TooGenericExceptionThrown:GenericNetworkClientTests.kt:GenericNetworkClientTests$throw Throwable("No internet connection")</ID>
+    <ID>UnusedPrivateProperty:ECClientTests.kt:ECClientTests$private val now = Clock.System.now()</ID>
+    <ID>UnusedVariable:RandomProviderTests.kt:RandomProviderTests$i</ID>
+    <ID>UtilityClassWithPublicConstructor:MockHttpClientFactory.kt:MockHttpClientFactory</ID>
+    <ID>VarCouldBeVal:LoggingContactTests.kt:LoggingContactTests$private var slot = Capture.slot&lt;LogEntry>()</ID>
+    <ID>VarCouldBeVal:LoggingEmbeddedMessagingTests.kt:LoggingEmbeddedMessagingTests$private var slot = Capture.slot&lt;LogEntry>()</ID>
+    <ID>VarCouldBeVal:LoggingEventTrackerTests.kt:LoggingEventTrackerTests$private var slot = Capture.slot&lt;LogEntry>()</ID>
+    <ID>VarCouldBeVal:SdkContextTests.kt:SdkContextTests$private var features: MutableSet&lt;Features> = mutableSetOf()</ID>
+  </CurrentIssues>
+</SmellBaseline>

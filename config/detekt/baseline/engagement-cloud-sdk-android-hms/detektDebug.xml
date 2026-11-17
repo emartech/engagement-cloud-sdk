@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>EmptyDefaultConstructor:SAPEngagementCloudHuaweiMessagingService.kt:SAPEngagementCloudHuaweiMessagingService</ID>
+    <ID>ForbiddenPublicDataClass:HuaweiMessagingServiceRegistrationOptions.kt:HuaweiMessagingServiceRegistrationOptions</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SAPEngagementCloudHuaweiMessagingService.kt:SAPEngagementCloudHuaweiMessagingService.Companion$const val EMS_KEY = "ems"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SAPEngagementCloudHuaweiMessagingService.kt:SAPEngagementCloudHuaweiMessagingService.Companion$const val PUSH_MESSAGE_PAYLOAD_INTENT_FILTER_ACTION = "com.sap.ec.sdk.PUSH_MESSAGE_PAYLOAD"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SAPEngagementCloudHuaweiMessagingService.kt:SAPEngagementCloudHuaweiMessagingService.Companion$const val PUSH_MESSAGE_PAYLOAD_INTENT_KEY = "pushPayload"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SAPEngagementCloudHuaweiMessagingService.kt:SAPEngagementCloudHuaweiMessagingService.Companion$const val PUSH_TOKEN_INTENT_FILTER_ACTION = "com.sap.ec.sdk.PUSH_TOKEN"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SAPEngagementCloudHuaweiMessagingService.kt:SAPEngagementCloudHuaweiMessagingService.Companion$const val PUSH_TOKEN_INTENT_KEY = "pushToken"</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:HuaweiMessagingServiceRegistrationOptions.kt:HuaweiMessagingServiceRegistrationOptions</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:HuaweiServiceChecker.kt:HuaweiServiceChecker</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SAPEngagementCloudHuaweiMessagingService.kt:SAPEngagementCloudHuaweiMessagingService : HmsMessageService</ID>
+    <ID>NewLineAtEndOfFile:HuaweiServiceChecker.kt:com.sap.ec.HuaweiServiceChecker.kt</ID>
+    <ID>NewLineAtEndOfFile:SAPEngagementCloudHuaweiMessagingService.kt:com.sap.ec.service.SAPEngagementCloudHuaweiMessagingService.kt</ID>
+  </CurrentIssues>
+</SmellBaseline>

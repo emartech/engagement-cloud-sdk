@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>EmptyFunctionBlock:trackPushToken.ios.kt:{ }</ID>
+    <ID>FunctionNaming:MainViewController.kt:fun MainViewController</ID>
+    <ID>NewLineAtEndOfFile:enableTracking.ios.kt:com.sap.ec.sample.enableTracking.ios.kt</ID>
+    <ID>NewLineAtEndOfFile:trackPushToken.ios.kt:com.sap.ec.sample.trackPushToken.ios.kt</ID>
+  </CurrentIssues>
+</SmellBaseline>

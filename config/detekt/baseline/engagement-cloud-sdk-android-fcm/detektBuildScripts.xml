@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>MaxLineLength:build.gradle.kts:url = uri("https://maven.pkg.github.com/${System.getenv("GITHUB_REPO") ?: "emartech/engagement-cloud-sdk"}")</ID>
+    <ID>NewLineAtEndOfFile:build.gradle.kts:.build.gradle.kts</ID>
+  </CurrentIssues>
+</SmellBaseline>

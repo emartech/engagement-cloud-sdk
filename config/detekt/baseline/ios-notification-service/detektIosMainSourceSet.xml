@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ForbiddenPublicDataClass:AppEventActionModel.kt:AppEventActionModel : ActionModel</ID>
+    <ID>ForbiddenPublicDataClass:CustomEventActionModel.kt:CustomEventActionModel : ActionModel</ID>
+    <ID>ForbiddenPublicDataClass:DismissActionModel.kt:DismissActionModel : ActionModel</ID>
+    <ID>InvalidPackageDeclaration:ActionModel.kt:package com.sap.ec.iosNotificationService.models</ID>
+    <ID>InvalidPackageDeclaration:AppEventActionModel.kt:package com.sap.ec.iosNotificationService.models</ID>
+    <ID>InvalidPackageDeclaration:CustomEventActionModel.kt:package com.sap.ec.iosNotificationService.models</ID>
+    <ID>InvalidPackageDeclaration:DismissActionModel.kt:package com.sap.ec.iosNotificationService.models</ID>
+    <ID>InvalidPackageDeclaration:Downloader.kt:package com.sap.ec.iosNotificationService.networking</ID>
+    <ID>InvalidPackageDeclaration:FileSmith.kt:package com.sap.ec.iosNotificationService.file</ID>
+    <ID>InvalidPackageDeclaration:OpenUrlActionModel.kt:package com.sap.ec.iosNotificationService.models</ID>
+    <ID>InvalidPackageDeclaration:Provider.kt:package com.sap.ec.iosNotificationService.provider</ID>
+    <ID>InvalidPackageDeclaration:SessionProvider.kt:package com.sap.ec.iosNotificationService.provider</ID>
+    <ID>InvalidPackageDeclaration:UUIDProvider.kt:package com.sap.ec.iosNotificationService.provider</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ActionModel.kt:ActionModel</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AppEventActionModel.kt:AppEventActionModel : ActionModel</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:CustomEventActionModel.kt:CustomEventActionModel : ActionModel</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DismissActionModel.kt:DismissActionModel : ActionModel</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:Downloader.kt:Downloader</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:Downloader.kt:suspend fun NSURLSession.dataTask: NSData?</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:Downloader.kt:suspend fun NSURLSession.downloadTask: Pair&lt;NSURL, NSURLResponse></ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EngagementCloudNotificationService.kt:EngagementCloudNotificationService</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EngagementCloudNotificationService.kt:PayloadVersion</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:FileSmith.kt:FileSmith</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:NotificationCenter.kt:NotificationCenter : NotificationCenterApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:NotificationCenter.kt:NotificationCenterApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:NotificationCenter.kt:suspend fun UNUserNotificationCenter.notificationCategories: MutableSet&lt;UNNotificationCategory></ID>
+    <ID>LibraryEntitiesShouldNotBePublic:OpenUrlActionModel.kt:OpenUrlActionModel : ActionModel</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:Provider.kt:Provider&lt;Value></ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SessionProvider.kt:SessionProvider : Provider</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:UUIDProvider.kt:UUIDProvider : Provider</ID>
+    <ID>MaxLineLength:EngagementCloudNotificationService.kt:EngagementCloudNotificationService$if (it is DismissActionModel) UNNotificationActionOptionDestructive else UNNotificationActionOptionForeground</ID>
+    <ID>MaxLineLength:FileSmith.kt:FileSmith$return</ID>
+    <ID>NewLineAtEndOfFile:CustomEventActionModel.kt:com.sap.ec.iosNotificationService.models.CustomEventActionModel.kt</ID>
+    <ID>NewLineAtEndOfFile:NotificationCenter.kt:com.sap.ec.notification.NotificationCenter.kt</ID>
+    <ID>ReturnCount:Downloader.kt:Downloader$suspend fun downloadFile: NSURL?</ID>
+    <ID>ReturnCount:FileSmith.kt:FileSmith$@OptIn(ExperimentalForeignApi::class) suspend fun tmpFileUrl: NSURL?</ID>
+  </CurrentIssues>
+</SmellBaseline>

@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>NewLineAtEndOfFile:FakeBrowserWindowHandler.kt:com.sap.ec.window.FakeBrowserWindowHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:NotificationClickHandlerTests.kt:com.sap.ec.notification.NotificationClickHandlerTests.kt</ID>
+  </CurrentIssues>
+</SmellBaseline>

@@ -1,0 +1,209 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>InjectDispatcher:LegacySDKMigrationStateTest.kt:LegacySDKMigrationStateTest$IO</ID>
+    <ID>InjectDispatcher:TransitionSafeActivityWatchdogTests.kt:TransitionSafeActivityWatchdogTests$Default</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidConfigTests.kt:AndroidConfigTests$@Test fun changeApplicationCode_shouldCall_sameMethod_onConfigApi_andReturnFailure_Result</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidConfigTests.kt:AndroidConfigTests$@Test fun changeApplicationCode_shouldCall_sameMethod_onConfigApi_andReturnSuccessResult</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidConfigTests.kt:AndroidConfigTests$@Test fun getApplicationCode_shouldCall_sameMethod_onConfigApi</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidConfigTests.kt:AndroidConfigTests$@Test fun getApplicationVersion_shouldCall_sameMethod_onConfigApi</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidConfigTests.kt:AndroidConfigTests$@Test fun getClientId_shouldCall_sameMethod_onConfigApi</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidConfigTests.kt:AndroidConfigTests$@Test fun getCurrentSdkState_shouldCall_sameMethod_onConfigApi</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidConfigTests.kt:AndroidConfigTests$@Test fun getLanguageCode_shouldCall_sameMethod_onConfigApi</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidConfigTests.kt:AndroidConfigTests$@Test fun getNotificationSettings_shouldCall_sameMethod_onAndroidNotificationSettingsCollector</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidConfigTests.kt:AndroidConfigTests$@Test fun getSdkVersion_shouldCall_sameMethod_onConfigApi</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidConfigTests.kt:AndroidConfigTests$@Test fun resetLanguage_shouldCall_sameMethod_onConfigApi_andReturnFailure_Result</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidConfigTests.kt:AndroidConfigTests$@Test fun resetLanguage_shouldCall_sameMethod_onConfigApi_andReturnSuccess_Result</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidConfigTests.kt:AndroidConfigTests$@Test fun setLanguage_shouldCall_sameMethod_onConfigApi_andReturnFailure_Result</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidConfigTests.kt:AndroidConfigTests$@Test fun setLanguage_shouldCall_sameMethod_onConfigApi_andReturnSuccess_Result</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidExternalUrlOpenerTests.kt:AndroidExternalUrlOpenerTests$@Test fun testOpen_shouldNotOpenInvalidUrl</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidExternalUrlOpenerTests.kt:AndroidExternalUrlOpenerTests$@Test fun testOpen_shouldNotOpenValidUrlWhenActivityIsNotFound</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidExternalUrlOpenerTests.kt:AndroidExternalUrlOpenerTests$@Test fun testOpen_shouldOpenValidUrl</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidPushMessageFactoryTest.kt:AndroidPushMessageFactoryTest$@Before fun setup</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidPushMessageFactoryTest.kt:AndroidPushMessageFactoryTest$@Test fun map_shouldDelegate_toHuaweiMapperV2_whenEmsVersion_isHUAWEI_V2</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidPushMessageFactoryTest.kt:AndroidPushMessageFactoryTest$@Test fun map_shouldDelegate_toMapperV2_whenEmsVersion_isFCM_V2</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidPushMessageFactoryTest.kt:AndroidPushMessageFactoryTest$@Test fun map_shouldDelegate_toSilentHuaweiMapperV2_whenEmsVersion_isHUAWEI_V2_andSilentProperty_isTrue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidPushMessageFactoryTest.kt:AndroidPushMessageFactoryTest$@Test fun map_shouldDelegate_toSilentMapperV2_whenEmsVersion_isFCM_V2_andSilentProperty_isTrue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidPushMessageFactoryTest.kt:AndroidPushMessageFactoryTest$@Test fun map_shouldReturnNull_whenEmsVersion_isNotFCM_V2</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidPushMessageFactoryTest.kt:AndroidPushMessageFactoryTest$@Test fun map_shouldReturnNull_whenEmsVersion_isNotHUAWEI_V2</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidPushMessageFactoryTest.kt:AndroidPushMessageFactoryTest$@Test fun map_shouldReturnNull_whenPayload_isNotMatchingAnyMapper</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidPushV2MapperTest.kt:AndroidPushV2MapperTest$@Before fun setup</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidPushV2MapperTest.kt:AndroidPushV2MapperTest$@Test fun map_shouldReturnAndroidPushMessage_whenInputIsValid</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidPushV2MapperTest.kt:AndroidPushV2MapperTest$@Test fun map_shouldReturnAndroidPushMessage_whenInputIsValid_withPushToInApp_defaultAction</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidPushV2MapperTest.kt:AndroidPushV2MapperTest$@Test fun map_shouldReturnNull_whenExceptionThrown</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidSetupTests.kt:AndroidSetupTests$@Test fun disableTracking_shouldDelegate_toSetupApi_andReturnItsResult</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidSetupTests.kt:AndroidSetupTests$@Test fun enableTracking_shouldDelegate_toSetupApi_andReturnItsResult</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidSqlDelightEventsDaoTests.kt:AndroidSqlDelightEventsDaoTests$@Test fun testGetEvents_whenNothingWasInserted</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidSqlDelightEventsDaoTests.kt:AndroidSqlDelightEventsDaoTests$@Test fun testInsertEvent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidSqlDelightEventsDaoTests.kt:AndroidSqlDelightEventsDaoTests$@Test fun testRemoveAll_shouldRemoveAllEvents</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidSqlDelightEventsDaoTests.kt:AndroidSqlDelightEventsDaoTests$@Test fun testRemoveEvent_shouldDoNothing_whenNothingWasInserted</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidSqlDelightEventsDaoTests.kt:AndroidSqlDelightEventsDaoTests$@Test fun testRemoveEvent_shouldRemoveEvent_ById</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:AndroidSqlDelightEventsDaoTests.kt:AndroidSqlDelightEventsDaoTests$@Test fun testUpsertEvent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DateTimeFormatTest.kt:DateTimeFormatTest.Companion$val TEST_TIMESTAMP = Instant.parse("2026-03-01T01:01:00Z").toEpochMilliseconds()</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeviceInfoCollectorTests.android.kt:DeviceInfoCollectorTests$@Test fun collectAsDeviceInfoForLogs_shouldReturn_deviceInfo_whenNative</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeviceInfoCollectorTests.android.kt:DeviceInfoCollectorTests$@Test fun collect_platformShouldBe_huawei</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeviceInfoCollectorTests.android.kt:DeviceInfoCollectorTests$@Test fun collect_shouldReturn_deviceInfo_whenNative</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeviceInfoCollectorTests.android.kt:DeviceInfoCollectorTests$@Test fun collect_shouldReturn_deviceInfo_whenWrapper</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeviceInfoCollectorTests.android.kt:DeviceInfoCollectorTests$@Test fun collect_shouldReturn_overWritten_language</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeviceInfoCollectorTests.android.kt:DeviceInfoCollectorTests$@Test fun getClientId_shouldReturnGenerateNewId_ifStorageReturnsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeviceInfoCollectorTests.android.kt:DeviceInfoCollectorTests$@Test fun getPushSettings_shouldCall_androidNotificationSettingsCollector_andReturn_enabledFalse</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:DeviceInfoCollectorTests.android.kt:DeviceInfoCollectorTests$@Test fun getPushSettings_shouldCall_androidNotificationSettingsCollector_andReturn_enabledTrue</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingIntegrationTests.kt:EmbeddedMessagingIntegrationTests$@BeforeTest fun setup</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingIntegrationTests.kt:EmbeddedMessagingIntegrationTests$@Ignore("Fake API is discontinued, will update tests for the real API") @Test fun testFetchBadgeCount_should_handle_requests</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingIntegrationTests.kt:EmbeddedMessagingIntegrationTests$@Ignore("Fake API is discontinued, will update tests for the real API") @Test fun testFetchMessages_should_handle_requests</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingIntegrationTests.kt:EmbeddedMessagingIntegrationTests$@Ignore("Fake API is discontinued, will update tests for the real API") @Test fun testFetchMeta_should_handle_requests</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:EmbeddedMessagingIntegrationTests.kt:EmbeddedMessagingIntegrationTests$@Ignore("Fake API is discontinued, will update tests for the real API") @Test fun testUpdateTags_should_handle_requests</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:HuaweiPushV2MapperTest.kt:HuaweiPushV2MapperTest$@Before fun setup</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:HuaweiPushV2MapperTest.kt:HuaweiPushV2MapperTest$@Test fun map_shouldReturnAndroidPushMessage_whenInputIsValid</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:HuaweiPushV2MapperTest.kt:HuaweiPushV2MapperTest$@Test fun map_shouldReturnNull_andLogError_whenEms_objectIsMissing</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:HuaweiPushV2MapperTest.kt:HuaweiPushV2MapperTest$@Test fun map_shouldReturnNull_andLogError_whenExceptionThrown</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:HuaweiPushV2MapperTest.kt:HuaweiPushV2MapperTest$@Test fun map_shouldReturnNull_andLogError_whenNotification_objectIsMissing</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:HuaweiPushV2MapperTest.kt:HuaweiPushV2MapperTest$@Test fun map_shouldReturnNull_whenBodyIsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:HuaweiPushV2MapperTest.kt:HuaweiPushV2MapperTest$@Test fun map_shouldReturnNull_whenTitleIsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppViewProviderTests.kt:InAppViewProviderTests$@Test fun provide_shouldReturn_webInAppViewInstance</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:InAppViewTests.kt:InAppViewTests$@OptIn(ExperimentalCoroutinesApi::class) @Test fun load_should_createWebView_andAddItToLayout</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LaunchApplicationHandlerTest.kt:LaunchApplicationHandlerTest$@Test fun testLaunchApplication_when_activityIsGiven_inConfig_andAndroidVersionIsBelow34</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LaunchApplicationHandlerTest.kt:LaunchApplicationHandlerTest$@Test fun testLaunchApplication_when_activityIsNull_inConfig</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LaunchApplicationHandlerTest.kt:LaunchApplicationHandlerTest$@Test fun testLaunchApplication_when_activityIsNull_inConfig_andLaunchIntentIsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LaunchApplicationHandlerTest.kt:LaunchApplicationHandlerTest.Companion$const val BACKGROUND_ACTIVITY_CREATOR_START_MODE_KEY = "android.activity.pendingIntentCreatorBackgroundActivityStartMode"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LaunchApplicationHandlerTest.kt:LaunchApplicationHandlerTest.Companion$const val BACKGROUND_ACTIVITY_START_MODE_KEY = "android.pendingIntent.backgroundActivityAllowed"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LegacySDKMigrationStateTest.kt:LegacySDKMigrationStateTest$@Test fun active_shouldMigrateLegacyData</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LegacySDKMigrationStateTest.kt:LegacySDKMigrationStateTest$@Test fun active_shouldMigrateLegacyData_evenIfPartOfTheMigrationFails_andThereIsMissingData</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LegacySDKMigrationStateTest.kt:LegacySDKMigrationStateTest$@Test fun active_shouldNotLeakAnyException</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LegacySDKMigrationStateTest.kt:LegacySDKMigrationStateTest$@Test fun active_shouldReturn_whenDataHasAlreadyBeenMigrated</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LegacySDKMigrationStateTest.kt:LegacySDKMigrationStateTest.Companion$const val TEST_CLIENT_ID = "test_client_id"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LegacySDKMigrationStateTest.kt:LegacySDKMigrationStateTest.Companion$const val TEST_CLIENT_STATE = "test_client_state"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LegacySDKMigrationStateTest.kt:LegacySDKMigrationStateTest.Companion$const val TEST_CONTACT_TOKEN = "test_contact_token"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LegacySDKMigrationStateTest.kt:LegacySDKMigrationStateTest.Companion$const val TEST_DEVICE_EVENT_STATE = "test_device_event_state"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LegacySDKMigrationStateTest.kt:LegacySDKMigrationStateTest.Companion$const val TEST_PUSH_TOKEN = "test_push_token"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:LegacySDKMigrationStateTest.kt:LegacySDKMigrationStateTest.Companion$const val TEST_REFRESH_TOKEN = "test_refresh_token"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NotificationCompatStylerTest.kt:NotificationCompatStylerTest$@Test fun style_shouldCreateBigPictureStyle_andNotSetLargeIcon_whenNotificationStyleIsBigPictureAndIconIsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NotificationCompatStylerTest.kt:NotificationCompatStylerTest$@Test fun style_shouldCreateBigPictureStyle_andSetImagesAsLargeIcon_whenNotificationStyleIsNotSet_andImageUrlIsNotNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NotificationCompatStylerTest.kt:NotificationCompatStylerTest$@Test fun style_shouldCreateBigPictureStyle_andSetLargeIcon_whenNotificationStyleIsBigPictureAndIconIsNotNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NotificationCompatStylerTest.kt:NotificationCompatStylerTest$@Test fun style_shouldCreateBigTextStyle_andNotSetLargeIcon_whenNotificationStyleIsThumbnailAndImageIsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NotificationCompatStylerTest.kt:NotificationCompatStylerTest$@Test fun style_shouldCreateBigTextStyle_andSetImageAsLargeIcon_whenNotificationStyleIsThumbnail</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NotificationCompatStylerTest.kt:NotificationCompatStylerTest$@Test fun style_shouldCreateBigTextStyle_whenNotificationStyleIsBigText</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NotificationCompatStylerTest.kt:NotificationCompatStylerTest$@Test fun style_shouldCreateBigTextStyle_whenNotificationStyleIsNotSet_andImageUrlIsNull</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NotificationCompatStylerTest.kt:NotificationCompatStylerTest$@Test fun style_shouldCreateMessagingStyle_whenNotificationStyleIsMessage</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NotificationCompatStylerTest.kt:NotificationCompatStylerTest.Companion$const val CHANNEL_ID = "channelId"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NotificationCompatStylerTest.kt:NotificationCompatStylerTest.Companion$const val ICON_URL = "iconUrl"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NotificationCompatStylerTest.kt:NotificationCompatStylerTest.Companion$const val IMAGE_URL = "imageUrl"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NotificationIntentProcessorTests.kt:NotificationIntentProcessorTests$@Test fun testProcessIntent_shouldHandleAction_withActionHandler</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NotificationIntentProcessorTests.kt:NotificationIntentProcessorTests$@Test fun testProcessIntent_shouldHandleAction_withActionHandler_withMandatoryActions</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NotificationIntentProcessorTests.kt:NotificationIntentProcessorTests$@Test fun testProcessIntent_shouldHandleAction_withActionHandler_withMandatoryActions_whenActionIsPushToInApp</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NotificationIntentProcessorTests.kt:NotificationIntentProcessorTests$@Test fun testProcessIntent_shouldHandleAction_withActionHandler_withMandatoryActions_whenTriggeredWithDefaultAction</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NotificationIntentProcessorTests.kt:NotificationIntentProcessorTests$@Test fun testProcessIntent_shouldHandleMandatoryActions_withActionHandler_whenThereWasNoTriggeredAction</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NotificationIntentProcessorTests.kt:NotificationIntentProcessorTests$@Test fun testProcessIntent_shouldNotCrash_whenIntentContains_invalidJsonString_forDefaultAction</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NotificationIntentProcessorTests.kt:NotificationIntentProcessorTests$@Test fun testProcessIntent_shouldNotCrash_whenIntentContains_invalidJsonString_forThePushMessage</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NotificationIntentProcessorTests.kt:NotificationIntentProcessorTests$@Test fun testProcessIntent_shouldNotCrash_whenIntentContains_invalidJsonString_forTriggeredAction</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:NotificationIntentProcessorTests.kt:NotificationIntentProcessorTests$@Test fun testProcessIntent_shouldNotIncludeLaunchApplication_andBasicDismissAction_InMandatoryActions_whenActionIsDismiss</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushMessageBroadcastReceiverTest.kt:PushMessageBroadcastReceiverTest$@Test fun testOnReceive_shouldDoNothing_whenPushPayloadKeyIsNotPresent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushMessageBroadcastReceiverTest.kt:PushMessageBroadcastReceiverTest$@Test fun testOnReceive_shouldGetPushMessageFromIntentAndPresent</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushMessageBroadcastReceiverTest.kt:PushMessageBroadcastReceiverTest$@Test fun testOnReceive_shouldHandleSilentPushMessage</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushMessageBroadcastReceiverTest.kt:PushMessageBroadcastReceiverTest$@Test fun testOnReceive_shouldLogError_whenPushPayload_couldNotBeDecoded</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushMessageHandlerTest.kt:PushMessageHandlerTest$@Before fun setup</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushMessageHandlerTest.kt:PushMessageHandlerTest$@Test fun handle_should_emit_event_with_campaignId</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushMessageHandlerTest.kt:PushMessageHandlerTest$@Test fun handle_should_invoke_actions_when_silentPush</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushMessagePresenterTest.kt:PushMessagePresenterTest$@After fun tearDown</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushMessagePresenterTest.kt:PushMessagePresenterTest$@Before fun setup</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushMessagePresenterTest.kt:PushMessagePresenterTest$@Test fun present_shouldCreateDebugChannel_if_debugMode_and_channelId_isInvalid</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushMessagePresenterTest.kt:PushMessagePresenterTest$@Test fun present_shouldShowNotification_withCorrectData_withActions</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushMessagePresenterTest.kt:PushMessagePresenterTest$@Test fun present_shouldShowNotification_withCorrectData_withActionsAndDefaultAction</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushMessagePresenterTest.kt:PushMessagePresenterTest$@Test fun present_shouldShowNotification_withCorrectData_withBadgeCount</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushMessagePresenterTest.kt:PushMessagePresenterTest$@Test fun present_shouldShowNotification_withCorrectData_withDefaultActionOnly</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushMessagePresenterTest.kt:PushMessagePresenterTest$@Test fun present_shouldShowNotification_withCorrectData_withDismissActionModel_filledWithId</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushMessagePresenterTest.kt:PushMessagePresenterTest$@Test fun present_shouldShowNotification_withCorrectData_withoutActions</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushMessagePresenterTest.kt:PushMessagePresenterTest$@Test fun present_should_not_CreateDebugChannel_if_debugMode_and_channelId_is_valid</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushMessagePresenterTest.kt:PushMessagePresenterTest$@Test fun present_should_not_CreateDebugChannel_if_not_debugMode</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushTokenBroadcastReceiverTest.kt:PushTokenBroadcastReceiverTest$@Test fun testOnReceive_shouldCallPushApiWithToken</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushTokenBroadcastReceiverTest.kt:PushTokenBroadcastReceiverTest$@Test fun testOnReceive_shouldCallPut_onStringStorage_withToken</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SharedPreferenceCryptoTest.kt:SharedPreferenceCryptoTest$@Test fun decrypt_shouldReturn_encryptedValue_ifIllegalArgumentException_withBase64ErrorHappens</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SharedPreferenceCryptoTest.kt:SharedPreferenceCryptoTest$@Test fun decrypt_shouldReturn_null_andGenerateNewSecretKey_ifGeneralSecurityExceptionHappens</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SharedPreferenceCryptoTest.kt:SharedPreferenceCryptoTest$@Test fun decrypt_shouldReturn_null_ifExceptionHappens</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SharedPreferenceCryptoTest.kt:SharedPreferenceCryptoTest$@Test fun decrypt_shouldReturn_null_ifIllegalArgumentExceptionHappens</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SilentAndroidPushV2MapperTest.kt:SilentAndroidPushV2MapperTest$@Before fun setup</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SilentAndroidPushV2MapperTest.kt:SilentAndroidPushV2MapperTest$@Test fun map_shouldReturnAndroidPushMessage_whenInputIsValid</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SilentAndroidPushV2MapperTest.kt:SilentAndroidPushV2MapperTest$@Test fun map_shouldReturnNull_whenExceptionThrown</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SilentHuaweiPushV2MapperTest.kt:SilentHuaweiPushV2MapperTest$@Before fun setup</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SilentHuaweiPushV2MapperTest.kt:SilentHuaweiPushV2MapperTest$@Test fun map_shouldReturnNull_andLogError_whenExceptionThrown</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SilentHuaweiPushV2MapperTest.kt:SilentHuaweiPushV2MapperTest$@Test fun map_shouldReturnSilentAndroidPushMessage_whenInputIsValid</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:TransitionSafeActivityWatchdogTests.kt:TransitionSafeActivityWatchdogTests$@Test fun currentActivity_shouldReturn_activity</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:TransitionSafeActivityWatchdogTests.kt:TransitionSafeActivityWatchdogTests$@Test fun currentActivity_shouldReturn_null</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:TransitionSafeActivityWatchdogTests.kt:TransitionSafeActivityWatchdogTests$@Test fun waitForActivity_shouldReturn_activity_if_onResumed</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:TransitionSafeActivityWatchdogTests.kt:TransitionSafeActivityWatchdogTests$@Test fun waitForActivity_shouldReturn_activity_if_onResumed_forAtLeast_500ms</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:TransitionSafeActivityWatchdogTests.kt:TransitionSafeActivityWatchdogTests$@Test fun waitForActivity_shouldWaitForAnActivity_inResumed_beforeReturning</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidConfigTests.kt:AndroidConfigTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidExternalUrlOpenerTests.kt:AndroidExternalUrlOpenerTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidFileCacheTests.kt:AndroidFileCacheTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidNotificationSettingsCollectorTests.kt:AndroidNotificationSettingsCollectorTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidPushMessageFactoryTest.kt:AndroidPushMessageFactoryTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidPushV2MapperTest.kt:AndroidPushV2MapperTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidSetupTests.kt:AndroidSetupTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidSqlDelightEventsDaoTests.kt:AndroidSqlDelightEventsDaoTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DateTimeFormatTest.kt:DateTimeFormatTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DeviceInfoCollectorTests.android.kt:DeviceInfoCollectorTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EmbeddedMessagingIntegrationTests.kt:EmbeddedMessagingIntegrationTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:FakeActivity.kt:FakeActivity : AppCompatActivity</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:HuaweiPushV2MapperTest.kt:HuaweiPushV2MapperTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InAppViewProviderTests.kt:InAppViewProviderTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InAppViewTests.kt:InAppViewTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LaunchApplicationHandlerTest.kt:LaunchApplicationHandlerTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LegacySDKMigrationStateTest.kt:LegacySDKMigrationStateTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:MetadataReaderTest.kt:MetadataReaderTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:NotificationCompatStylerTest.kt:NotificationCompatStylerTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:NotificationIntentProcessorTests.kt:NotificationIntentProcessorTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PlatformInfoCollectorTest.android.kt.kt:PlatformInfoCollectorTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushMessageBroadcastReceiverTest.kt:PushMessageBroadcastReceiverTest : KoinTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushMessageHandlerTest.kt:PushMessageHandlerTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushMessagePresenterTest.kt:PushMessagePresenterTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushTokenBroadcastReceiverTest.kt:PushTokenBroadcastReceiverTest : KoinTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SdkTestInstrumentationRunner.kt:SdkTestInstrumentationRunner : AndroidJUnitRunner</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SharedPreferenceCryptoTest.kt:SharedPreferenceCryptoTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SilentAndroidPushV2MapperTest.kt:SilentAndroidPushV2MapperTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SilentHuaweiPushV2MapperTest.kt:SilentHuaweiPushV2MapperTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:TestApplication.kt:TestApplication : Application</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:TransitionSafeActivityWatchdogTests.kt:TransitionSafeActivityWatchdogTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:WebViewProviderTests.kt:WebViewProviderTests</ID>
+    <ID>LongMethod:SilentHuaweiPushV2MapperTest.kt:SilentHuaweiPushV2MapperTest$@Test fun map_shouldReturnSilentAndroidPushMessage_whenInputIsValid</ID>
+    <ID>MatchingDeclarationName:PlatformInfoCollectorTest.android.kt.kt:PlatformInfoCollectorTest</ID>
+    <ID>MaxLineLength:EmbeddedMessagingIntegrationTests.kt:EmbeddedMessagingIntegrationTests$embeddedMessagingBaseUrl = "https://embedded-messaging-staging.gservice.emarsys.com/embedded-messaging/fake-api"</ID>
+    <ID>MaxLineLength:NotificationIntentProcessorTests.kt:NotificationIntentProcessorTests$coEvery { mockActionFactory.create(BasicDismissActionModel(COLLAPSE_ID, COLLAPSE_ID)) } returns mockBasicDismissAction</ID>
+    <ID>MaxLineLength:NotificationIntentProcessorTests.kt:NotificationIntentProcessorTests$fun</ID>
+    <ID>MaxLineLength:PushMessageBroadcastReceiverTest.kt:PushMessageBroadcastReceiverTest$coEvery { mockPushMessageFactory.create(Json.decodeFromString(PUSH_MESSAGE_STRING)) } returns expectedPushMessage</ID>
+    <ID>MaxLineLength:PushMessageBroadcastReceiverTest.kt:PushMessageBroadcastReceiverTest$coEvery { mockPushMessageFactory.create(Json.decodeFromString(SILENT_PUSH_MESSAGE_STRING)) } returns expectedSilentPushMessage</ID>
+    <ID>MaxLineLength:PushMessagePresenterTest.kt:PushMessagePresenterTest$every { mockMetadataReader.getInt(any(), com.sap.ec.R.drawable.default_small_notification_icon) } returns ICON_ID</ID>
+    <ID>MemberNameEqualsClassName:PushMessageBroadcastReceiverTest.kt:PushMessageBroadcastReceiverTest$private fun pushMessageBroadcastReceiverTest</ID>
+    <ID>NewLineAtEndOfFile:AndroidConfigTests.kt:com.sap.ec.api.config.AndroidConfigTests.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidExternalUrlOpenerTests.kt:com.sap.ec.core.url.AndroidExternalUrlOpenerTests.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidFileCacheTests.kt:com.sap.ec.core.cache.AndroidFileCacheTests.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidNotificationSettingsCollectorTests.kt:com.sap.ec.core.device.notification.AndroidNotificationSettingsCollectorTests.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidPushMessageFactoryTest.kt:com.sap.ec.mobileengage.push.AndroidPushMessageFactoryTest.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidPushV2MapperTest.kt:com.sap.ec.mobileengage.push.mapper.AndroidPushV2MapperTest.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidSetupTests.kt:com.sap.ec.api.setup.AndroidSetupTests.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidSqlDelightEventsDaoTests.kt:com.sap.ec.core.db.events.AndroidSqlDelightEventsDaoTests.kt</ID>
+    <ID>NewLineAtEndOfFile:DateTimeFormatTest.kt:com.sap.ec.core.datetime.datetime.DateTimeFormatTest.kt</ID>
+    <ID>NewLineAtEndOfFile:DeviceInfoCollectorTests.android.kt:com.sap.ec.core.device.DeviceInfoCollectorTests.android.kt</ID>
+    <ID>NewLineAtEndOfFile:EmbeddedMessagingIntegrationTests.kt:com.sap.ec.integration.EmbeddedMessagingIntegrationTests.kt</ID>
+    <ID>NewLineAtEndOfFile:FakeActivity.kt:com.sap.ec.FakeActivity.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppViewProviderTests.kt:com.sap.ec.mobileengage.inapp.InAppViewProviderTests.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppViewTests.kt:com.sap.ec.mobileengage.inapp.InAppViewTests.kt</ID>
+    <ID>NewLineAtEndOfFile:LegacySDKMigrationStateTest.kt:com.sap.ec.init.states.LegacySDKMigrationStateTest.kt</ID>
+    <ID>NewLineAtEndOfFile:MetadataReaderTest.kt:com.sap.ec.core.resource.MetadataReaderTest.kt</ID>
+    <ID>NewLineAtEndOfFile:NotificationCompatStylerTest.kt:com.sap.ec.mobileengage.push.NotificationCompatStylerTest.kt</ID>
+    <ID>NewLineAtEndOfFile:NotificationIntentProcessorTests.kt:com.sap.ec.mobileengage.push.NotificationIntentProcessorTests.kt</ID>
+    <ID>NewLineAtEndOfFile:PlatformInfoCollectorTest.android.kt.kt:com.sap.ec.core.device.PlatformInfoCollectorTest.android.kt.kt</ID>
+    <ID>NewLineAtEndOfFile:PushMessageBroadcastReceiverTest.kt:com.sap.ec.mobileengage.push.PushMessageBroadcastReceiverTest.kt</ID>
+    <ID>NewLineAtEndOfFile:PushMessageHandlerTest.kt:com.sap.ec.mobileengage.push.PushMessageHandlerTest.kt</ID>
+    <ID>NewLineAtEndOfFile:PushMessagePresenterTest.kt:com.sap.ec.mobileengage.push.PushMessagePresenterTest.kt</ID>
+    <ID>NewLineAtEndOfFile:PushTokenBroadcastReceiverTest.kt:com.sap.ec.mobileengage.push.PushTokenBroadcastReceiverTest.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkTestInstrumentationRunner.kt:com.sap.ec.SdkTestInstrumentationRunner.kt</ID>
+    <ID>NewLineAtEndOfFile:SharedPreferenceCryptoTest.kt:com.sap.ec.db_migration.SharedPreferenceCryptoTest.kt</ID>
+    <ID>NewLineAtEndOfFile:SilentAndroidPushV2MapperTest.kt:com.sap.ec.mobileengage.push.mapper.SilentAndroidPushV2MapperTest.kt</ID>
+    <ID>NewLineAtEndOfFile:TestApplication.kt:com.sap.ec.TestApplication.kt</ID>
+    <ID>NewLineAtEndOfFile:TransitionSafeActivityWatchdogTests.kt:com.sap.ec.watchdog.TransitionSafeActivityWatchdogTests.kt</ID>
+    <ID>NewLineAtEndOfFile:WebViewProviderTests.kt:com.sap.ec.mobileengage.inapp.WebViewProviderTests.kt</ID>
+    <ID>PackageNaming:SharedPreferenceCryptoTest.kt:package com.sap.ec.db_migration</ID>
+    <ID>UnnecessaryApply:PlatformInfoCollectorTest.android.kt.kt:PlatformInfoCollectorTest$apply { this.applicationInfo.flags = 0 }</ID>
+  </CurrentIssues>
+</SmellBaseline>

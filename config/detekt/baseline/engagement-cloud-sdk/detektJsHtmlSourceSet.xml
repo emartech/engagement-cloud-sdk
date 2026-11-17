@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ComposableNaming:ThemeMapper.kt:ThemeMapper$@Composable fun generateThemeCSS</ID>
+    <ID>ComposableParamOrder:ListPageView.kt:@Composable internal fun AdaptiveCardContainer</ID>
+    <ID>ComposableParamOrder:ListPageView.kt:@Composable internal fun MessageList</ID>
+    <ID>ComposableParamOrder:ListPageView.kt:@Composable internal fun MessageListContent</ID>
+    <ID>ComposableParamOrder:ListView.kt:@Composable internal fun ListView</ID>
+    <ID>CompositionLocalAllowlist:EmbeddedMessagingDesignValues.kt:internal val LocalDesignValues = compositionLocalOf { EmbeddedMessagingDesignValues() }</ID>
+    <ID>ContentSlotReused:EmbeddedMessagingTheme.kt:content: @Composable () -> Unit</ID>
+    <ID>ContentSlotReused:ListPageView.kt:content: @Composable () -> Unit</ID>
+    <ID>CyclomaticComplexMethod:ListPageView.kt:@Composable internal fun MessageList</ID>
+    <ID>CyclomaticComplexMethod:ListPageView.kt:@Composable internal fun PullToRefreshContainer</ID>
+    <ID>CyclomaticComplexMethod:MessageItemView.kt:@Composable private fun SwipeableMessageItem</ID>
+    <ID>CyclomaticComplexMethod:ThemeMapper.kt:ThemeMapper$@Composable fun generateThemeCSS</ID>
+    <ID>CyclomaticComplexMethod:ThemeMapper.kt:ThemeMapper$private fun mapFontSizes</ID>
+    <ID>FunctionNaming:CategoriesDialogView.kt:@Composable internal fun CategoriesDialogView</ID>
+    <ID>FunctionNaming:CategoriesDialogView.kt:@Composable private fun CategoryFilterChipsList</ID>
+    <ID>FunctionNaming:CategoriesDialogView.kt:@Composable private fun DialogActionButtons</ID>
+    <ID>FunctionNaming:CategoriesDialogView.kt:@Composable private fun DialogHeader</ID>
+    <ID>FunctionNaming:CategoriesDialogView.kt:@OptIn(ExperimentalComposeWebSvgApi::class) @Composable internal fun SvgIcon</ID>
+    <ID>FunctionNaming:CategorySelectorButton.kt:@Composable internal fun CategorySelectorButton</ID>
+    <ID>FunctionNaming:CompactListView.kt:@Composable internal fun CompactListView</ID>
+    <ID>FunctionNaming:DeleteMessageDialogView.kt:@Composable internal fun DeleteMessageDialogView</ID>
+    <ID>FunctionNaming:EmbeddedMessagingTheme.kt:@Composable internal fun EmbeddedMessagingTheme</ID>
+    <ID>FunctionNaming:InlineInAppView.kt:@Composable internal actual fun InlineInAppView</ID>
+    <ID>FunctionNaming:InlineInAppView.kt:@Composable internal fun InlineInAppView</ID>
+    <ID>FunctionNaming:ListPageView.kt:@Composable internal fun AdaptiveCardContainer</ID>
+    <ID>FunctionNaming:ListPageView.kt:@Composable internal fun EmptyDetailState</ID>
+    <ID>FunctionNaming:ListPageView.kt:@Composable internal fun EmptyState</ID>
+    <ID>FunctionNaming:ListPageView.kt:@Composable internal fun FilterRow</ID>
+    <ID>FunctionNaming:ListPageView.kt:@Composable internal fun FilteredMessageItemsListEmptyState</ID>
+    <ID>FunctionNaming:ListPageView.kt:@Composable internal fun ListContent</ID>
+    <ID>FunctionNaming:ListPageView.kt:@Composable internal fun ListPageView</ID>
+    <ID>FunctionNaming:ListPageView.kt:@Composable internal fun MessageList</ID>
+    <ID>FunctionNaming:ListPageView.kt:@Composable internal fun MessageListContent</ID>
+    <ID>FunctionNaming:ListPageView.kt:@Composable internal fun NoConnectionErrorState</ID>
+    <ID>FunctionNaming:ListPageView.kt:@Composable internal fun PullToRefreshContainer</ID>
+    <ID>FunctionNaming:ListPageView.kt:@Composable internal fun RefreshButton</ID>
+    <ID>FunctionNaming:ListPageView.kt:@Composable private fun RefreshOnConnectionRestored</ID>
+    <ID>FunctionNaming:ListView.kt:@Composable internal fun ListView</ID>
+    <ID>FunctionNaming:MessageDetailView.kt:@Composable internal fun MessageDetailView</ID>
+    <ID>FunctionNaming:MessageItemView.kt:@Composable internal fun LoadingSpinner</ID>
+    <ID>FunctionNaming:MessageItemView.kt:@Composable internal fun MessageItemView</ID>
+    <ID>FunctionNaming:MessageItemView.kt:@Composable private fun ECMessageItem</ID>
+    <ID>FunctionNaming:MessageItemView.kt:@Composable private fun SwipeableMessageItem</ID>
+    <ID>FunctionNaming:PlaceholderMessageItemView.kt:@Composable internal fun PlaceholderMessageItemView</ID>
+    <ID>FunctionNaming:PlaceholderMessageList.kt:@Composable internal fun PlaceholderMessageList</ID>
+    <ID>LambdaParameterInRestartableEffect:InlineInAppView.kt:onClose: () -> Unit</ID>
+    <ID>LambdaParameterInRestartableEffect:ListPageView.kt:onRefresh: () -> Unit</ID>
+    <ID>LambdaParameterInRestartableEffect:MessageItemView.kt:onDeleteClicked: () -> Unit</ID>
+    <ID>LargeClass:EmbeddedMessagingStyleSheet.kt:EmbeddedMessagingStyleSheet : StyleSheet</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:CustomElements.kt:ComposeCustomElement : CustomElementLifecycle</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:CustomElements.kt:CustomElementLifecycle</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:CustomElements.kt:ECMessagingCompactListElement : ComposeCustomElement</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:CustomElements.kt:ECMessagingListElement : ComposeCustomElement</ID>
+    <ID>LongMethod:ListPageView.kt:@Composable internal fun FilterRow</ID>
+    <ID>LongMethod:ListPageView.kt:@Composable internal fun MessageList</ID>
+    <ID>LongMethod:ListPageView.kt:@Composable internal fun PullToRefreshContainer</ID>
+    <ID>LongMethod:ListView.kt:@Composable internal fun ListView</ID>
+    <ID>LongMethod:MessageItemView.kt:@Composable internal fun MessageItemView</ID>
+    <ID>LongMethod:MessageItemView.kt:@Composable private fun SwipeableMessageItem</ID>
+    <ID>LongMethod:ThemeMapper.kt:ThemeMapper$@Composable fun generateThemeCSS</ID>
+    <ID>LoopWithTooManyJumpStatements:ListPageView.kt:for</ID>
+    <ID>MagicNumber:PlaceholderMessageList.kt:3</ID>
+    <ID>MaxLineLength:ListPageView.kt:if (!filterUnopenedOnly) EmbeddedMessagingStyleSheet.filterButtonSelected else EmbeddedMessagingStyleSheet.filterButtonUnselected</ID>
+    <ID>MaxLineLength:ListPageView.kt:if (filterUnopenedOnly) EmbeddedMessagingStyleSheet.filterButtonSelected else EmbeddedMessagingStyleSheet.filterButtonUnselected</ID>
+    <ID>MaxLineLength:ListPageView.kt:val noConnectionRefreshErrorWithEmptyList by remember { derivedStateOf { !hasConnection &amp;&amp; lazyPagingMessageItems.itemCount == 0 &amp;&amp; lazyPagingMessageItems.hasRefreshError() } }</ID>
+    <ID>MaxLineLength:ListPageView.kt:val noConnectionRefreshErrorWithMessages by remember { derivedStateOf { !hasConnection &amp;&amp; lazyPagingMessageItems.itemCount > 0 &amp;&amp; lazyPagingMessageItems.hasRefreshError() } }</ID>
+    <ID>MaxLineLength:PlaceholderMessageItemView.kt:classes(EmbeddedMessagingStyleSheet.shimmerEffect, EmbeddedMessagingStyleSheet.messageItemTextPlaceholder)</ID>
+    <ID>MutableStateParam:CategoriesDialogView.kt:selectedCategories: MutableState&lt;Set&lt;String>></ID>
+    <ID>NewLineAtEndOfFile:CompactListView.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.list.CompactListView.kt</ID>
+    <ID>NewLineAtEndOfFile:CustomElements.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.CustomElements.kt</ID>
+    <ID>NewLineAtEndOfFile:DeleteMessageDialogView.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.delete.DeleteMessageDialogView.kt</ID>
+    <ID>NewLineAtEndOfFile:ListView.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.list.ListView.kt</ID>
+    <ID>NewLineAtEndOfFile:ThemeMapper.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.theme.ThemeMapper.kt</ID>
+    <ID>ParameterNaming:CategoriesDialogView.kt:onApplyClicked: (Set&lt;String>) -> Unit</ID>
+    <ID>ParameterNaming:DeleteMessageDialogView.kt:onApplyClicked: () -> Unit</ID>
+    <ID>ParameterNaming:InlineInAppView.kt:onLoaded: (() -> Unit)? = null</ID>
+    <ID>ParameterNaming:InlineInAppView.kt:onLoaded: ((String) -> Unit)?</ID>
+    <ID>ParameterNaming:InlineInAppView.kt:onLoaded: ((String) -> Unit)? = null</ID>
+    <ID>ParameterNaming:ListPageView.kt:onCategorySelectorClicked: () -> Unit</ID>
+    <ID>ParameterNaming:ListPageView.kt:onDeleteIconClicked: (MessageItemViewModelApi) -> Unit = {}</ID>
+    <ID>ParameterNaming:ListView.kt:onDeleteIconClicked: (MessageItemViewModelApi) -> Unit = {}</ID>
+    <ID>ParameterNaming:MessageDetailView.kt:onLoaded: ((String) -> Unit)? = null</ID>
+    <ID>ParameterNaming:MessageItemView.kt:onDeleteClicked: () -> Unit</ID>
+    <ID>TooManyFunctions:ListPageView.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.list.ListPageView.kt</ID>
+    <ID>UnusedParameter:CustomElementInitialization.kt:factory: () -> ComposeCustomElement</ID>
+    <ID>UnusedParameter:CustomElementInitialization.kt:observedAttributes: Array&lt;String></ID>
+  </CurrentIssues>
+</SmellBaseline>

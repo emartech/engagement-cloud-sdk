@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ComposableNaming:IosEmbeddedMessaging.kt:IosEmbeddedMessaging$@Composable private fun mapUIViewControllerToCompose</ID>
+    <ID>EmptyFunctionBlock:IosLaunchApplicationHandler.kt:IosLaunchApplicationHandler${ }</ID>
+    <ID>EmptyFunctionBlock:LegacySDKMigrationState.ios.kt:LegacySDKMigrationState${}</ID>
+    <ID>EmptyFunctionBlock:PlatformInitializer.kt:PlatformInitializer${}</ID>
+    <ID>ForbiddenPublicDataClass:IosEngagementCloudSDKConfig.kt:IosEngagementCloudSDKConfig : SdkConfig</ID>
+    <ID>ForbiddenPublicDataClass:IosNotificationSettings.kt:IosNotificationSettings</ID>
+    <ID>ForbiddenPublicDataClass:NotificationCenterDelegateRegistration.kt:NotificationCenterDelegateRegistration</ID>
+    <ID>ForbiddenPublicDataClass:NotificationCenterDelegateRegistrationOptions.kt:NotificationCenterDelegateRegistrationOptions</ID>
+    <ID>FunctionNaming:IosEmbeddedMessagingApi.kt:IosEmbeddedMessagingApi$fun CompactViewController: UIViewController</ID>
+    <ID>FunctionNaming:IosEmbeddedMessagingApi.kt:IosEmbeddedMessagingApi$fun ViewController: UIViewController</ID>
+    <ID>FunctionNaming:IosInAppApi.kt:IosInAppApi$fun InlineInAppViewController: UIViewController</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ConsoleLogger.ios.kt:ConsoleLogger : ConsoleLoggerApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosConfigApi.kt:IosConfigApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosContact.kt:IosContact : IosContactApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosContactApi.kt:IosContactApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosDeepLink.kt:IosDeepLink : IosDeepLinkApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosDeepLinkApi.kt:IosDeepLinkApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosEmbeddedMessaging.kt:IosEmbeddedMessaging : IosEmbeddedMessagingApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosEmbeddedMessagingApi.kt:IosEmbeddedMessagingApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosEngagementCloud.kt:typealias EngagementCloudEventListener = (EngagementCloudEvent) -> Unit</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosEngagementCloudSDKConfig.kt:IosEngagementCloudSDKConfig : SdkConfig</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosInApp.kt:IosInApp : IosInAppApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosInAppApi.kt:IosInAppApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosNotificationSettings.kt:IosNotificationSettings</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosPush.kt:IosPush : IosPushApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosPushApi.kt:IosPushApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosSetup.kt:IosSetup : IosSetupApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosSetupApi.kt:IosSetupApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosSetupApi.kt:typealias OnContactLinkingFailed = (onSuccess: (LinkContactData?) -> Unit, onError: (NSError?) -> Unit) -> Unit</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosTracking.kt:IosTracking : IosTrackingApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosTrackingApi.kt:IosTrackingApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:NotificationCenterDelegateRegistration.kt:NotificationCenterDelegateRegistration</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:NotificationCenterDelegateRegistrationOptions.kt:NotificationCenterDelegateRegistrationOptions</ID>
+    <ID>LongMethod:InAppJsBridge.kt:InAppJsBridge$private suspend fun processAction</ID>
+    <ID>MagicNumber:IosBadgeCountHandler.kt:IosBadgeCountHandler$16</ID>
+    <ID>MagicNumber:LegacySDKMigrationState.ios.kt:LegacySDKMigrationState$16</ID>
+    <ID>MaxLineLength:IosInAppPresenter.kt:IosInAppPresenter$sdkEventDistributor.sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Dismiss &amp;&amp; it.id == inAppView.inAppMessage.dismissId }</ID>
+    <ID>MaxLineLength:IosLanguageTagValidator.ios.kt:IosLanguageTagValidator$return NSLocale.ISOLanguageCodes.contains(locale.languageCode) &amp;&amp; NSLocale.ISOCountryCodes().contains(locale.countryCode)</ID>
+    <ID>MaxLineLength:IosPushInternal.kt:IosPushInternal.InternalNotificationCenterDelegateProxy$private val didReceiveNotificationResponse: (actionIdentifier: String, userInfo: Map&lt;String, Any>, handler: () -> Unit) -> Unit</ID>
+    <ID>MaxLineLength:IosPushInternal.kt:IosPushInternal.InternalNotificationCenterDelegateProxy$private val queuePendingNotificationResponse: (actionIdentifier: String, userInfo: Map&lt;String, Any>, handler: () -> Unit) -> Unit</ID>
+    <ID>MaxLineLength:IosPushInternal.kt:IosPushInternal.InternalNotificationCenterDelegateProxy$withCompletionHandler(UNNotificationPresentationOptionBanner + UNNotificationPresentationOptionList + UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionSound + UNNotificationPresentationOptionBadge)</ID>
+    <ID>MaxLineLength:IosPushWrapper.kt:IosPushWrapper$throw PreconditionFailedException("Error while handling silent push message, the userInfo can't be parsed")</ID>
+    <ID>MaxLineLength:IosSetupApi.kt:IosSetupApi$*</ID>
+    <ID>MaxLineLength:SceneProvider.kt:SceneProvider$scene.activationState == UISceneActivationStateForegroundActive || scene.activationState == UISceneActivationStateForegroundInactive</ID>
+    <ID>NewLineAtEndOfFile:ConsoleLogger.ios.kt:com.sap.ec.core.log.ConsoleLogger.ios.kt</ID>
+    <ID>NewLineAtEndOfFile:DateTimeFormat.ios.kt:com.sap.ec.core.datetime.DateTimeFormat.ios.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppViewProvider.kt:com.sap.ec.mobileengage.inapp.InAppViewProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:IosApplicationVersionProvider.kt:com.sap.ec.core.providers.IosApplicationVersionProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:IosBadgeCountHandler.kt:com.sap.ec.core.badge.IosBadgeCountHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:IosClipboardHandler.kt:com.sap.ec.core.clipboard.IosClipboardHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:IosConfig.kt:com.sap.ec.api.config.IosConfig.kt</ID>
+    <ID>NewLineAtEndOfFile:IosConfigApi.kt:com.sap.ec.api.config.IosConfigApi.kt</ID>
+    <ID>NewLineAtEndOfFile:IosConnectionWatchdog.kt:com.sap.ec.core.watchdog.connection.IosConnectionWatchdog.kt</ID>
+    <ID>NewLineAtEndOfFile:IosContact.kt:com.sap.ec.api.contact.IosContact.kt</ID>
+    <ID>NewLineAtEndOfFile:IosContactApi.kt:com.sap.ec.api.contact.IosContactApi.kt</ID>
+    <ID>NewLineAtEndOfFile:IosDeepLink.kt:com.sap.ec.api.deeplink.IosDeepLink.kt</ID>
+    <ID>NewLineAtEndOfFile:IosDeepLinkApi.kt:com.sap.ec.api.deeplink.IosDeepLinkApi.kt</ID>
+    <ID>NewLineAtEndOfFile:IosEmbeddedMessaging.kt:com.sap.ec.api.embeddedmessaging.IosEmbeddedMessaging.kt</ID>
+    <ID>NewLineAtEndOfFile:IosEmbeddedMessagingApi.kt:com.sap.ec.api.embeddedmessaging.IosEmbeddedMessagingApi.kt</ID>
+    <ID>NewLineAtEndOfFile:IosEngagementCloud.kt:com.sap.ec.IosEngagementCloud.kt</ID>
+    <ID>NewLineAtEndOfFile:IosExternalUrlOpener.kt:com.sap.ec.core.url.IosExternalUrlOpener.kt</ID>
+    <ID>NewLineAtEndOfFile:IosFileCache.ios.kt:com.sap.ec.core.cache.IosFileCache.ios.kt</ID>
+    <ID>NewLineAtEndOfFile:IosGathererPush.kt:com.sap.ec.mobileengage.push.IosGathererPush.kt</ID>
+    <ID>NewLineAtEndOfFile:IosInApp.kt:com.sap.ec.api.inapp.IosInApp.kt</ID>
+    <ID>NewLineAtEndOfFile:IosInAppApi.kt:com.sap.ec.api.inapp.IosInAppApi.kt</ID>
+    <ID>NewLineAtEndOfFile:IosInAppPresenter.kt:com.sap.ec.mobileengage.inapp.IosInAppPresenter.kt</ID>
+    <ID>NewLineAtEndOfFile:IosInjection.kt:com.sap.ec.di.IosInjection.kt</ID>
+    <ID>NewLineAtEndOfFile:IosLanguageProvider.kt:com.sap.ec.core.providers.IosLanguageProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:IosLanguageTagValidator.ios.kt:com.sap.ec.core.language.IosLanguageTagValidator.ios.kt</ID>
+    <ID>NewLineAtEndOfFile:IosLaunchApplicationHandler.kt:com.sap.ec.core.launchapplication.IosLaunchApplicationHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:IosLifecycleWatchdog.kt:com.sap.ec.core.watchdog.lifecycle.IosLifecycleWatchdog.kt</ID>
+    <ID>NewLineAtEndOfFile:IosLoggingPush.kt:com.sap.ec.mobileengage.push.IosLoggingPush.kt</ID>
+    <ID>NewLineAtEndOfFile:IosNotificationSettings.kt:com.sap.ec.core.device.notification.IosNotificationSettings.kt</ID>
+    <ID>NewLineAtEndOfFile:IosNotificationSettingsCollector.kt:com.sap.ec.core.device.notification.IosNotificationSettingsCollector.kt</ID>
+    <ID>NewLineAtEndOfFile:IosNotificationSettingsCollectorApi.kt:com.sap.ec.core.device.notification.IosNotificationSettingsCollectorApi.kt</ID>
+    <ID>NewLineAtEndOfFile:IosPush.kt:com.sap.ec.api.push.IosPush.kt</ID>
+    <ID>NewLineAtEndOfFile:IosPushApi.kt:com.sap.ec.api.push.IosPushApi.kt</ID>
+    <ID>NewLineAtEndOfFile:IosPushInstance.kt:com.sap.ec.mobileengage.push.IosPushInstance.kt</ID>
+    <ID>NewLineAtEndOfFile:IosPushWrapperApi.kt:com.sap.ec.mobileengage.push.IosPushWrapperApi.kt</ID>
+    <ID>NewLineAtEndOfFile:IosSdkConfigStore.kt:com.sap.ec.enable.config.IosSdkConfigStore.kt</ID>
+    <ID>NewLineAtEndOfFile:IosSetup.kt:com.sap.ec.api.setup.IosSetup.kt</ID>
+    <ID>NewLineAtEndOfFile:IosSetupApi.kt:com.sap.ec.api.setup.IosSetupApi.kt</ID>
+    <ID>NewLineAtEndOfFile:IosSqDelightEventsDao.kt:com.sap.ec.core.db.events.IosSqDelightEventsDao.kt</ID>
+    <ID>NewLineAtEndOfFile:IosTracking.kt:com.sap.ec.api.tracking.IosTracking.kt</ID>
+    <ID>NewLineAtEndOfFile:IosTrackingApi.kt:com.sap.ec.api.tracking.IosTrackingApi.kt</ID>
+    <ID>NewLineAtEndOfFile:IosWebViewFactory.kt:com.sap.ec.mobileengage.inapp.providers.IosWebViewFactory.kt</ID>
+    <ID>NewLineAtEndOfFile:IosWebViewFactoryApi.kt:com.sap.ec.mobileengage.inapp.providers.IosWebViewFactoryApi.kt</ID>
+    <ID>NewLineAtEndOfFile:IosWebViewHolder.kt:com.sap.ec.mobileengage.inapp.IosWebViewHolder.kt</ID>
+    <ID>NewLineAtEndOfFile:KotlinPlatform.ios.kt:com.sap.ec.KotlinPlatform.ios.kt</ID>
+    <ID>NewLineAtEndOfFile:NWPathMonitorWrapper.kt:com.sap.ec.core.watchdog.connection.NWPathMonitorWrapper.kt</ID>
+    <ID>NewLineAtEndOfFile:NetworkConnection.kt:com.sap.ec.core.watchdog.connection.NetworkConnection.kt</ID>
+    <ID>NewLineAtEndOfFile:PageLocationProvider.ios.kt:com.sap.ec.core.providers.pagelocation.PageLocationProvider.ios.kt</ID>
+    <ID>NewLineAtEndOfFile:PlatformCategoryProvider.ios.kt:com.sap.ec.core.providers.platform.PlatformCategoryProvider.ios.kt</ID>
+    <ID>NewLineAtEndOfFile:PlatformInitializer.kt:com.sap.ec.enable.PlatformInitializer.kt</ID>
+    <ID>NewLineAtEndOfFile:Reachability.kt:com.sap.ec.core.watchdog.connection.Reachability.kt</ID>
+    <ID>NewLineAtEndOfFile:SceneProvider.kt:com.sap.ec.mobileengage.inapp.providers.SceneProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:StringStorage.kt:com.sap.ec.core.storage.StringStorage.kt</ID>
+    <ID>NewLineAtEndOfFile:UIDevice.kt:com.sap.ec.core.device.UIDevice.kt</ID>
+    <ID>NewLineAtEndOfFile:UIDeviceApi.kt:com.sap.ec.core.device.UIDeviceApi.kt</ID>
+    <ID>NewLineAtEndOfFile:UserInfoExtension.kt:com.sap.ec.mobileengage.push.extension.UserInfoExtension.kt</ID>
+    <ID>NewLineAtEndOfFile:ViewControllerProvider.kt:com.sap.ec.mobileengage.inapp.providers.ViewControllerProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:WindowProvider.kt:com.sap.ec.mobileengage.inapp.providers.WindowProvider.kt</ID>
+    <ID>ReturnCount:LegacySDKMigrationState.ios.kt:LegacySDKMigrationState$private fun findInUserDefaults: String?</ID>
+    <ID>SwallowedException:IosFileCache.ios.kt:IosFileCache$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:InAppJsBridge.kt:InAppJsBridge$error: Throwable</ID>
+    <ID>TooGenericExceptionCaught:IosFileCache.ios.kt:IosFileCache$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:IosPushInternal.kt:IosPushInternal$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:IosPushWrapper.kt:IosPushWrapper$e: Exception</ID>
+    <ID>TooManyFunctions:LegacySDKMigrationState.ios.kt:LegacySDKMigrationState : State</ID>
+  </CurrentIssues>
+</SmellBaseline>

@@ -1,0 +1,997 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>AbstractClassCanBeConcreteClass:AbstractSqlDelightEventsDao.kt:AbstractSqlDelightEventsDao$AbstractSqlDelightEventsDao</ID>
+    <ID>AbstractClassCanBeInterface:AndroidPushMessage.kt:AndroidPush$AndroidPush</ID>
+    <ID>AbstractClassCanBeInterface:InAppPresentationAnimation.kt:InAppPresentationAnimation$InAppPresentationAnimation</ID>
+    <ID>AbstractClassCanBeInterface:InAppStyle.kt:InAppPresentationMode$InAppPresentationMode</ID>
+    <ID>ComplexCondition:ApplicationCode.kt:this.value.matches(applicationCodeValidationRegex) || globalRemoteConfigApplicationCodeValidationRegex?.let { this.value.matches(it) } == true || this.value.matches(multiRegionApplicationCodeValidationRegexV1) || this.value.matches(multiRegionApplicationCodeValidationRegexV2)</ID>
+    <ID>ComplexCondition:ECClient.kt:ECClient$exception != null &amp;&amp; exception is SdkException.FailedRequestException &amp;&amp; exception.response.status == HttpStatusCode.Unauthorized &amp;&amp; requestContext.refreshToken != null &amp;&amp; retryCount &lt; MAX_RETRY_COUNT</ID>
+    <ID>ComplexCondition:ListPageViewModel.kt:ListPageViewModel$(!it.isExcludedLocally &amp;&amp; filterUnopenedOnly.value &amp;&amp; locallyOpenedMessageIds.value.contains( it.id )) || it.isDeleted</ID>
+    <ID>ComposableParamOrder:MessageItemsListPane.kt:@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class) @Composable internal fun MessageItemsListPane</ID>
+    <ID>CompositionLocalAllowlist:EmbeddedMessagingDesignValues.kt:internal val LocalDesignValues = compositionLocalOf { EmbeddedMessagingDesignValues() }</ID>
+    <ID>CompositionLocalAllowlist:StringResources.kt:internal val LocalStringResources = compositionLocalOf { StringResources() }</ID>
+    <ID>ConstructorParameterNaming:ListPageViewModel.kt:ListPageViewModel$private val _categories: MutableStateFlow&lt;List&lt;Category>></ID>
+    <ID>ContentSlotReused:ListPageView.kt:content: @Composable () -> Unit</ID>
+    <ID>ContentSlotReused:MessageItemsListPane.kt:content: @Composable () -> Unit</ID>
+    <ID>CyclomaticComplexMethod:ListPageView.kt:@OptIn(ExperimentalMaterial3Api::class) @Composable private fun MessageList</ID>
+    <ID>CyclomaticComplexMethod:MessageItemsListPane.kt:@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class) @Composable internal fun MessageItemsListPane</ID>
+    <ID>CyclomaticComplexMethod:UrlFactory.kt:UrlFactory$override suspend fun create: Url</ID>
+    <ID>DoubleMutabilityForCollection:ThreadSafePersistentStore.kt:ThreadSafePersistentStore$override var items: MutableList&lt;Item> = storage.get(id, itemsSerializer)?.toMutableList() ?: mutableListOf()</ID>
+    <ID>DoubleMutabilityForCollection:ThreadSafePersistentStoreApi.kt:ThreadSafePersistentStoreApi$var items: MutableList&lt;Item></ID>
+    <ID>EmptyClassBlock:AndroidSqlDelightEventsDao.kt:AndroidSqlDelightEventsDao${ }</ID>
+    <ID>EmptyDefaultConstructor:RequestContext.kt:RequestContext</ID>
+    <ID>EmptyFunctionBlock:AppStartState.kt:AppStartState${ }</ID>
+    <ID>EmptyFunctionBlock:ApplyAppCodeBasedRemoteConfigState.kt:ApplyAppCodeBasedRemoteConfigState${ }</ID>
+    <ID>EmptyFunctionBlock:ApplyGlobalRemoteConfigState.kt:ApplyGlobalRemoteConfigState${ }</ID>
+    <ID>EmptyFunctionBlock:ClearDeviceInfoState.kt:ClearDeviceInfoState${ }</ID>
+    <ID>EmptyFunctionBlock:ClearEventsState.kt:ClearEventsState${ }</ID>
+    <ID>EmptyFunctionBlock:ClearPushTokenOnDisableState.kt:ClearPushTokenOnDisableState${ }</ID>
+    <ID>EmptyFunctionBlock:ClearRequestContextTokensState.kt:ClearRequestContextTokensState${}</ID>
+    <ID>EmptyFunctionBlock:ClearStoredConfigState.kt:ClearStoredConfigState${ }</ID>
+    <ID>EmptyFunctionBlock:CollectDeviceInfoState.kt:CollectDeviceInfoState${}</ID>
+    <ID>EmptyFunctionBlock:CustomElementInitialization.kt:{ ; }</ID>
+    <ID>EmptyFunctionBlock:EventTrackerGatherer.kt:EventTrackerGatherer${ }</ID>
+    <ID>EmptyFunctionBlock:FetchEmbeddedMessagingMetaState.kt:FetchEmbeddedMessagingMetaState${ }</ID>
+    <ID>EmptyFunctionBlock:FetchJsBridgeState.kt:FetchJsBridgeState${ }</ID>
+    <ID>EmptyFunctionBlock:GathererConfig.kt:GathererConfig${}</ID>
+    <ID>EmptyFunctionBlock:GathererInApp.kt:GathererInApp${}</ID>
+    <ID>EmptyFunctionBlock:InitializerState.kt:InitializerState${ }</ID>
+    <ID>EmptyFunctionBlock:LegacyDBOpenHelper.kt:LegacyDBOpenHelper${}</ID>
+    <ID>EmptyFunctionBlock:LegacySDKMigrationState.android.kt:LegacySDKMigrationState${}</ID>
+    <ID>EmptyFunctionBlock:LinkContactState.kt:LinkContactState${}</ID>
+    <ID>EmptyFunctionBlock:PushGatherer.kt:PushGatherer${ }</ID>
+    <ID>EmptyFunctionBlock:RegisterClientState.kt:RegisterClientState${ }</ID>
+    <ID>EmptyFunctionBlock:RegisterEventBasedClientsState.kt:RegisterEventBasedClientsState${}</ID>
+    <ID>EmptyFunctionBlock:RegisterEventConsumersState.kt:RegisterEventConsumersState${}</ID>
+    <ID>EmptyFunctionBlock:RegisterInstancesState.kt:RegisterInstancesState${ }</ID>
+    <ID>EmptyFunctionBlock:RegisterPushTokenState.kt:RegisterPushTokenState${ }</ID>
+    <ID>EmptyFunctionBlock:RegisterSdkEventDistributorState.kt:RegisterSdkEventDistributorState${}</ID>
+    <ID>EmptyFunctionBlock:RegisterWatchdogsState.kt:RegisterWatchdogsState${ }</ID>
+    <ID>EmptyFunctionBlock:RestoreOperationalEventsState.kt:RestoreOperationalEventsState${}</ID>
+    <ID>EmptyFunctionBlock:RestoreSavedSdkEventsState.kt:RestoreSavedSdkEventsState${}</ID>
+    <ID>EmptyFunctionBlock:RichContentDisplayAction.kt:RichContentDisplayAction${ }</ID>
+    <ID>EmptyFunctionBlock:SdkConfigLoaderState.kt:SdkConfigLoaderState${ }</ID>
+    <ID>EmptyFunctionBlock:SessionSubscriptionState.kt:SessionSubscriptionState${ }</ID>
+    <ID>EmptyFunctionBlock:UnlinkContactState.kt:UnlinkContactState${}</ID>
+    <ID>EnumNaming:StateLifecycle.kt:StateLifecycle$activate</ID>
+    <ID>EnumNaming:StateLifecycle.kt:StateLifecycle$prepare</ID>
+    <ID>EnumNaming:StateLifecycle.kt:StateLifecycle$relaxed</ID>
+    <ID>ForbiddenPublicDataClass:AndroidEngagementCloudSDKConfig.kt:AndroidEngagementCloudSDKConfig : SdkConfig</ID>
+    <ID>ForbiddenPublicDataClass:AndroidNotificationSettings.kt:AndroidNotificationSettings</ID>
+    <ID>ForbiddenPublicDataClass:AppEvent.kt:AppEvent : EngagementCloudEvent</ID>
+    <ID>ForbiddenPublicDataClass:BadgeCount.kt:BadgeCount</ID>
+    <ID>ForbiddenPublicDataClass:BadgeCountEvent.kt:BadgeCountEvent : EngagementCloudEvent</ID>
+    <ID>ForbiddenPublicDataClass:CartEvent.kt:CartEvent : TrackedEvent</ID>
+    <ID>ForbiddenPublicDataClass:CartItem.kt:CartItem</ID>
+    <ID>ForbiddenPublicDataClass:CategoryViewEvent.kt:CategoryViewEvent : TrackedEvent</ID>
+    <ID>ForbiddenPublicDataClass:CustomEvent.kt:CustomEvent : TrackedEvent</ID>
+    <ID>ForbiddenPublicDataClass:DeviceEvent.kt:DeviceEvent</ID>
+    <ID>ForbiddenPublicDataClass:DeviceInfo.kt:ChannelSettings</ID>
+    <ID>ForbiddenPublicDataClass:DeviceInfo.kt:NotificationSettings</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.External$Custom : ExternalOnlineSdkEventDeviceEventWithCustomAttributes</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.External$NavigateEvent : ExternalOnlineSdkEventDeviceEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.External.WebExtendEvent$Cart : WebExtendEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.External.WebExtendEvent$CategoryView : WebExtendEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.External.WebExtendEvent$ItemView : WebExtendEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.External.WebExtendEvent$Purchase : WebExtendEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.External.WebExtendEvent$RecommendationClick : WebExtendEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.External.WebExtendEvent$Search : WebExtendEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.External.WebExtendEvent$Tag : WebExtendEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal$BadgeCount : Internal</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal$OnEventAction : Internal</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal$OnEventActionExecuted : InternalReporting</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal$SilentPush : Internal</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.EmbeddedMessaging$FetchBadgeCount : EmbeddedMessaging</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.EmbeddedMessaging$FetchMessages : EmbeddedMessaging</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.EmbeddedMessaging$FetchMeta : EmbeddedMessagingSetupFlowEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.EmbeddedMessaging$FetchNextPage : EmbeddedMessaging</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.EmbeddedMessaging$TriggerRefresh : Internal</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.EmbeddedMessaging$UpdateTagsForMessages : EmbeddedMessaging</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.InApp$ButtonClicked : InAppReporting</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.InApp$Present : Internal</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.InApp$Viewed : InAppReporting</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Push$Clicked : PushReporting</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Sdk$AppStart : SdkCustomSetupFlowEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Sdk$ApplyAppCodeBasedRemoteConfig : SdkOnlineSdkEventSetupFlowEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Sdk$ApplyGlobalRemoteConfig : SdkOperationalEventSetupFlowEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Sdk$ChangeAppCode : SdkOnlineSdkEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Sdk$ChangeLanguage : SdkOnlineSdkEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Sdk$ClearPushToken : SdkOnlineSdkEventOperationalEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Sdk$Dismiss : Sdk</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Sdk$LinkAuthenticatedContact : SdkOnlineSdkEventLinkContactEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Sdk$LinkContact : SdkOnlineSdkEventLinkContactEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Sdk$Log : SdkLogEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Sdk$Metric : SdkLogEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Sdk$RegisterDeviceInfo : SdkOnlineSdkEventSetupFlowEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Sdk$RegisterPushToken : SdkOnlineSdkEventSetupFlowEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Sdk$RemoteConfigUpdateRequired : Sdk</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Sdk$ReregistrationRequired : Sdk</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Sdk$SessionEnd : SdkCustom</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Sdk$SessionStart : SdkCustom</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Sdk$TrackDeepLink : SdkOnlineSdkEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Sdk$UnlinkContact : SdkOnlineSdkEventOperationalEvent</ID>
+    <ID>ForbiddenPublicDataClass:Event.kt:SdkEvent.Internal.Sdk.Answer$Response&lt;T> : Answer</ID>
+    <ID>ForbiddenPublicDataClass:InAppMessage.kt:InAppMessage</ID>
+    <ID>ForbiddenPublicDataClass:IosPushUserInfo.kt:Ems</ID>
+    <ID>ForbiddenPublicDataClass:ItemViewEvent.kt:ItemViewEvent : TrackedEvent</ID>
+    <ID>ForbiddenPublicDataClass:LinkContactData.kt:LinkContactData$ContactFieldValueData : LinkContactData</ID>
+    <ID>ForbiddenPublicDataClass:LinkContactData.kt:LinkContactData$OpenIdTokenData : LinkContactData</ID>
+    <ID>ForbiddenPublicDataClass:LogEntry.kt:LogEntry</ID>
+    <ID>ForbiddenPublicDataClass:MessageTagUpdate.kt:MessageTagUpdate</ID>
+    <ID>ForbiddenPublicDataClass:MessagesResponse.kt:Category</ID>
+    <ID>ForbiddenPublicDataClass:NavigateEvent.kt:NavigateEvent : TrackedEvent</ID>
+    <ID>ForbiddenPublicDataClass:Product.kt:Product</ID>
+    <ID>ForbiddenPublicDataClass:PurchaseEvent.kt:PurchaseEvent : TrackedEvent</ID>
+    <ID>ForbiddenPublicDataClass:PushInformation.kt:PushInformation</ID>
+    <ID>ForbiddenPublicDataClass:PushMessage.kt:ActionableData&lt;A: ActionModel></ID>
+    <ID>ForbiddenPublicDataClass:PushMessage.kt:DisplayableData</ID>
+    <ID>ForbiddenPublicDataClass:RecommendationClickEvent.kt:RecommendationClickEvent : TrackedEvent</ID>
+    <ID>ForbiddenPublicDataClass:Response.kt:Response</ID>
+    <ID>ForbiddenPublicDataClass:ResponseErrorBody.kt:ErrorDetail</ID>
+    <ID>ForbiddenPublicDataClass:ResponseErrorBody.kt:ResponseError</ID>
+    <ID>ForbiddenPublicDataClass:ResponseErrorBody.kt:ResponseErrorBody</ID>
+    <ID>ForbiddenPublicDataClass:SearchEvent.kt:SearchEvent : TrackedEvent</ID>
+    <ID>ForbiddenPublicDataClass:TagEvent.kt:TagEvent : TrackedEvent</ID>
+    <ID>ForbiddenPublicDataClass:UrlRequest.kt:UrlRequest</ID>
+    <ID>FunctionNaming:CategoriesDialogView.kt:@Composable internal fun CategoriesDialogView</ID>
+    <ID>FunctionNaming:CategoriesDialogView.kt:@Composable private fun CategoryFilterChipsList</ID>
+    <ID>FunctionNaming:CategoriesDialogView.kt:@Composable private fun DialogActionButtons</ID>
+    <ID>FunctionNaming:CategoriesDialogView.kt:@Composable private fun DialogHeader</ID>
+    <ID>FunctionNaming:CategorySelectorButton.kt:@Composable internal fun CategorySelectorButton</ID>
+    <ID>FunctionNaming:CompactListView.kt:@Composable fun EmbeddedMessagingCompactView</ID>
+    <ID>FunctionNaming:DeleteMessageItemConfirmationDialog.kt:@Composable internal fun DeleteMessageItemConfirmationDialog</ID>
+    <ID>FunctionNaming:EmbeddedMessagingTheme.kt:@Composable internal fun EmbeddedMessagingTheme</ID>
+    <ID>FunctionNaming:FilterByReadStateTabs.kt:@Composable internal fun FilterByReadStateTabs</ID>
+    <ID>FunctionNaming:InlineInAppView.kt:@Composable fun InlineInAppView</ID>
+    <ID>FunctionNaming:InlineInAppView.kt:@Composable internal actual fun InlineInAppView</ID>
+    <ID>FunctionNaming:InlineInAppView.kt:@Composable internal expect fun InlineInAppView</ID>
+    <ID>FunctionNaming:InlineInAppView.kt:@Composable internal fun InlineInAppView</ID>
+    <ID>FunctionNaming:InlineInAppViewRendererApi.kt:InlineInAppViewRendererApi$@Composable fun Render</ID>
+    <ID>FunctionNaming:ListPageView.kt:@Composable fun EmbeddedMessagingView</ID>
+    <ID>FunctionNaming:ListPageView.kt:@Composable internal fun AdaptiveCardContainer</ID>
+    <ID>FunctionNaming:ListPageView.kt:@Composable internal fun InternalListPageView</ID>
+    <ID>FunctionNaming:ListPageView.kt:@OptIn(ExperimentalMaterial3Api::class) @Composable private fun MessageList</ID>
+    <ID>FunctionNaming:MessageDetailView.kt:@Composable internal fun MessageDetailView</ID>
+    <ID>FunctionNaming:MessageItemView.kt:@Composable internal fun LoadingSpinner</ID>
+    <ID>FunctionNaming:MessageItemView.kt:@Composable internal fun MessageItemView</ID>
+    <ID>FunctionNaming:MessageItemsListPane.kt:@Composable internal fun BoxWithDeleteIcon</ID>
+    <ID>FunctionNaming:MessageItemsListPane.kt:@Composable internal fun EmptyState</ID>
+    <ID>FunctionNaming:MessageItemsListPane.kt:@Composable internal fun LazyItemScope.MessageItemsListEmptyState</ID>
+    <ID>FunctionNaming:MessageItemsListPane.kt:@Composable internal fun MessagesLoadingSpinner</ID>
+    <ID>FunctionNaming:MessageItemsListPane.kt:@Composable private fun DeleteMessageOnSwipeBox</ID>
+    <ID>FunctionNaming:MessageItemsListPane.kt:@Composable private fun ErrorStateNoConnection</ID>
+    <ID>FunctionNaming:MessageItemsListPane.kt:@Composable private fun LazyItemScope.FilteredMessageItemsListEmptyState</ID>
+    <ID>FunctionNaming:MessageItemsListPane.kt:@Composable private fun MessageItemViewContainer</ID>
+    <ID>FunctionNaming:MessageItemsListPane.kt:@Composable private fun RefreshButtonOnWeb</ID>
+    <ID>FunctionNaming:MessageItemsListPane.kt:@Composable private fun RefreshableMessageItemsList</ID>
+    <ID>FunctionNaming:MessageItemsListPane.kt:@OptIn(ExperimentalMaterial3Api::class) @Composable private fun FilterRow</ID>
+    <ID>FunctionNaming:MessageItemsListPane.kt:@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class) @Composable internal fun MessageItemsListPane</ID>
+    <ID>FunctionNaming:PlaceholderMessageList.kt:@Composable internal fun PlaceholderMessageList</ID>
+    <ID>FunctionNaming:PlaceholderMessageList.kt:@Composable private fun PlaceholderMessageItem</ID>
+    <ID>InjectDispatcher:AndroidConnectionWatchDog.kt:AndroidConnectionWatchDog$IO</ID>
+    <ID>InjectDispatcher:AndroidInjection.kt:AndroidInjection$Default</ID>
+    <ID>InjectDispatcher:AndroidInjection.kt:AndroidInjection$IO</ID>
+    <ID>InjectDispatcher:CoreInjection.kt:CoreInjection$Default</ID>
+    <ID>InjectDispatcher:LegacySDKMigrationState.android.kt:LegacySDKMigrationState$IO</ID>
+    <ID>InjectDispatcher:TransitionSafeCurrentActivityWatchdog.kt:TransitionSafeCurrentActivityWatchdog$Default</ID>
+    <ID>LambdaParameterEventTrailing:MessageDetailView.kt:onBack: () -> Unit</ID>
+    <ID>LambdaParameterInRestartableEffect:InlineInAppView.kt:onClose: () -> Unit</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:ConsoleLogger.android.kt:ConsoleLogger$@OptIn(ExperimentalSerializationApi::class) val prettyJson = Json { prettyPrint = true prettyPrintIndent = " " }</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:JsonUtil.kt:JsonUtil$@OptIn(ExperimentalSerializationApi::class) val json = Json { encodeDefaults = true isLenient = true ignoreUnknownKeys = true allowTrailingComma = true explicitNulls = false decodeEnumsCaseInsensitive = true }</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushConstants.kt:PushConstants$const val DEFAULT_TAP_ACTION_ID = "defaultTapActionId"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushConstants.kt:PushConstants$const val INTENT_EXTRA_ACTION_KEY = "action"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushConstants.kt:PushConstants$const val INTENT_EXTRA_DEFAULT_TAP_ACTION_KEY = "defaultTapAction"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushConstants.kt:PushConstants$const val INTENT_EXTRA_PAYLOAD_KEY = "payload"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushConstants.kt:PushConstants$const val LAST_SENT_PUSH_TOKEN_STORAGE_KEY = "emsLastSentPushToken"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushConstants.kt:PushConstants$const val PUSH_MESSAGE_PAYLOAD_INTENT_FILTER_ACTION = "com.sap.ec.sdk.PUSH_MESSAGE_PAYLOAD"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushConstants.kt:PushConstants$const val PUSH_MESSAGE_PAYLOAD_INTENT_KEY = "pushPayload"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushConstants.kt:PushConstants$const val PUSH_NOTIFICATION_ICON_NAME = "com.sap.ec.small_notification_icon"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushConstants.kt:PushConstants$const val PUSH_TOKEN_INTENT_FILTER_ACTION = "com.sap.ec.sdk.PUSH_TOKEN"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushConstants.kt:PushConstants$const val PUSH_TOKEN_KEY = "pushToken"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushConstants.kt:PushConstants$const val PUSH_TOKEN_STORAGE_KEY = "emsPushToken"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushConstants.kt:PushConstants$const val WEB_PUSH_ON_BADGE_COUNT_UPDATE_RECEIVED = "sap-sdk-on-badge-count-update-received"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushConstants.kt:PushConstants$const val WEB_PUSH_ON_NOTIFICATION_CLICKED_CHANNEL_NAME = "sap-sdk-on-notification-clicked-channel"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:PushConstants.kt:PushConstants$const val WEB_PUSH_SDK_READY_CHANNEL_NAME = "sap-sdk-sdk-ready-channel"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val APPLY_APPCODE_BASED_REMOTE_CONFIG_EVENT_NAME = "applyAppCodeBasedRemoteConfig"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val APPLY_GLOBAL_REMOTE_CONFIG_EVENT_NAME = "applyGlobalRemoteConfig"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val APP_START_EVENT_NAME = "app:start"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val BUTTON_CLICK_ORIGIN = "button"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val CHANGE_APP_CODE_NAME = "changeApplicationCode"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val CHANGE_LANGUAGE_EVENT_NAME = "changeLanguage"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val CLEAR_PUSH_TOKEN_EVENT_NAME = "clearPushToken"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val DISMISS_EVENT_NAME = "dismiss"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val EMBEDDED_MESSAGING_BUTTON_CLICKED_EVENT_NAME = "em:click"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val EMS_DEEP_LINK_TRACKED_KEY = "ems_deep_link_tracked"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val INAPP_VIEWED_EVENT_NAME = "inapp:viewed"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val IN_APP_BUTTON_CLICKED_EVENT_NAME = "inapp:click"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val LANGUAGE_STORAGE_KEY = "customerOverwroteLanguageCodeKey"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val LEGACY_SDK_MIGRATION_DONE_KEY = "SAPEngagementCloudSdkLegacySdkMigrationDone"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val LINK_AUTHENTICATED_CONTACT_NAME = "linAuthenticatedContact"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val LINK_CONTACT_NAME = "linkContact"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val LOG_EVENT_NAME = "log"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val METRIC_EVENT_NAME = "metric"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val MOBILE_PLATFORM_CATEGORY = "mobile"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val ON_EVENT_ACTION_ORIGIN = "onEventAction"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val ON_EVENT_ACTION_REPORTING_EVENT_NAME = "on_event:action"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val PAGE_LOCATION_ATTRIBUTE_KEY = "url"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val PUSH_CLICKED_EVENT_NAME = "push:click"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val PUSH_DEFAULT_REPORTING = "{ \"id\": \"defaultReportingId\" }"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val REGISTER_DEVICE_INFO_EVENT_NAME = "registerDeviceInfo"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val REGISTER_PUSH_TOKEN_EVENT_NAME = "registerPushToken"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val REMOTE_CONFIG_UPDATE_REQUIRED_EVENT_NAME = "remoteConfigUpdateRequired"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val REREGISTRATION_REQUIRED_EVENT_NAME = "reregistrationRequired"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val SESSION_END_EVENT_NAME = "session:end"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val SESSION_START_EVENT_NAME = "session:start"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val SILENT_PUSH_RECEIVED_EVENT_NAME = "push:silentPushReceived"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val TRACK_DEEPLINK_NAME = "trackDeepLink"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val UNKNOWN_WRAPPER_INFO = "unknown"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val UNLINK_CONTACT_NAME = "unlinkContact"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val WEBPUSH_CLICKED_EVENT_NAME = "webpush:click"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val WEB_BUTTON_CLICKED_EVENT_NAME = "web:click"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val WEB_PLATFORM_CATEGORY = "web"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkConstants.kt:SdkConstants$const val WEB_VIEWED_EVENT_NAME = "web:viewed"</ID>
+    <ID>LibraryCodeMustSpecifyReturnType:SdkKoinIsolationContext.kt:SdkKoinIsolationContext$val koin = koinApp.koin</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ActionModel.kt:ActionModel</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ActionModel.kt:BasicActionModel : ActionModel</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ActionModel.kt:PresentableActionModel : ActionModel</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidConfigApi.kt:AndroidConfigApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidDeepLink.kt:AndroidDeepLink : AndroidDeepLinkApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidDeepLinkApi.kt:AndroidDeepLinkApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidEngagementCloudSDKConfig.kt:AndroidEngagementCloudSDKConfig : SdkConfig</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidNotificationSettings.kt:AndroidNotificationSettings</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidPushV2Mapper.kt:inline fun &lt;reified T> String?.fromString: T?</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidSetup.kt:AndroidSetup : AndroidSetupApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AndroidSetupApi.kt:AndroidSetupApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AppEvent.kt:AppEvent : EngagementCloudEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:AutoRegisterable.kt:AutoRegisterable</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:BadgeCount.kt:BadgeCount</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:BadgeCount.kt:BadgeCountMethod</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:BadgeCountEvent.kt:BadgeCountEvent : EngagementCloudEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:CartEvent.kt:CartEvent : TrackedEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:CartItem.kt:CartItem</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:CategoryViewEvent.kt:CategoryViewEvent : TrackedEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:CompactListView.kt:@Composable fun EmbeddedMessagingCompactView</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ConfigApi.kt:ConfigApi : AutoRegisterable</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ConsoleLogger.android.kt:ConsoleLogger : ConsoleLoggerApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ConsoleLogger.kt:ConsoleLogger : ConsoleLoggerApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ConsoleLoggerApi.kt:ConsoleLoggerApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ContactApi.kt:ContactApi : AutoRegisterable</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:CustomEvent.kt:CustomEvent : TrackedEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DeepLinkApi.kt:DeepLinkApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DeviceCategory.kt:DeviceCategory</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DeviceEvent.kt:DeviceEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DeviceInfo.kt:ChannelSettings</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DeviceInfo.kt:NotificationSettings</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EmbeddedMessagingApi.kt:EmbeddedMessagingApi : AutoRegisterable</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EngagementCloudEvent.kt:EngagementCloudEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:Event.kt:OnlineSdkEvent : SdkEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:Event.kt:SdkEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EventSource.kt:EventSource</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EventType.kt:EventType</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EventsDaoApi.kt:EventsDaoApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:HuaweiPushV2Mapper.kt:fun JsonElement?.getStringOrDefault: String</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InAppApi.kt:InAppApi : AutoRegisterable</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InAppMessage.kt:InAppMessage</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InAppStyle.kt:InAppType</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InlineInAppView.kt:@Composable fun InlineInAppView</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InternalSdkApi.kt:InternalSdkApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosNotificationSettingsStatus.kt:IosAlertStyle : IosNotificationConstant</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosNotificationSettingsStatus.kt:IosAuthorizationStatus : IosNotificationConstant</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosNotificationSettingsStatus.kt:IosNotificationSetting : IosNotificationConstant</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosNotificationSettingsStatus.kt:IosShowPreviewSetting : IosNotificationConstant</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosPushUserInfo.kt:Ems</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ItemViewEvent.kt:ItemViewEvent : TrackedEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LinkContactData.kt:LinkContactData</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ListPageView.kt:@Composable fun EmbeddedMessagingView</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LogConfigHolder.kt:LogConfigHolder : LogConfigHolderApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LogConfigHolderApi.kt:LogConfigHolderApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LogEntry.kt:LogEntry</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LogLevel.kt:LogLevel</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:Logger.kt:Logger</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:Mapper.kt:Mapper&lt;From, To></ID>
+    <ID>LibraryEntitiesShouldNotBePublic:MessageItemViewModelApi.kt:CustomMessageItemViewModelApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:MessageTagUpdate.kt:MessageTagUpdate</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:MessageTagUpdate.kt:TagOperation</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:MessagesResponse.kt:Category</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:NavigateEvent.kt:NavigateEvent : TrackedEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:Product.kt:Product</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PurchaseEvent.kt:PurchaseEvent : TrackedEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushApi.kt:PushApi : AutoRegisterable</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushInformation.kt:PushInformation</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushInformation.kt:PushType</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushMessage.kt:ActionableData&lt;A: ActionModel></ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushMessage.kt:DisplayableData</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:RecommendationClickEvent.kt:RecommendationClickEvent : TrackedEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:RequestContext.kt:RequestContext : RequestContextApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:RequestContextApi.kt:RequestContextApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:Response.kt:@InternalSdkApi inline fun &lt;reified T> Response.body: T</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:Response.kt:Response</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ResponseErrorBody.kt:ErrorDetail</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ResponseErrorBody.kt:ResponseError</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ResponseErrorBody.kt:ResponseErrorBody</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SdkConfig.kt:SdkConfig</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SdkEventDistributorApi.kt:SdkEventDistributorApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SdkEventEmitterApi.kt:SdkEventEmitterApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SdkEventManagerApi.kt:SdkEventManagerApi : SdkEventDistributorApiSdkEventEmitterApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SdkEventWaiterApi.kt:SdkEventWaiterApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SdkException.kt:SdkException : RuntimeException</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SdkState.kt:SdkState</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SearchEvent.kt:SearchEvent : TrackedEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SetupApi.kt:SetupApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:TagEvent.kt:TagEvent : TrackedEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ThreadSafePersistentStoreApi.kt:ThreadSafePersistentStoreApi&lt;Item></ID>
+    <ID>LibraryEntitiesShouldNotBePublic:TrackedEvent.kt:TrackedEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:TrackingApi.kt:TrackingApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:UrlRequest.kt:UrlRequest</ID>
+    <ID>LongMethod:CompactListView.kt:@Composable fun EmbeddedMessagingCompactView</ID>
+    <ID>LongMethod:FilterByReadStateTabs.kt:@Composable internal fun FilterByReadStateTabs</ID>
+    <ID>LongMethod:GenericNetworkClient.kt:GenericNetworkClient$override suspend fun send: Result&lt;Response></ID>
+    <ID>LongMethod:ListPageView.kt:@OptIn(ExperimentalMaterial3Api::class) @Composable private fun MessageList</ID>
+    <ID>LongMethod:MessageItemView.kt:@Composable internal fun MessageItemView</ID>
+    <ID>LongMethod:MessageItemsListPane.kt:@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class) @Composable internal fun MessageItemsListPane</ID>
+    <ID>LongMethod:PlaceholderMessageList.kt:@Composable private fun PlaceholderMessageItem</ID>
+    <ID>LongParameterList:ConfigClient.kt:ConfigClient</ID>
+    <ID>LongParameterList:ConfigInternal.kt:ConfigInternal</ID>
+    <ID>LongParameterList:ContactClient.kt:ContactClient</ID>
+    <ID>LongParameterList:DeepLinkClient.kt:DeepLinkClient</ID>
+    <ID>LongParameterList:DeviceClient.kt:DeviceClient</ID>
+    <ID>LongParameterList:DeviceInfoCollector.android.kt:DeviceInfoCollector</ID>
+    <ID>LongParameterList:ECSdkSession.kt:ECSdkSession</ID>
+    <ID>LongParameterList:EmbeddedMessagingClient.kt:EmbeddedMessagingClient</ID>
+    <ID>LongParameterList:EmbeddedMessagingPagingSource.kt:EmbeddedMessagingPagingSource</ID>
+    <ID>LongParameterList:EventClient.kt:EventClient</ID>
+    <ID>LongParameterList:InAppPresenter.kt:InAppPresenter</ID>
+    <ID>LongParameterList:ListPageViewModel.kt:ListPageViewModel</ID>
+    <ID>LongParameterList:LoggingClient.kt:LoggingClient</ID>
+    <ID>LongParameterList:MessageItemsListPane.kt:@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class) @Composable internal fun MessageItemsListPane</ID>
+    <ID>LongParameterList:PagerFactory.kt:PagerFactory</ID>
+    <ID>LongParameterList:PushClient.kt:PushClient</ID>
+    <ID>LongParameterList:PushMessagePresenter.kt:PushMessagePresenter</ID>
+    <ID>LongParameterList:RegisterInstancesState.kt:RegisterInstancesState</ID>
+    <ID>LongParameterList:RemoteConfigClient.kt:RemoteConfigClient</ID>
+    <ID>MagicNumber:Crypto.kt:Crypto$32</ID>
+    <ID>MagicNumber:Crypto.kt:Crypto$8</ID>
+    <ID>MagicNumber:DeviceInfo.kt:ChannelSettings$1000</ID>
+    <ID>MagicNumber:EmbeddedMessagingClient.kt:EmbeddedMessagingClient$1000L</ID>
+    <ID>MagicNumber:Event.kt:OnlineSdkEvent$3</ID>
+    <ID>MagicNumber:EventsQueries.kt:EventsQueries$137_156_936</ID>
+    <ID>MagicNumber:EventsQueries.kt:EventsQueries$499_586_846</ID>
+    <ID>MagicNumber:EventsQueries.kt:EventsQueries$618_763_774</ID>
+    <ID>MagicNumber:EventsQueries.kt:EventsQueries$818_296_288</ID>
+    <ID>MagicNumber:EventsQueries.kt:EventsQueries$857_679_315</ID>
+    <ID>MagicNumber:GenericNetworkClient.kt:GenericNetworkClient$400</ID>
+    <ID>MagicNumber:GenericNetworkClient.kt:GenericNetworkClient$408</ID>
+    <ID>MagicNumber:GenericNetworkClient.kt:GenericNetworkClient$429</ID>
+    <ID>MagicNumber:GenericNetworkClient.kt:GenericNetworkClient$499</ID>
+    <ID>MagicNumber:InAppPresenterApi.kt:InAppPresenterApi$0.3</ID>
+    <ID>MagicNumber:InlineInAppMessageFetcher.kt:InlineInAppMessageFetcher$204</ID>
+    <ID>MagicNumber:IosNotificationSettingsStatus.kt:IosAuthorizationStatus.Ephemeral$4</ID>
+    <ID>MagicNumber:IosNotificationSettingsStatus.kt:IosAuthorizationStatus.Provisional$3</ID>
+    <ID>MagicNumber:ListPageView.kt:0.5f</ID>
+    <ID>MagicNumber:ListPageView.kt:3000L</ID>
+    <ID>MagicNumber:LogLevel.kt:LogLevel.Error$3</ID>
+    <ID>MagicNumber:LogLevel.kt:LogLevel.Metric$4</ID>
+    <ID>MagicNumber:MessageItemsListPane.kt:0.5f</ID>
+    <ID>MagicNumber:MessageItemsListPane.kt:0.75f</ID>
+    <ID>MagicNumber:PlaceholderMessageList.kt:0.7f</ID>
+    <ID>MagicNumber:PlaceholderMessageList.kt:0.9f</ID>
+    <ID>MagicNumber:PlaceholderMessageList.kt:3</ID>
+    <ID>MagicNumber:SdkLogger.kt:SdkLogger$10</ID>
+    <ID>MagicNumber:SharedPreferencesCrypto.kt:SharedPreferenceCrypto$128</ID>
+    <ID>MagicNumber:ThemeMapper.kt:16</ID>
+    <ID>MagicNumber:ThemeMapper.kt:6</ID>
+    <ID>MagicNumber:ThemeMapper.kt:8</ID>
+    <ID>MagicNumber:TransitionSafeCurrentActivityWatchdog.kt:TransitionSafeCurrentActivityWatchdog$500</ID>
+    <ID>MatchingDeclarationName:LaunchApplicationActionModel.kt:BasicLaunchApplicationActionModel : ActionModel</ID>
+    <ID>MatchingDeclarationName:MessageResponseSerializer.kt:MessagesResponseSerializer : KSerializer</ID>
+    <ID>MatchingDeclarationName:RefeshTokenRequestBody.kt:RefreshTokenRequestBody</ID>
+    <ID>MatchingDeclarationName:RichContentDisplayActionModel.kt:BasicRichContentDisplayActionModel : BasicActionModel</ID>
+    <ID>MatchingDeclarationName:SharedPreferencesCrypto.kt:SharedPreferenceCrypto</ID>
+    <ID>MatchingDeclarationName:ShimmerEffect.kt:Shimmer : Effect</ID>
+    <ID>MaxLineLength:AndroidInjection.kt:AndroidInjection$single&lt;NotificationManager> { (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager) }</ID>
+    <ID>MaxLineLength:AndroidSdkConfigStore.kt:AndroidSdkConfigStore$override val deserializer: KSerializer&lt;AndroidEngagementCloudSDKConfig> = AndroidEngagementCloudSDKConfig.serializer()</ID>
+    <ID>MaxLineLength:AndroidSetupApi.kt:AndroidSetupApi$*</ID>
+    <ID>MaxLineLength:CategoriesDialogView.kt:contentDescription = "$text ${LocalStringResources.current.selectedCategoryFilterChipIconAltText}"</ID>
+    <ID>MaxLineLength:CategorySelectorButton.kt:containerColor = if (isCategorySelectionActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant</ID>
+    <ID>MaxLineLength:CategorySelectorButton.kt:contentColor = if (isCategorySelectionActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface</ID>
+    <ID>MaxLineLength:ConfigClient.kt:ConfigClient$val updatedConfig = sdkContext.getSdkConfig()?.copyWith(applicationCode = sdkEvent.applicationCode)</ID>
+    <ID>MaxLineLength:ConfigExtension.kt:internal suspend</ID>
+    <ID>MaxLineLength:ContactClient.kt:ContactClient$return event is SdkEvent.Internal.Sdk.LinkContact || event is SdkEvent.Internal.Sdk.LinkAuthenticatedContact || event is SdkEvent.Internal.Sdk.UnlinkContact</ID>
+    <ID>MaxLineLength:ContactInternal.kt:ContactInternal$sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.UnlinkContact(applicationCode = sdkContext.getSdkConfig()?.applicationCode))</ID>
+    <ID>MaxLineLength:DefaultClientExceptionHandler.kt:DefaultClientExceptionHandler$is FailedRequestException</ID>
+    <ID>MaxLineLength:ECClient.kt:ECClient$exception.response.status == HttpStatusCode.Unauthorized</ID>
+    <ID>MaxLineLength:ECClient.kt:ECClient$sdkLogger.debug("Response error code can't be parsed to Int. Error code value: ${parsedBody.error.code}")</ID>
+    <ID>MaxLineLength:EmbeddedMessagesRequestFactory.kt:EmbeddedMessagesRequestFactory$override suspend</ID>
+    <ID>MaxLineLength:EmbeddedMessagesRequestFactory.kt:EmbeddedMessagesRequestFactory$private suspend</ID>
+    <ID>MaxLineLength:EmbeddedMessaging.kt:EmbeddedMessaging$internal</ID>
+    <ID>MaxLineLength:EmbeddedMessagingRequestFactoryApi.kt:EmbeddedMessagingRequestFactoryApi$suspend fun createBatched: UrlRequest</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$background = EmbeddedMessagingConstants.ColorDefaults.BACKGROUND.toColor(MaterialTheme.colorScheme.background)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$errorContainer = EmbeddedMessagingConstants.ColorDefaults.ERROR_CONTAINER.toColor(MaterialTheme.colorScheme.errorContainer)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$inverseOnSurface = EmbeddedMessagingConstants.ColorDefaults.INVERSE_ON_SURFACE.toColor(MaterialTheme.colorScheme.inverseOnSurface)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$inversePrimary = EmbeddedMessagingConstants.ColorDefaults.INVERSE_PRIMARY.toColor(MaterialTheme.colorScheme.inversePrimary)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$inverseSurface = EmbeddedMessagingConstants.ColorDefaults.INVERSE_SURFACE.toColor(MaterialTheme.colorScheme.inverseSurface)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$onBackground = EmbeddedMessagingConstants.ColorDefaults.ON_BACKGROUND.toColor(MaterialTheme.colorScheme.onBackground)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$onErrorContainer = EmbeddedMessagingConstants.ColorDefaults.ON_ERROR_CONTAINER.toColor(MaterialTheme.colorScheme.onErrorContainer)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$onPrimary = EmbeddedMessagingConstants.ColorDefaults.ON_PRIMARY.toColor(MaterialTheme.colorScheme.onPrimary)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$onPrimaryContainer = EmbeddedMessagingConstants.ColorDefaults.ON_PRIMARY_CONTAINER.toColor(MaterialTheme.colorScheme.onPrimaryContainer)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$onPrimaryFixed = EmbeddedMessagingConstants.ColorDefaults.ON_PRIMARY_FIXED.toColor(MaterialTheme.colorScheme.onPrimaryFixed)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$onPrimaryFixedVariant = EmbeddedMessagingConstants.ColorDefaults.ON_PRIMARY_FIXED_VARIANT.toColor(MaterialTheme.colorScheme.onPrimaryFixedVariant)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$onSecondary = EmbeddedMessagingConstants.ColorDefaults.ON_SECONDARY.toColor(MaterialTheme.colorScheme.onSecondary)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$onSecondaryContainer = EmbeddedMessagingConstants.ColorDefaults.ON_SECONDARY_CONTAINER.toColor(MaterialTheme.colorScheme.onSecondaryContainer)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$onSecondaryFixed = EmbeddedMessagingConstants.ColorDefaults.ON_SECONDARY_FIXED.toColor(MaterialTheme.colorScheme.onSecondaryFixed)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$onSecondaryFixedVariant = EmbeddedMessagingConstants.ColorDefaults.ON_SECONDARY_FIXED_VARIANT.toColor(MaterialTheme.colorScheme.onSecondaryFixedVariant)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$onSurface = EmbeddedMessagingConstants.ColorDefaults.ON_SURFACE.toColor(MaterialTheme.colorScheme.onSurface)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$onSurfaceVariant = EmbeddedMessagingConstants.ColorDefaults.ON_SURFACE_VARIANT.toColor(MaterialTheme.colorScheme.onSurfaceVariant)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$onTertiary = EmbeddedMessagingConstants.ColorDefaults.ON_TERTIARY.toColor(MaterialTheme.colorScheme.onTertiary)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$onTertiaryContainer = EmbeddedMessagingConstants.ColorDefaults.ON_TERTIARY_CONTAINER.toColor(MaterialTheme.colorScheme.onTertiaryContainer)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$onTertiaryFixed = EmbeddedMessagingConstants.ColorDefaults.ON_TERTIARY_FIXED.toColor(MaterialTheme.colorScheme.onTertiaryFixed)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$onTertiaryFixedVariant = EmbeddedMessagingConstants.ColorDefaults.ON_TERTIARY_FIXED_VARIANT.toColor(MaterialTheme.colorScheme.onTertiaryFixedVariant)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$outlineVariant = EmbeddedMessagingConstants.ColorDefaults.OUTLINE_VARIANT.toColor(MaterialTheme.colorScheme.outlineVariant)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$primaryContainer = EmbeddedMessagingConstants.ColorDefaults.PRIMARY_CONTAINER.toColor(MaterialTheme.colorScheme.primaryContainer)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$primaryFixed = EmbeddedMessagingConstants.ColorDefaults.PRIMARY_FIXED.toColor(MaterialTheme.colorScheme.primaryFixed)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$primaryFixedDim = EmbeddedMessagingConstants.ColorDefaults.PRIMARY_FIXED_DIM.toColor(MaterialTheme.colorScheme.primaryFixedDim)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$secondaryContainer = EmbeddedMessagingConstants.ColorDefaults.SECONDARY_CONTAINER.toColor(MaterialTheme.colorScheme.secondaryContainer)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$secondaryFixed = EmbeddedMessagingConstants.ColorDefaults.SECONDARY_FIXED.toColor(MaterialTheme.colorScheme.secondaryFixed)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$secondaryFixedDim = EmbeddedMessagingConstants.ColorDefaults.SECONDARY_FIXED_DIM.toColor(MaterialTheme.colorScheme.secondaryFixedDim)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$surfaceBright = EmbeddedMessagingConstants.ColorDefaults.SURFACE_BRIGHT.toColor(MaterialTheme.colorScheme.surfaceBright)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$surfaceContainer = EmbeddedMessagingConstants.ColorDefaults.SURFACE_CONTAINER.toColor(MaterialTheme.colorScheme.surfaceContainer)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$surfaceContainerHigh = EmbeddedMessagingConstants.ColorDefaults.SURFACE_CONTAINER_HIGH.toColor(MaterialTheme.colorScheme.surfaceContainerHigh)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$surfaceContainerHighest = EmbeddedMessagingConstants.ColorDefaults.SURFACE_CONTAINER_HIGHEST.toColor(MaterialTheme.colorScheme.surfaceContainerHighest)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$surfaceContainerLow = EmbeddedMessagingConstants.ColorDefaults.SURFACE_CONTAINER_LOW.toColor(MaterialTheme.colorScheme.surfaceContainerLow)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$surfaceContainerLowest = EmbeddedMessagingConstants.ColorDefaults.SURFACE_CONTAINER_LOWEST.toColor(MaterialTheme.colorScheme.surfaceContainerLowest)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$surfaceDim = EmbeddedMessagingConstants.ColorDefaults.SURFACE_DIM.toColor(MaterialTheme.colorScheme.surfaceDim)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$surfaceTint = EmbeddedMessagingConstants.ColorDefaults.SURFACE_TINT.toColor(MaterialTheme.colorScheme.surfaceTint)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$surfaceVariant = EmbeddedMessagingConstants.ColorDefaults.SURFACE_VARIANT.toColor(MaterialTheme.colorScheme.surfaceVariant)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$tertiaryContainer = EmbeddedMessagingConstants.ColorDefaults.TERTIARY_CONTAINER.toColor(MaterialTheme.colorScheme.tertiaryContainer)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$tertiaryFixed = EmbeddedMessagingConstants.ColorDefaults.TERTIARY_FIXED.toColor(MaterialTheme.colorScheme.tertiaryFixed)</ID>
+    <ID>MaxLineLength:EmbeddedMessagingUiConstants.kt:EmbeddedMessagingUiConstants.Colors$tertiaryFixedDim = EmbeddedMessagingConstants.ColorDefaults.TERTIARY_FIXED_DIM.toColor(MaterialTheme.colorScheme.tertiaryFixedDim)</ID>
+    <ID>MaxLineLength:EnableOrganizer.kt:EnableOrganizer$sdkLogger.debug("Enabling SDK failed during MeStateMachine activation. Failed with exception: ${it.message}")</ID>
+    <ID>MaxLineLength:Event.kt:SdkEvent.DeviceEvent$fun</ID>
+    <ID>MaxLineLength:Event.kt:SdkEvent.Internal.Reporting$override</ID>
+    <ID>MaxLineLength:EventTracker.kt:EventTracker$internal</ID>
+    <ID>MaxLineLength:EventsQueries.kt:EventsQueries$public</ID>
+    <ID>MaxLineLength:EventsQueries.kt:EventsQueries$val</ID>
+    <ID>MaxLineLength:GenericNetworkClient.kt:GenericNetworkClient$!httpResponse.status.isSuccess() &amp;&amp; httpResponse.status != HttpStatusCode.Unauthorized &amp;&amp; retries == MAX_RETRY_COUNT</ID>
+    <ID>MaxLineLength:GenericNetworkClient.kt:GenericNetworkClient$return !response.status.isSuccess() &amp;&amp; (response.status.value == 408 || response.status.value == 429 || response.status.value !in 400..499)</ID>
+    <ID>MaxLineLength:HuaweiPushV2Mapper.kt:HuaweiPushV2Mapper$notificationObject[ACTIONS]?.jsonArray?.let { json.decodeFromJsonElement&lt;List&lt;PresentableActionModel>>(it) }</ID>
+    <ID>MaxLineLength:InitInjection.kt:InitStateTypes$LegacySDKMigration</ID>
+    <ID>MaxLineLength:LaunchApplicationHandler.kt:LaunchApplicationHandler$this.setPendingIntentBackgroundActivityStartMode(ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED)</ID>
+    <ID>MaxLineLength:LaunchApplicationHandler.kt:LaunchApplicationHandler$this.setPendingIntentCreatorBackgroundActivityStartMode(ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED)</ID>
+    <ID>MaxLineLength:ListPageView.kt:onRefresh = { viewModel.refreshMessagesWithThrottling { lazyPagingMessageItems.refresh() } }</ID>
+    <ID>MaxLineLength:ListPageViewModel.kt:ListPageViewModel$(timestampProvider.provide() - lastRefreshTimestamp!!).inWholeSeconds &lt; embeddedMessagingContext.embeddedMessagingFrequencyCapSeconds</ID>
+    <ID>MaxLineLength:MessageItemView.kt:fontWeight = if (viewModel.isNotOpened) UNREAD_MESSAGE_LEAD_FONT_WEIGHT else READ_MESSAGE_LEAD_FONT_WEIGHT</ID>
+    <ID>MaxLineLength:MessageItemView.kt:fontWeight = if (viewModel.isNotOpened) UNREAD_MESSAGE_TITLE_FONT_WEIGHT else READ_MESSAGE_TITLE_FONT_WEIGHT</ID>
+    <ID>MaxLineLength:MessageItemsListPane.kt:if (messageIdToDelete != null) it else SwipeToDismissBoxValue.Settled</ID>
+    <ID>MaxLineLength:MessageItemsListPane.kt:}</ID>
+    <ID>MaxLineLength:MutableList.kt:internal suspend</ID>
+    <ID>MaxLineLength:PushInternal.kt:PushInternal$sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.ClearPushToken(applicationCode = sdkContext.getSdkConfig()?.applicationCode))</ID>
+    <ID>MaxLineLength:PushMessagePresenter.kt:PushMessagePresenter$return platformInfoCollector.isDebugMode() &amp;&amp; !notificationSettings.channelSettings.any { channelSettings -> channelSettings.channelId == channelId }</ID>
+    <ID>MaxLineLength:PushPresenter.kt:PushPresenter$internal</ID>
+    <ID>MaxLineLength:PushTokenBroadcastReceiver.kt:PushTokenBroadcastReceiver$}</ID>
+    <ID>MaxLineLength:RemoteConfigClient.kt:RemoteConfigClient$return sdkEvent is SdkEvent.Internal.Sdk.ApplyGlobalRemoteConfig || sdkEvent is SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig</ID>
+    <ID>MaxLineLength:SapEngagementCloudDB.kt:SapEngagementCloudDB.Companion$public operator fun invoke: SapEngagementCloudDB</ID>
+    <ID>MaxLineLength:SapEngagementCloudDBImpl.kt:internal fun KClass&lt;SapEngagementCloudDB>.newInstance: SapEngagementCloudDB</ID>
+    <ID>MaxLineLength:SdkEventDistributor.kt:SdkEventDistributor$*</ID>
+    <ID>MaxLineLength:SdkEventDistributor.kt:SdkEventDistributor$* Events that have the [SdkEvent.Internal.OperationalEvent] interface are processed even when the SDK is below OnHold state.</ID>
+    <ID>MaxLineLength:SdkEventDistributor.kt:SdkEventDistributor$sdkLogger.trace("Register public event: ${sdkEvent.type}", buildJsonObject { put("event", sdkEvent.toString()) })</ID>
+    <ID>MaxLineLength:SdkEventWaiter.kt:SdkEventWaiter$Result.failure(Exception("No internet connection. Event: ${sdkEvent.type} is stored and will be processed when connection is restored."))</ID>
+    <ID>MaxLineLength:SdkEventWaiter.kt:SdkEventWaiter$sdkEventDistributor.sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Answer &amp;&amp; sdkEvent.id == it.originId } as SdkEvent.Internal.Sdk.Answer.Response&lt;T></ID>
+    <ID>MaxLineLength:SdkException.kt:SdkException$FailedRequestException : SdkException</ID>
+    <ID>MaxLineLength:Setup.kt:Setup$*</ID>
+    <ID>MaxLineLength:SetupApi.kt:SetupApi$*</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$background = colors.background.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().background)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$errorContainer = colors.errorContainer.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().errorContainer)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$inverseOnSurface = colors.inverseOnSurface.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().inverseOnSurface)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$inversePrimary = colors.inversePrimary.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().inversePrimary)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$inverseSurface = colors.inverseSurface.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().inverseSurface)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$messageItemCardCornerRadius = if (it.messageItemCardCornerRadius != null) it.messageItemCardCornerRadius.dp else ZERO_CORNER_RADIUS</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$messageItemCardElevation = if (it.messageItemCardElevation != null) it.messageItemCardElevation.dp else ZERO_ELEVATION</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$onBackground = colors.onBackground.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().onBackground)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$onErrorContainer = colors.onErrorContainer.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().onErrorContainer)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$onPrimary = colors.onPrimary.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().onPrimary)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$onPrimaryContainer = colors.onPrimaryContainer.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().onPrimaryContainer)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$onPrimaryFixed = colors.onPrimaryFixed.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().onPrimaryFixed)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$onPrimaryFixedVariant = colors.onPrimaryFixedVariant.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().onPrimaryFixedVariant)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$onSecondary = colors.onSecondary.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().onSecondary)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$onSecondaryContainer = colors.onSecondaryContainer.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().onSecondaryContainer)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$onSecondaryFixed = colors.onSecondaryFixed.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().onSecondaryFixed)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$onSecondaryFixedVariant = colors.onSecondaryFixedVariant.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().onSecondaryFixedVariant)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$onSurface = colors.onSurface.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().onSurface)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$onSurfaceVariant = colors.onSurfaceVariant.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().onSurfaceVariant)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$onTertiary = colors.onTertiary.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().onTertiary)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$onTertiaryContainer = colors.onTertiaryContainer.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().onTertiaryContainer)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$onTertiaryFixed = colors.onTertiaryFixed.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().onTertiaryFixed)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$onTertiaryFixedVariant = colors.onTertiaryFixedVariant.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().onTertiaryFixedVariant)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$outlineVariant = colors.outlineVariant.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().outlineVariant)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$primaryContainer = colors.primaryContainer.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().primaryContainer)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$primaryFixed = colors.primaryFixed.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().primaryFixed)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$primaryFixedDim = colors.primaryFixedDim.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().primaryFixedDim)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$secondary = colors.secondary.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().secondary)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$secondaryContainer = colors.secondaryContainer.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().secondaryContainer)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$secondaryFixed = colors.secondaryFixed.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().secondaryFixed)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$secondaryFixedDim = colors.secondaryFixedDim.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().secondaryFixedDim)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$surfaceBright = colors.surfaceBright.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().surfaceBright)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$surfaceContainer = colors.surfaceContainer.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().surfaceContainer)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$surfaceContainerHigh = colors.surfaceContainerHigh.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().surfaceContainerHigh)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$surfaceContainerHighest = colors.surfaceContainerHighest.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().surfaceContainerHighest)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$surfaceContainerLow = colors.surfaceContainerLow.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().surfaceContainerLow)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$surfaceContainerLowest = colors.surfaceContainerLowest.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().surfaceContainerLowest)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$surfaceDim = colors.surfaceDim.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().surfaceDim)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$surfaceTint = colors.surfaceTint.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().surfaceTint)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$surfaceVariant = colors.surfaceVariant.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().surfaceVariant)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$tertiary = colors.tertiary.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().tertiary)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$tertiaryContainer = colors.tertiaryContainer.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().tertiaryContainer)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$tertiaryFixed = colors.tertiaryFixed.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().tertiaryFixed)</ID>
+    <ID>MaxLineLength:ThemeMapper.kt:ThemeMapper$tertiaryFixedDim = colors.tertiaryFixedDim.toColor(EmbeddedMessagingUiConstants.Colors.getDefaultColorScheme().tertiaryFixedDim)</ID>
+    <ID>MaxLineLength:Tracking.kt:Tracking$*</ID>
+    <ID>MaxLineLength:UnlinkContactState.kt:UnlinkContactState$sdkEventDistributor.registerEvent(SdkEvent.Internal.Sdk.UnlinkContact(applicationCode = sdkContext.getSdkConfig()?.applicationCode))</ID>
+    <ID>MaxLineLength:UrlFactory.kt:UrlFactory$ECUrlType.FetchBadgeCount -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/badge-count")</ID>
+    <ID>MaxLineLength:UrlFactory.kt:UrlFactory$ECUrlType.FetchEmbeddedMessages -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/messages")</ID>
+    <ID>MaxLineLength:UrlFactory.kt:UrlFactory$ECUrlType.FetchMeta -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/meta")</ID>
+    <ID>MaxLineLength:UrlFactory.kt:UrlFactory$ECUrlType.GlobalRemoteConfigSignature -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/GLOBAL")</ID>
+    <ID>MaxLineLength:UrlFactory.kt:UrlFactory$ECUrlType.PushToken -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/push-token")</ID>
+    <ID>MaxLineLength:UrlFactory.kt:UrlFactory$ECUrlType.RegisterDeviceInfo -> Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client")</ID>
+    <ID>MaxLineLength:UrlFactory.kt:UrlFactory$ECUrlType.RemoteConfigSignature -> Url("${sdkContext.defaultUrls.remoteConfigBaseUrl}/signature/${getApplicationCode()}")</ID>
+    <ID>MaxLineLength:UrlFactory.kt:UrlFactory$ECUrlType.UpdateTagsForMessages -> Url("${sdkContext.defaultUrls.embeddedMessagingBaseUrl}/embedded-messaging/api/$V1_API/${getApplicationCode()}/tags")</ID>
+    <ID>MaxLineLength:UrlFactory.kt:UrlFactory$URLBuilder("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${getApplicationCode()}/client/app").build()</ID>
+    <ID>MaxLineLength:UrlFactory.kt:UrlFactory$Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${urlType.applicationCode}/client/contact")</ID>
+    <ID>MaxLineLength:UrlFactory.kt:UrlFactory$Url("${sdkContext.defaultUrls.clientServiceBaseUrl}/$V4_API/apps/${urlType.applicationCode}/client/push-token")</ID>
+    <ID>MaxLineLength:UrlFactory.kt:UrlFactory$Url("${sdkContext.defaultUrls.eventServiceBaseUrl}/$V5_API/apps/${getApplicationCode()}/inline-messages")</ID>
+    <ID>MaxLineLength:UserAgentProvider.kt:UserAgentProvider$internal</ID>
+    <ID>ModifierMissing:CompactListView.kt:@Composable fun EmbeddedMessagingCompactView</ID>
+    <ID>ModifierWithoutDefault:MessageDetailView.kt:modifier: Modifier</ID>
+    <ID>MutableStateParam:CategoriesDialogView.kt:selectedCategories: MutableState&lt;Set&lt;String>></ID>
+    <ID>NestedBlockDepth:LaunchApplicationHandler.kt:LaunchApplicationHandler$override suspend fun launchApplication</ID>
+    <ID>NestedBlockDepth:LegacySDKMigrationState.android.kt:LegacySDKMigrationState$actual override suspend fun active: Result&lt;Unit></ID>
+    <ID>NewLineAtEndOfFile:AbstractSqlDelightEventsDao.kt:com.sap.ec.core.db.events.AbstractSqlDelightEventsDao.kt</ID>
+    <ID>NewLineAtEndOfFile:ActionHandler.kt:com.sap.ec.core.actions.ActionHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:ActionHandlerApi.kt:com.sap.ec.core.actions.ActionHandlerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:Activatable.kt:com.sap.ec.api.Activatable.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidApplicationVersionProvider.kt:com.sap.ec.core.providers.AndroidApplicationVersionProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidClipboardHandler.kt:com.sap.ec.mobileengage.clipboard.AndroidClipboardHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidConfig.kt:com.sap.ec.api.config.AndroidConfig.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidConfigApi.kt:com.sap.ec.api.config.AndroidConfigApi.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidConnectionWatchDog.kt:com.sap.ec.watchdog.connection.AndroidConnectionWatchDog.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidDeepLink.kt:com.sap.ec.api.deeplink.AndroidDeepLink.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidDeepLinkApi.kt:com.sap.ec.api.deeplink.AndroidDeepLinkApi.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidExternalUrlOpener.kt:com.sap.ec.mobileengage.url.AndroidExternalUrlOpener.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidFileCache.android.kt:com.sap.ec.core.cache.AndroidFileCache.android.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidInjection.kt:com.sap.ec.di.AndroidInjection.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidLifecycleWatchDog.kt:com.sap.ec.watchdog.lifecycle.AndroidLifecycleWatchDog.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidNotificationSettings.kt:com.sap.ec.core.device.notification.AndroidNotificationSettings.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidNotificationSettingsCollector.kt:com.sap.ec.core.device.notification.AndroidNotificationSettingsCollector.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidNotificationSettingsCollectorApi.kt:com.sap.ec.core.device.notification.AndroidNotificationSettingsCollectorApi.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidPermissionHandler.kt:com.sap.ec.mobileengage.permission.AndroidPermissionHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidPlatformData.kt:com.sap.ec.mobileengage.push.model.AndroidPlatformData.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidPushMessage.kt:com.sap.ec.mobileengage.push.model.AndroidPushMessage.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidPushMessageFactory.kt:com.sap.ec.mobileengage.push.AndroidPushMessageFactory.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidPushV2Mapper.kt:com.sap.ec.mobileengage.push.mapper.AndroidPushV2Mapper.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidSdkConfigStore.kt:com.sap.ec.enable.config.AndroidSdkConfigStore.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidSetup.kt:com.sap.ec.api.setup.AndroidSetup.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidSetupApi.kt:com.sap.ec.api.setup.AndroidSetupApi.kt</ID>
+    <ID>NewLineAtEndOfFile:AndroidVersionUtils.kt:com.sap.ec.core.device.AndroidVersionUtils.kt</ID>
+    <ID>NewLineAtEndOfFile:Api.kt:com.sap.ec.api.Api.kt</ID>
+    <ID>NewLineAtEndOfFile:ApiContext.kt:com.sap.ec.api.generic.ApiContext.kt</ID>
+    <ID>NewLineAtEndOfFile:AppEventAction.kt:com.sap.ec.mobileengage.action.actions.AppEventAction.kt</ID>
+    <ID>NewLineAtEndOfFile:AppEventActionModel.kt:com.sap.ec.mobileengage.action.models.AppEventActionModel.kt</ID>
+    <ID>NewLineAtEndOfFile:AppStartState.kt:com.sap.ec.enable.states.AppStartState.kt</ID>
+    <ID>NewLineAtEndOfFile:ApplicationCode.kt:com.sap.ec.config.ApplicationCode.kt</ID>
+    <ID>NewLineAtEndOfFile:ApplicationVersionProviderApi.kt:com.sap.ec.core.providers.ApplicationVersionProviderApi.kt</ID>
+    <ID>NewLineAtEndOfFile:ApplyAppCodeBasedRemoteConfigState.kt:com.sap.ec.enable.states.ApplyAppCodeBasedRemoteConfigState.kt</ID>
+    <ID>NewLineAtEndOfFile:ApplyGlobalRemoteConfigState.kt:com.sap.ec.init.states.ApplyGlobalRemoteConfigState.kt</ID>
+    <ID>NewLineAtEndOfFile:AutoRegisterable.kt:com.sap.ec.api.AutoRegisterable.kt</ID>
+    <ID>NewLineAtEndOfFile:BadgeCount.kt:com.sap.ec.mobileengage.action.models.BadgeCount.kt</ID>
+    <ID>NewLineAtEndOfFile:BadgeCountEvent.kt:com.sap.ec.api.event.model.BadgeCountEvent.kt</ID>
+    <ID>NewLineAtEndOfFile:BadgeCountHandlerApi.kt:com.sap.ec.core.actions.badge.BadgeCountHandlerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:BroadcastReceiver.kt:com.sap.ec.core.extension.BroadcastReceiver.kt</ID>
+    <ID>NewLineAtEndOfFile:CategorySelectorButton.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.category.CategorySelectorButton.kt</ID>
+    <ID>NewLineAtEndOfFile:ClearDeviceInfoState.kt:com.sap.ec.disable.states.ClearDeviceInfoState.kt</ID>
+    <ID>NewLineAtEndOfFile:ClearEventsState.kt:com.sap.ec.disable.states.ClearEventsState.kt</ID>
+    <ID>NewLineAtEndOfFile:ClearPushTokenOnDisableState.kt:com.sap.ec.disable.states.ClearPushTokenOnDisableState.kt</ID>
+    <ID>NewLineAtEndOfFile:ClearRequestContextTokensState.kt:com.sap.ec.reregistration.states.ClearRequestContextTokensState.kt</ID>
+    <ID>NewLineAtEndOfFile:ClearStoredConfigState.kt:com.sap.ec.disable.states.ClearStoredConfigState.kt</ID>
+    <ID>NewLineAtEndOfFile:ClientIdProvider.kt:com.sap.ec.core.providers.ClientIdProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:ClipboardHandlerApi.kt:com.sap.ec.core.actions.clipboard.ClipboardHandlerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:CollectDeviceInfoState.kt:com.sap.ec.enable.states.CollectDeviceInfoState.kt</ID>
+    <ID>NewLineAtEndOfFile:CompactListView.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.list.CompactListView.kt</ID>
+    <ID>NewLineAtEndOfFile:Config.kt:com.sap.ec.api.config.Config.kt</ID>
+    <ID>NewLineAtEndOfFile:ConfigApi.kt:com.sap.ec.api.config.ConfigApi.kt</ID>
+    <ID>NewLineAtEndOfFile:ConfigCall.kt:com.sap.ec.api.config.ConfigCall.kt</ID>
+    <ID>NewLineAtEndOfFile:ConfigClient.kt:com.sap.ec.networking.clients.config.ConfigClient.kt</ID>
+    <ID>NewLineAtEndOfFile:ConfigExtension.kt:com.sap.ec.config.ConfigExtension.kt</ID>
+    <ID>NewLineAtEndOfFile:ConfigInjection.kt:com.sap.ec.di.ConfigInjection.kt</ID>
+    <ID>NewLineAtEndOfFile:ConfigInternal.kt:com.sap.ec.api.config.ConfigInternal.kt</ID>
+    <ID>NewLineAtEndOfFile:ConfigInternalApi.kt:com.sap.ec.api.config.ConfigInternalApi.kt</ID>
+    <ID>NewLineAtEndOfFile:ConnectionWatchDog.kt:com.sap.ec.watchdog.connection.ConnectionWatchDog.kt</ID>
+    <ID>NewLineAtEndOfFile:ConsoleLogger.android.kt:com.sap.ec.core.log.ConsoleLogger.android.kt</ID>
+    <ID>NewLineAtEndOfFile:ConsoleLogger.kt:com.sap.ec.core.log.ConsoleLogger.kt</ID>
+    <ID>NewLineAtEndOfFile:ConsoleLoggerApi.kt:com.sap.ec.core.log.ConsoleLoggerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:Contact.kt:com.sap.ec.api.contact.Contact.kt</ID>
+    <ID>NewLineAtEndOfFile:ContactApi.kt:com.sap.ec.api.contact.ContactApi.kt</ID>
+    <ID>NewLineAtEndOfFile:ContactCall.kt:com.sap.ec.api.contact.ContactCall.kt</ID>
+    <ID>NewLineAtEndOfFile:ContactClient.kt:com.sap.ec.networking.clients.contact.ContactClient.kt</ID>
+    <ID>NewLineAtEndOfFile:ContactGatherer.kt:com.sap.ec.api.contact.ContactGatherer.kt</ID>
+    <ID>NewLineAtEndOfFile:ContactInjection.kt:com.sap.ec.di.ContactInjection.kt</ID>
+    <ID>NewLineAtEndOfFile:ContactInternal.kt:com.sap.ec.api.contact.ContactInternal.kt</ID>
+    <ID>NewLineAtEndOfFile:ContactTokenHandler.kt:com.sap.ec.networking.clients.contact.ContactTokenHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:ContactTokenHandlerApi.kt:com.sap.ec.networking.clients.contact.ContactTokenHandlerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:ContentReplacerApi.kt:com.sap.ec.mobileengage.inapp.jsbridge.ContentReplacerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:CopyToClipboardAction.kt:com.sap.ec.mobileengage.action.actions.CopyToClipboardAction.kt</ID>
+    <ID>NewLineAtEndOfFile:CopyToClipboardActionModel.kt:com.sap.ec.mobileengage.action.models.CopyToClipboardActionModel.kt</ID>
+    <ID>NewLineAtEndOfFile:CoreInjection.kt:com.sap.ec.di.CoreInjection.kt</ID>
+    <ID>NewLineAtEndOfFile:Crypto.kt:com.sap.ec.core.crypto.Crypto.kt</ID>
+    <ID>NewLineAtEndOfFile:CryptoApi.kt:com.sap.ec.core.crypto.CryptoApi.kt</ID>
+    <ID>NewLineAtEndOfFile:CustomEvent.kt:com.sap.ec.api.event.model.CustomEvent.kt</ID>
+    <ID>NewLineAtEndOfFile:CustomEventActionModel.kt:com.sap.ec.mobileengage.action.models.CustomEventActionModel.kt</ID>
+    <ID>NewLineAtEndOfFile:DateTimeFormat.kt:com.sap.ec.core.datetime.DateTimeFormat.kt</ID>
+    <ID>NewLineAtEndOfFile:DeepLinkApi.kt:com.sap.ec.api.deeplink.DeepLinkApi.kt</ID>
+    <ID>NewLineAtEndOfFile:DeepLinkClient.kt:com.sap.ec.networking.clients.deepLink.DeepLinkClient.kt</ID>
+    <ID>NewLineAtEndOfFile:DeepLinkInjection.kt:com.sap.ec.di.DeepLinkInjection.kt</ID>
+    <ID>NewLineAtEndOfFile:DefaultUrls.kt:com.sap.ec.context.DefaultUrls.kt</ID>
+    <ID>NewLineAtEndOfFile:DefaultUrlsApi.kt:com.sap.ec.context.DefaultUrlsApi.kt</ID>
+    <ID>NewLineAtEndOfFile:DeleteMessageItemConfirmationDialog.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.item.DeleteMessageItemConfirmationDialog.kt</ID>
+    <ID>NewLineAtEndOfFile:DeviceClient.kt:com.sap.ec.networking.clients.device.DeviceClient.kt</ID>
+    <ID>NewLineAtEndOfFile:DeviceEvent.kt:com.sap.ec.networking.clients.event.model.DeviceEvent.kt</ID>
+    <ID>NewLineAtEndOfFile:DeviceEventRequestBody.kt:com.sap.ec.networking.clients.event.model.DeviceEventRequestBody.kt</ID>
+    <ID>NewLineAtEndOfFile:DeviceEventResponse.kt:com.sap.ec.networking.clients.event.model.DeviceEventResponse.kt</ID>
+    <ID>NewLineAtEndOfFile:DeviceInfoCollector.android.kt:com.sap.ec.core.device.DeviceInfoCollector.android.kt</ID>
+    <ID>NewLineAtEndOfFile:DeviceInfoCollector.kt:com.sap.ec.core.device.DeviceInfoCollector.kt</ID>
+    <ID>NewLineAtEndOfFile:DeviceInfoCollectorApi.kt:com.sap.ec.core.device.DeviceInfoCollectorApi.kt</ID>
+    <ID>NewLineAtEndOfFile:DeviceInfoStorage.kt:com.sap.ec.core.device.DeviceInfoStorage.kt</ID>
+    <ID>NewLineAtEndOfFile:DeviceInfoStorageApi.kt:com.sap.ec.core.device.DeviceInfoStorageApi.kt</ID>
+    <ID>NewLineAtEndOfFile:DisableOrganizer.kt:com.sap.ec.disable.DisableOrganizer.kt</ID>
+    <ID>NewLineAtEndOfFile:DisableOrganizerApi.kt:com.sap.ec.disable.DisableOrganizerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:DoubleProvider.kt:com.sap.ec.core.providers.DoubleProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:Downloader.kt:com.sap.ec.core.util.Downloader.kt</ID>
+    <ID>NewLineAtEndOfFile:DownloaderApi.kt:com.sap.ec.core.util.DownloaderApi.kt</ID>
+    <ID>NewLineAtEndOfFile:ECClient.kt:com.sap.ec.networking.ECClient.kt</ID>
+    <ID>NewLineAtEndOfFile:ECHeaders.kt:com.sap.ec.networking.ECHeaders.kt</ID>
+    <ID>NewLineAtEndOfFile:ECSdkSession.kt:com.sap.ec.mobileengage.session.ECSdkSession.kt</ID>
+    <ID>NewLineAtEndOfFile:ECUrlType.kt:com.sap.ec.core.url.ECUrlType.kt</ID>
+    <ID>NewLineAtEndOfFile:Effect.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.list.placeholders.Effect.kt</ID>
+    <ID>NewLineAtEndOfFile:EmbeddedMessageAnimation.kt:com.sap.ec.networking.clients.embedded.messaging.model.EmbeddedMessageAnimation.kt</ID>
+    <ID>NewLineAtEndOfFile:EmbeddedMessagesRequestFactory.kt:com.sap.ec.mobileengage.embeddedmessaging.networking.EmbeddedMessagesRequestFactory.kt</ID>
+    <ID>NewLineAtEndOfFile:EmbeddedMessaging.kt:com.sap.ec.api.embeddedmessaging.EmbeddedMessaging.kt</ID>
+    <ID>NewLineAtEndOfFile:EmbeddedMessagingApi.kt:com.sap.ec.api.embeddedmessaging.EmbeddedMessagingApi.kt</ID>
+    <ID>NewLineAtEndOfFile:EmbeddedMessagingConstants.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants.kt</ID>
+    <ID>NewLineAtEndOfFile:EmbeddedMessagingContextApi.kt:com.sap.ec.mobileengage.embeddedmessaging.EmbeddedMessagingContextApi.kt</ID>
+    <ID>NewLineAtEndOfFile:EmbeddedMessagingDesignValues.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingDesignValues.kt</ID>
+    <ID>NewLineAtEndOfFile:EmbeddedMessagingInjection.kt:com.sap.ec.di.EmbeddedMessagingInjection.kt</ID>
+    <ID>NewLineAtEndOfFile:EmbeddedMessagingInternal.kt:com.sap.ec.api.embeddedmessaging.EmbeddedMessagingInternal.kt</ID>
+    <ID>NewLineAtEndOfFile:EmbeddedMessagingInternalApi.kt:com.sap.ec.api.embeddedmessaging.EmbeddedMessagingInternalApi.kt</ID>
+    <ID>NewLineAtEndOfFile:EmbeddedMessagingPagingSource.kt:com.sap.ec.mobileengage.embeddedmessaging.pagination.EmbeddedMessagingPagingSource.kt</ID>
+    <ID>NewLineAtEndOfFile:EmbeddedMessagingRequestFactoryApi.kt:com.sap.ec.mobileengage.embeddedmessaging.networking.EmbeddedMessagingRequestFactoryApi.kt</ID>
+    <ID>NewLineAtEndOfFile:EmbeddedMessagingTheme.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme.kt</ID>
+    <ID>NewLineAtEndOfFile:EmbeddedMessagingUiConstants.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.kt</ID>
+    <ID>NewLineAtEndOfFile:EnableOrganizer.kt:com.sap.ec.enable.EnableOrganizer.kt</ID>
+    <ID>NewLineAtEndOfFile:EnableOrganizerApi.kt:com.sap.ec.enable.EnableOrganizerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:EngagementCloudEvent.kt:com.sap.ec.api.event.model.EngagementCloudEvent.kt</ID>
+    <ID>NewLineAtEndOfFile:EngagementCloudSdkInitializer.kt:com.sap.ec.EngagementCloudSdkInitializer.kt</ID>
+    <ID>NewLineAtEndOfFile:Event.kt:com.sap.ec.event.Event.kt</ID>
+    <ID>NewLineAtEndOfFile:EventActionFactoryApi.kt:com.sap.ec.mobileengage.action.EventActionFactoryApi.kt</ID>
+    <ID>NewLineAtEndOfFile:EventInjection.kt:com.sap.ec.di.EventInjection.kt</ID>
+    <ID>NewLineAtEndOfFile:EventTracker.kt:com.sap.ec.api.event.EventTracker.kt</ID>
+    <ID>NewLineAtEndOfFile:EventTrackerApi.kt:com.sap.ec.api.event.EventTrackerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:EventTrackerCall.kt:com.sap.ec.api.event.EventTrackerCall.kt</ID>
+    <ID>NewLineAtEndOfFile:EventTrackerGatherer.kt:com.sap.ec.api.event.EventTrackerGatherer.kt</ID>
+    <ID>NewLineAtEndOfFile:EventTrackerInternal.kt:com.sap.ec.api.event.EventTrackerInternal.kt</ID>
+    <ID>NewLineAtEndOfFile:EventTrackerInternalApi.kt:com.sap.ec.api.event.EventTrackerInternalApi.kt</ID>
+    <ID>NewLineAtEndOfFile:EventType.kt:com.sap.ec.api.event.model.EventType.kt</ID>
+    <ID>NewLineAtEndOfFile:EventsDaoApi.kt:com.sap.ec.core.db.events.EventsDaoApi.kt</ID>
+    <ID>NewLineAtEndOfFile:Features.kt:com.sap.ec.context.Features.kt</ID>
+    <ID>NewLineAtEndOfFile:FetchEmbeddedMessagingMetaState.kt:com.sap.ec.enable.states.FetchEmbeddedMessagingMetaState.kt</ID>
+    <ID>NewLineAtEndOfFile:FileCacheApi.kt:com.sap.ec.core.cache.FileCacheApi.kt</ID>
+    <ID>NewLineAtEndOfFile:FilterByReadStateTabs.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.tab.FilterByReadStateTabs.kt</ID>
+    <ID>NewLineAtEndOfFile:FollowUpChangeAppCodeOrganizer.kt:com.sap.ec.mobileengage.config.FollowUpChangeAppCodeOrganizer.kt</ID>
+    <ID>NewLineAtEndOfFile:FollowUpChangeAppCodeOrganizerApi.kt:com.sap.ec.mobileengage.config.FollowUpChangeAppCodeOrganizerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:GathererConfig.kt:com.sap.ec.api.config.GathererConfig.kt</ID>
+    <ID>NewLineAtEndOfFile:GathererInApp.kt:com.sap.ec.api.inapp.GathererInApp.kt</ID>
+    <ID>NewLineAtEndOfFile:HuaweiPushV2Mapper.kt:com.sap.ec.mobileengage.push.mapper.HuaweiPushV2Mapper.kt</ID>
+    <ID>NewLineAtEndOfFile:IframeBridgeV2.kt:com.sap.ec.IframeBridgeV2.kt</ID>
+    <ID>NewLineAtEndOfFile:InApp.kt:com.sap.ec.api.inapp.InApp.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppApi.kt:com.sap.ec.api.inapp.InAppApi.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppCall.kt:com.sap.ec.api.inapp.InAppCall.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppConfig.kt:com.sap.ec.api.inapp.InAppConfig.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppConfigApi.kt:com.sap.ec.api.inapp.InAppConfigApi.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppDialogProvider.kt:com.sap.ec.mobileengage.inapp.provider.InAppDialogProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppDownloader.kt:com.sap.ec.mobileengage.inapp.networking.download.InAppDownloader.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppDownloaderApi.kt:com.sap.ec.mobileengage.inapp.networking.download.InAppDownloaderApi.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppEventConsumer.kt:com.sap.ec.mobileengage.inapp.presentation.InAppEventConsumer.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppInjection.kt:com.sap.ec.di.InAppInjection.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppInternal.kt:com.sap.ec.api.inapp.InAppInternal.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppInternalApi.kt:com.sap.ec.api.inapp.InAppInternalApi.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppJsBridgeData.kt:com.sap.ec.mobileengage.inapp.jsbridge.InAppJsBridgeData.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppJsBridgeFactory.kt:com.sap.ec.mobileengage.inapp.InAppJsBridgeFactory.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppLoadingMetric.kt:com.sap.ec.mobileengage.inapp.reporting.InAppLoadingMetric.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppPresentationAnimation.kt:com.sap.ec.mobileengage.inapp.presentation.InAppPresentationAnimation.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppStyle.kt:com.sap.ec.mobileengage.inapp.presentation.InAppStyle.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppView.kt:com.sap.ec.mobileengage.inapp.view.InAppView.kt</ID>
+    <ID>NewLineAtEndOfFile:InitInjection.kt:com.sap.ec.di.InitInjection.kt</ID>
+    <ID>NewLineAtEndOfFile:InitOrganizer.kt:com.sap.ec.init.InitOrganizer.kt</ID>
+    <ID>NewLineAtEndOfFile:InitOrganizerApi.kt:com.sap.ec.init.InitOrganizerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:InitializerState.kt:com.sap.ec.init.states.InitializerState.kt</ID>
+    <ID>NewLineAtEndOfFile:InlineInAppMessageFetcherApi.kt:com.sap.ec.mobileengage.inapp.networking.download.InlineInAppMessageFetcherApi.kt</ID>
+    <ID>NewLineAtEndOfFile:InlineInAppView.kt:com.sap.ec.mobileengage.inapp.view.InlineInAppView.kt</ID>
+    <ID>NewLineAtEndOfFile:InstantProvider.kt:com.sap.ec.core.providers.InstantProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:JsonExtensions.kt:com.sap.ec.util.JsonExtensions.kt</ID>
+    <ID>NewLineAtEndOfFile:JsonUtil.kt:com.sap.ec.util.JsonUtil.kt</ID>
+    <ID>NewLineAtEndOfFile:KotlinPlatform.android.kt:com.sap.ec.KotlinPlatform.android.kt</ID>
+    <ID>NewLineAtEndOfFile:KotlinPlatform.kt:com.sap.ec.KotlinPlatform.kt</ID>
+    <ID>NewLineAtEndOfFile:LanguageHandlerApi.kt:com.sap.ec.core.language.LanguageHandlerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:LanguageProviderApi.kt:com.sap.ec.core.providers.LanguageProviderApi.kt</ID>
+    <ID>NewLineAtEndOfFile:LastPageReachedException.kt:com.sap.ec.mobileengage.embeddedmessaging.exceptions.LastPageReachedException.kt</ID>
+    <ID>NewLineAtEndOfFile:LaunchApplicationHandlerApi.kt:com.sap.ec.core.actions.launchapplication.LaunchApplicationHandlerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:LazyPagingItemsExtension.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.list.LazyPagingItemsExtension.kt</ID>
+    <ID>NewLineAtEndOfFile:LegacyDBOpenHelper.kt:com.sap.ec.db_migration.LegacyDBOpenHelper.kt</ID>
+    <ID>NewLineAtEndOfFile:LifecycleEvent.kt:com.sap.ec.core.lifecycle.LifecycleEvent.kt</ID>
+    <ID>NewLineAtEndOfFile:LifecycleWatchDog.kt:com.sap.ec.watchdog.lifecycle.LifecycleWatchDog.kt</ID>
+    <ID>NewLineAtEndOfFile:LinkContactState.kt:com.sap.ec.reregistration.states.LinkContactState.kt</ID>
+    <ID>NewLineAtEndOfFile:ListPageModel.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.list.ListPageModel.kt</ID>
+    <ID>NewLineAtEndOfFile:ListPageModelApi.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.list.ListPageModelApi.kt</ID>
+    <ID>NewLineAtEndOfFile:ListPageView.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.list.ListPageView.kt</ID>
+    <ID>NewLineAtEndOfFile:ListPageViewModel.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.list.ListPageViewModel.kt</ID>
+    <ID>NewLineAtEndOfFile:ListPageViewModelApi.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.list.ListPageViewModelApi.kt</ID>
+    <ID>NewLineAtEndOfFile:LogConfigHolder.kt:com.sap.ec.core.log.LogConfigHolder.kt</ID>
+    <ID>NewLineAtEndOfFile:LogConfigHolderApi.kt:com.sap.ec.core.log.LogConfigHolderApi.kt</ID>
+    <ID>NewLineAtEndOfFile:LogContext.kt:com.sap.ec.core.log.LogContext.kt</ID>
+    <ID>NewLineAtEndOfFile:LogEventRegistry.kt:com.sap.ec.core.log.LogEventRegistry.kt</ID>
+    <ID>NewLineAtEndOfFile:LogEventRegistryApi.kt:com.sap.ec.core.log.LogEventRegistryApi.kt</ID>
+    <ID>NewLineAtEndOfFile:LogLevel.kt:com.sap.ec.core.log.LogLevel.kt</ID>
+    <ID>NewLineAtEndOfFile:LogRequest.kt:com.sap.ec.networking.clients.logging.LogRequest.kt</ID>
+    <ID>NewLineAtEndOfFile:Logger.kt:com.sap.ec.core.log.Logger.kt</ID>
+    <ID>NewLineAtEndOfFile:LoggingConfig.kt:com.sap.ec.api.config.LoggingConfig.kt</ID>
+    <ID>NewLineAtEndOfFile:LoggingContact.kt:com.sap.ec.api.contact.LoggingContact.kt</ID>
+    <ID>NewLineAtEndOfFile:LoggingEmbeddedMessaging.kt:com.sap.ec.api.embeddedmessaging.LoggingEmbeddedMessaging.kt</ID>
+    <ID>NewLineAtEndOfFile:LoggingEventTracker.kt:com.sap.ec.api.event.LoggingEventTracker.kt</ID>
+    <ID>NewLineAtEndOfFile:LoggingInApp.kt:com.sap.ec.api.inapp.LoggingInApp.kt</ID>
+    <ID>NewLineAtEndOfFile:LoggingPush.kt:com.sap.ec.api.push.LoggingPush.kt</ID>
+    <ID>NewLineAtEndOfFile:MessageItemModel.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemModel.kt</ID>
+    <ID>NewLineAtEndOfFile:MessageItemModelApi.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemModelApi.kt</ID>
+    <ID>NewLineAtEndOfFile:MessageItemView.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemView.kt</ID>
+    <ID>NewLineAtEndOfFile:MessageItemViewModel.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModel.kt</ID>
+    <ID>NewLineAtEndOfFile:MessageItemViewModelApi.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi.kt</ID>
+    <ID>NewLineAtEndOfFile:MessageResponseSerializer.kt:com.sap.ec.networking.clients.embedded.messaging.serializer.MessageResponseSerializer.kt</ID>
+    <ID>NewLineAtEndOfFile:MessageTagUpdate.kt:com.sap.ec.mobileengage.embeddedmessaging.models.MessageTagUpdate.kt</ID>
+    <ID>NewLineAtEndOfFile:MessagesWithCategories.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.list.MessagesWithCategories.kt</ID>
+    <ID>NewLineAtEndOfFile:MetadataReader.kt:com.sap.ec.core.resource.MetadataReader.kt</ID>
+    <ID>NewLineAtEndOfFile:NaturalBatching.kt:com.sap.ec.core.channel.NaturalBatching.kt</ID>
+    <ID>NewLineAtEndOfFile:NavigateEvent.kt:com.sap.ec.api.event.model.NavigateEvent.kt</ID>
+    <ID>NewLineAtEndOfFile:NetworkClientApi.kt:com.sap.ec.core.networking.clients.NetworkClientApi.kt</ID>
+    <ID>NewLineAtEndOfFile:NetworkInjection.kt:com.sap.ec.di.NetworkInjection.kt</ID>
+    <ID>NewLineAtEndOfFile:NotificationIntentProcessor.kt:com.sap.ec.mobileengage.push.NotificationIntentProcessor.kt</ID>
+    <ID>NewLineAtEndOfFile:NotificationMethod.kt:com.sap.ec.mobileengage.push.model.NotificationMethod.kt</ID>
+    <ID>NewLineAtEndOfFile:NotificationOpenedActivity.kt:com.sap.ec.mobileengage.push.NotificationOpenedActivity.kt</ID>
+    <ID>NewLineAtEndOfFile:NotificationOperation.kt:com.sap.ec.mobileengage.push.NotificationOperation.kt</ID>
+    <ID>NewLineAtEndOfFile:NotificationStyle.kt:com.sap.ec.mobileengage.push.model.NotificationStyle.kt</ID>
+    <ID>NewLineAtEndOfFile:OpenExternalUrlActionModel.kt:com.sap.ec.mobileengage.action.models.OpenExternalUrlActionModel.kt</ID>
+    <ID>NewLineAtEndOfFile:PageLocationProvider.android.kt:com.sap.ec.core.providers.pagelocation.PageLocationProvider.android.kt</ID>
+    <ID>NewLineAtEndOfFile:PageLocationProvider.kt:com.sap.ec.core.providers.pagelocation.PageLocationProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:PageLocationProviderApi.kt:com.sap.ec.core.providers.pagelocation.PageLocationProviderApi.kt</ID>
+    <ID>NewLineAtEndOfFile:PagerFactory.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.list.PagerFactory.kt</ID>
+    <ID>NewLineAtEndOfFile:PagerFactoryApi.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.list.PagerFactoryApi.kt</ID>
+    <ID>NewLineAtEndOfFile:PlaceholderMessageList.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.list.placeholders.PlaceholderMessageList.kt</ID>
+    <ID>NewLineAtEndOfFile:PlatformCategoryProvider.android.kt:com.sap.ec.core.providers.platform.PlatformCategoryProvider.android.kt</ID>
+    <ID>NewLineAtEndOfFile:PlatformCategoryProvider.kt:com.sap.ec.core.providers.platform.PlatformCategoryProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:PlatformCategoryProviderApi.kt:com.sap.ec.core.providers.platform.PlatformCategoryProviderApi.kt</ID>
+    <ID>NewLineAtEndOfFile:PlatformInfoCollector.kt:com.sap.ec.core.device.PlatformInfoCollector.kt</ID>
+    <ID>NewLineAtEndOfFile:PlatformInfoCollectorApi.kt:com.sap.ec.core.device.PlatformInfoCollectorApi.kt</ID>
+    <ID>NewLineAtEndOfFile:PlatformInitializer.kt:com.sap.ec.enable.PlatformInitializer.kt</ID>
+    <ID>NewLineAtEndOfFile:PlatformInitializerApi.kt:com.sap.ec.enable.PlatformInitializerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:Provider.kt:com.sap.ec.core.providers.Provider.kt</ID>
+    <ID>NewLineAtEndOfFile:Push.kt:com.sap.ec.api.push.Push.kt</ID>
+    <ID>NewLineAtEndOfFile:PushActionFactory.kt:com.sap.ec.mobileengage.action.PushActionFactory.kt</ID>
+    <ID>NewLineAtEndOfFile:PushActionFactoryApi.kt:com.sap.ec.mobileengage.action.PushActionFactoryApi.kt</ID>
+    <ID>NewLineAtEndOfFile:PushApi.kt:com.sap.ec.api.push.PushApi.kt</ID>
+    <ID>NewLineAtEndOfFile:PushCall.kt:com.sap.ec.api.push.PushCall.kt</ID>
+    <ID>NewLineAtEndOfFile:PushClient.kt:com.sap.ec.networking.clients.push.PushClient.kt</ID>
+    <ID>NewLineAtEndOfFile:PushGatherer.kt:com.sap.ec.api.push.PushGatherer.kt</ID>
+    <ID>NewLineAtEndOfFile:PushHandler.kt:com.sap.ec.mobileengage.push.PushHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:PushInformation.kt:com.sap.ec.api.push.PushInformation.kt</ID>
+    <ID>NewLineAtEndOfFile:PushInternal.kt:com.sap.ec.api.push.PushInternal.kt</ID>
+    <ID>NewLineAtEndOfFile:PushInternalApi.kt:com.sap.ec.api.push.PushInternalApi.kt</ID>
+    <ID>NewLineAtEndOfFile:PushMessageBroadcastReceiver.kt:com.sap.ec.mobileengage.push.PushMessageBroadcastReceiver.kt</ID>
+    <ID>NewLineAtEndOfFile:PushMessagePresenter.kt:com.sap.ec.mobileengage.push.PushMessagePresenter.kt</ID>
+    <ID>NewLineAtEndOfFile:PushToInAppHandler.kt:com.sap.ec.mobileengage.pushtoinapp.PushToInAppHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:PushToInAppHandlerApi.kt:com.sap.ec.core.actions.pushtoinapp.PushToInAppHandlerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:PushToInAppPayload.kt:com.sap.ec.mobileengage.inapp.networking.models.PushToInAppPayload.kt</ID>
+    <ID>NewLineAtEndOfFile:PushToInappAction.kt:com.sap.ec.mobileengage.action.actions.PushToInappAction.kt</ID>
+    <ID>NewLineAtEndOfFile:PushTokenRegisterOnBootCompletedReceiver.kt:com.sap.ec.mobileengage.push.PushTokenRegisterOnBootCompletedReceiver.kt</ID>
+    <ID>NewLineAtEndOfFile:RandomProvider.kt:com.sap.ec.core.providers.RandomProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:RegisterClientState.kt:com.sap.ec.enable.states.RegisterClientState.kt</ID>
+    <ID>NewLineAtEndOfFile:RegisterEventBasedClientsState.kt:com.sap.ec.enable.states.RegisterEventBasedClientsState.kt</ID>
+    <ID>NewLineAtEndOfFile:RegisterEventConsumersState.kt:com.sap.ec.init.states.RegisterEventConsumersState.kt</ID>
+    <ID>NewLineAtEndOfFile:RegisterInstancesState.kt:com.sap.ec.init.states.RegisterInstancesState.kt</ID>
+    <ID>NewLineAtEndOfFile:RegisterPushTokenState.kt:com.sap.ec.enable.states.RegisterPushTokenState.kt</ID>
+    <ID>NewLineAtEndOfFile:RegisterSdkEventDistributorState.kt:com.sap.ec.init.states.RegisterSdkEventDistributorState.kt</ID>
+    <ID>NewLineAtEndOfFile:RegisterWatchdogsState.kt:com.sap.ec.init.states.RegisterWatchdogsState.kt</ID>
+    <ID>NewLineAtEndOfFile:Registerable.kt:com.sap.ec.core.Registerable.kt</ID>
+    <ID>NewLineAtEndOfFile:RemoteConfigClient.kt:com.sap.ec.networking.clients.remoteConfig.RemoteConfigClient.kt</ID>
+    <ID>NewLineAtEndOfFile:RemoteConfigClientApi.kt:com.sap.ec.networking.clients.remoteConfig.RemoteConfigClientApi.kt</ID>
+    <ID>NewLineAtEndOfFile:RemoteConfigInjection.kt:com.sap.ec.di.RemoteConfigInjection.kt</ID>
+    <ID>NewLineAtEndOfFile:RemoteConfigResponse.kt:com.sap.ec.remoteConfig.RemoteConfigResponse.kt</ID>
+    <ID>NewLineAtEndOfFile:RemoteConfigResponseHandler.kt:com.sap.ec.remoteConfig.RemoteConfigResponseHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:RemoteConfigResponseHandlerApi.kt:com.sap.ec.remoteConfig.RemoteConfigResponseHandlerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:RemoteLogger.kt:com.sap.ec.core.log.RemoteLogger.kt</ID>
+    <ID>NewLineAtEndOfFile:RemoteLoggerApi.kt:com.sap.ec.core.log.RemoteLoggerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:ReportingAction.kt:com.sap.ec.mobileengage.action.actions.ReportingAction.kt</ID>
+    <ID>NewLineAtEndOfFile:ReportingActionModel.kt:com.sap.ec.mobileengage.action.models.ReportingActionModel.kt</ID>
+    <ID>NewLineAtEndOfFile:RequestContext.kt:com.sap.ec.core.networking.context.RequestContext.kt</ID>
+    <ID>NewLineAtEndOfFile:RequestContextApi.kt:com.sap.ec.core.networking.context.RequestContextApi.kt</ID>
+    <ID>NewLineAtEndOfFile:ReregistrationClient.kt:com.sap.ec.networking.clients.reregistration.ReregistrationClient.kt</ID>
+    <ID>NewLineAtEndOfFile:Response.kt:com.sap.ec.core.networking.model.Response.kt</ID>
+    <ID>NewLineAtEndOfFile:ResponseErrorBody.kt:com.sap.ec.networking.clients.error.ResponseErrorBody.kt</ID>
+    <ID>NewLineAtEndOfFile:ResponseExtensions.kt:com.sap.ec.response.ResponseExtensions.kt</ID>
+    <ID>NewLineAtEndOfFile:RestoreOperationalEventsState.kt:com.sap.ec.init.states.RestoreOperationalEventsState.kt</ID>
+    <ID>NewLineAtEndOfFile:RestoreSavedSdkEventsState.kt:com.sap.ec.enable.states.RestoreSavedSdkEventsState.kt</ID>
+    <ID>NewLineAtEndOfFile:RichContentDisplayAction.kt:com.sap.ec.mobileengage.action.actions.RichContentDisplayAction.kt</ID>
+    <ID>NewLineAtEndOfFile:RichContentDisplayActionModel.kt:com.sap.ec.mobileengage.action.models.RichContentDisplayActionModel.kt</ID>
+    <ID>NewLineAtEndOfFile:RunCatchingWithoutCancellation.kt:com.sap.ec.util.RunCatchingWithoutCancellation.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkBuildConfig.kt:com.sap.ec.core.device.SdkBuildConfig.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkConfig.kt:com.sap.ec.config.SdkConfig.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkConfigLoaderState.kt:com.sap.ec.init.states.SdkConfigLoaderState.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkConfigStoreApi.kt:com.sap.ec.enable.config.SdkConfigStoreApi.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkConstants.kt:com.sap.ec.SdkConstants.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkContextApi.kt:com.sap.ec.context.SdkContextApi.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkEventDistributor.kt:com.sap.ec.core.channel.SdkEventDistributor.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkEventDistributorApi.kt:com.sap.ec.core.channel.SdkEventDistributorApi.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkEventEmitterApi.kt:com.sap.ec.core.channel.SdkEventEmitterApi.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkEventManagerApi.kt:com.sap.ec.core.channel.SdkEventManagerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkEventWaiter.kt:com.sap.ec.core.channel.SdkEventWaiter.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkEventWaiterApi.kt:com.sap.ec.core.channel.SdkEventWaiterApi.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkKoinIsolationContext.kt:com.sap.ec.di.SdkKoinIsolationContext.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkLogger.kt:com.sap.ec.core.log.SdkLogger.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkState.kt:com.sap.ec.api.SdkState.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkVersionProvider.kt:com.sap.ec.core.providers.sdkversion.SdkVersionProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkVersionProviderApi.kt:com.sap.ec.core.providers.sdkversion.SdkVersionProviderApi.kt</ID>
+    <ID>NewLineAtEndOfFile:SessionApi.kt:com.sap.ec.mobileengage.session.SessionApi.kt</ID>
+    <ID>NewLineAtEndOfFile:SessionContext.kt:com.sap.ec.core.session.SessionContext.kt</ID>
+    <ID>NewLineAtEndOfFile:SessionId.kt:com.sap.ec.core.session.SessionId.kt</ID>
+    <ID>NewLineAtEndOfFile:SessionSubscriptionState.kt:com.sap.ec.init.states.SessionSubscriptionState.kt</ID>
+    <ID>NewLineAtEndOfFile:Setup.kt:com.sap.ec.api.setup.Setup.kt</ID>
+    <ID>NewLineAtEndOfFile:SetupApi.kt:com.sap.ec.api.setup.SetupApi.kt</ID>
+    <ID>NewLineAtEndOfFile:SetupInjection.kt:com.sap.ec.di.SetupInjection.kt</ID>
+    <ID>NewLineAtEndOfFile:SharedPreferencesCrypto.kt:com.sap.ec.db_migration.SharedPreferencesCrypto.kt</ID>
+    <ID>NewLineAtEndOfFile:ShimmerEffect.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.list.placeholders.ShimmerEffect.kt</ID>
+    <ID>NewLineAtEndOfFile:SilentHuaweiPushV2Mapper.kt:com.sap.ec.mobileengage.push.mapper.SilentHuaweiPushV2Mapper.kt</ID>
+    <ID>NewLineAtEndOfFile:SilentPushMessageHandler.kt:com.sap.ec.mobileengage.push.SilentPushMessageHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:State.kt:com.sap.ec.core.state.State.kt</ID>
+    <ID>NewLineAtEndOfFile:StateMachineApi.kt:com.sap.ec.core.state.StateMachineApi.kt</ID>
+    <ID>NewLineAtEndOfFile:StorageApi.kt:com.sap.ec.core.storage.StorageApi.kt</ID>
+    <ID>NewLineAtEndOfFile:StorageConstants.kt:com.sap.ec.core.storage.StorageConstants.kt</ID>
+    <ID>NewLineAtEndOfFile:ThreadSafePersistentStoreApi.kt:com.sap.ec.core.collections.ThreadSafePersistentStoreApi.kt</ID>
+    <ID>NewLineAtEndOfFile:TimestampProvider.kt:com.sap.ec.core.providers.TimestampProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:TimezoneProvider.kt:com.sap.ec.core.providers.TimezoneProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:TimezoneProviderApi.kt:com.sap.ec.core.providers.TimezoneProviderApi.kt</ID>
+    <ID>NewLineAtEndOfFile:Tracking.kt:com.sap.ec.tracking.Tracking.kt</ID>
+    <ID>NewLineAtEndOfFile:TrackingApi.kt:com.sap.ec.tracking.TrackingApi.kt</ID>
+    <ID>NewLineAtEndOfFile:TranslationMapper.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.translation.TranslationMapper.kt</ID>
+    <ID>NewLineAtEndOfFile:TranslationMapperApi.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.translation.TranslationMapperApi.kt</ID>
+    <ID>NewLineAtEndOfFile:UUIDProvider.kt:com.sap.ec.core.providers.UUIDProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:UnlinkContactState.kt:com.sap.ec.disable.states.UnlinkContactState.kt</ID>
+    <ID>NewLineAtEndOfFile:UrlRequest.kt:com.sap.ec.core.networking.model.UrlRequest.kt</ID>
+    <ID>NewLineAtEndOfFile:UserAgentProvider.kt:com.sap.ec.core.networking.UserAgentProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:UserAgentProviderApi.kt:com.sap.ec.core.networking.UserAgentProviderApi.kt</ID>
+    <ID>NewLineAtEndOfFile:UuidProviderApi.kt:com.sap.ec.core.providers.UuidProviderApi.kt</ID>
+    <ID>NewLineAtEndOfFile:WebViewHolder.kt:com.sap.ec.mobileengage.inapp.webview.WebViewHolder.kt</ID>
+    <ID>NewLineAtEndOfFile:WebViewProvider.kt:com.sap.ec.mobileengage.inapp.provider.WebViewProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:onScreenTime.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.item.onScreenTime.kt</ID>
+    <ID>NoNameShadowing:AndroidInjection.kt:AndroidInjection${ it.register() }</ID>
+    <ID>NoNameShadowing:CustomEventAction.kt:CustomEventAction$value</ID>
+    <ID>NoNameShadowing:Event.kt:SdkEvent.DeviceEvent$pageLocation</ID>
+    <ID>NoNameShadowing:ListPageModel.kt:ListPageModel$messagesResponse</ID>
+    <ID>NoNameShadowing:LoggingClient.kt:LoggingClient${ it.ack(eventsDao, sdkLogger) }</ID>
+    <ID>NoNameShadowing:MessageItemView.kt:{ it.width > 0 &amp;&amp; it.height > 0 }</ID>
+    <ID>NoNameShadowing:ReregistrationClient.kt:ReregistrationClient${ sdkLogger.error("Error during re-registration", it) }</ID>
+    <ID>NoNameShadowing:SdkEventDistributor.kt:SdkEventDistributor${ it == SdkState.Active || it == SdkState.OnHold }</ID>
+    <ID>NoNameShadowing:SdkEventDistributor.kt:SdkEventDistributor${ it == SdkState.Active }</ID>
+    <ID>NoNameShadowing:SdkEventDistributor.kt:SdkEventDistributor${ it }</ID>
+    <ID>PackageNaming:LegacyDBOpenHelper.kt:package com.sap.ec.db_migration</ID>
+    <ID>PackageNaming:LegacySharedPreferencesWrapper.kt:package com.sap.ec.db_migration</ID>
+    <ID>PackageNaming:SharedPreferencesCrypto.kt:package com.sap.ec.db_migration</ID>
+    <ID>ParameterNaming:CategoriesDialogView.kt:onApplyClicked: (Set&lt;String>) -> Unit</ID>
+    <ID>ParameterNaming:InlineInAppView.kt:onLoaded: (() -> Unit)? = null</ID>
+    <ID>ParameterNaming:InlineInAppView.kt:onLoaded: ((String) -> Unit)?</ID>
+    <ID>ParameterNaming:InlineInAppView.kt:onLoaded: ((String) -> Unit)? = null</ID>
+    <ID>ParameterNaming:MessageItemsListPane.kt:onCategorySelectorClicked: () -> Unit</ID>
+    <ID>ParameterNaming:onScreenTime.kt:onMinScreenTimeReached: () -> Unit</ID>
+    <ID>PrintStackTrace:AndroidApplicationVersionProvider.kt:AndroidApplicationVersionProvider$e</ID>
+    <ID>RedundantSuspendModifier:Crypto.kt:Crypto$suspend</ID>
+    <ID>ReturnCount:InlineInAppMessageFetcher.kt:InlineInAppMessageFetcher$override suspend fun fetch: InAppMessage?</ID>
+    <ID>ReturnCount:JsBridgeClient.kt:JsBridgeClient$override suspend fun fetchJSBridge: Result&lt;Unit></ID>
+    <ID>ReturnCount:LinkContactState.kt:LinkContactState$override suspend fun active: Result&lt;Unit></ID>
+    <ID>SpreadOperator:AndroidInjection.kt:AndroidInjection$("check", *types)</ID>
+    <ID>SpreadOperator:EventClient.kt:EventClient$( exception, "EventClient: Error during event consumption", *sdkEvents.toTypedArray() )</ID>
+    <ID>SpreadOperator:LoggingClient.kt:LoggingClient$( exception, "LoggingClient: ConsumeLogsAndMetrics error", *sdkEvents.toTypedArray() )</ID>
+    <ID>SuspendFunWithFlowReturnType:AbstractSqlDelightEventsDao.kt:AbstractSqlDelightEventsDao$suspend</ID>
+    <ID>SuspendFunWithFlowReturnType:EventsDaoApi.kt:EventsDaoApi$suspend</ID>
+    <ID>SwallowedException:Crypto.kt:Crypto$exception: Throwable</ID>
+    <ID>SwallowedException:IosPushUserInfo.kt:FlexibleBooleanSerializer$e2: Exception</ID>
+    <ID>SwallowedException:IosPushUserInfo.kt:FlexibleBooleanSerializer$e: Exception</ID>
+    <ID>SwallowedException:NotificationCompatStyler.kt:exception: Exception</ID>
+    <ID>SwallowedException:Store.kt:Store$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:AndroidApplicationVersionProvider.kt:AndroidApplicationVersionProvider$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:AndroidPushV2Mapper.kt:AndroidPushV2Mapper$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:BroadcastReceiver.kt:e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ClearDeviceInfoState.kt:ClearDeviceInfoState$error: Throwable</ID>
+    <ID>TooGenericExceptionCaught:ConfigClient.kt:ConfigClient$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ContactClient.kt:ContactClient$throwable: Throwable</ID>
+    <ID>TooGenericExceptionCaught:Crypto.kt:Crypto$exception: Throwable</ID>
+    <ID>TooGenericExceptionCaught:DeepLinkClient.kt:DeepLinkClient$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:DeviceClient.kt:DeviceClient$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:Downloader.kt:Downloader$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:ECSdkSession.kt:ECSdkSession$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:EmbeddedMessagingClient.kt:EmbeddedMessagingClient$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:EmbeddedMessagingPagingSource.kt:EmbeddedMessagingPagingSource$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:EngagementCloud.kt:EngagementCloud$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:Event.kt:OnlineSdkEvent$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:EventClient.kt:EventClient$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:EventClient.kt:EventClient$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:GenericNetworkClient.kt:GenericNetworkClient$throwable: Throwable</ID>
+    <ID>TooGenericExceptionCaught:HuaweiPushV2Mapper.kt:HuaweiPushV2Mapper$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:InAppJsBridge.kt:InAppJsBridge$error: Throwable</ID>
+    <ID>TooGenericExceptionCaught:InlineInAppMessageFetcher.kt:InlineInAppMessageFetcher$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:IosPushUserInfo.kt:FlexibleBooleanSerializer$e2: Exception</ID>
+    <ID>TooGenericExceptionCaught:IosPushUserInfo.kt:FlexibleBooleanSerializer$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:LegacySDKMigrationState.android.kt:LegacySDKMigrationState$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:LinkContactState.kt:LinkContactState$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ListPageModel.kt:ListPageModel$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:LoggingClient.kt:LoggingClient$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:MessageItemModel.kt:MessageItemModel$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:NotificationCompatStyler.kt:exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:NotificationIntentProcessor.kt:NotificationIntentProcessor$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:PushClient.kt:PushClient$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:PushMessageBroadcastReceiver.kt:PushMessageBroadcastReceiver$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:RemoteConfigClient.kt:RemoteConfigClient$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:RemoteConfigResponseHandler.kt:RemoteConfigResponseHandler$exception: Throwable</ID>
+    <ID>TooGenericExceptionCaught:RestoreSavedSdkEventsState.kt:RestoreSavedSdkEventsState$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:RunCatchingWithoutCancellation.kt:throwable: Throwable</ID>
+    <ID>TooGenericExceptionCaught:SdkConfigLoaderState.kt:SdkConfigLoaderState$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:SdkEventDistributor.kt:SdkEventDistributor$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:SharedPreferencesCrypto.kt:SharedPreferenceCrypto$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:SilentAndroidPushV2Mapper.kt:SilentAndroidPushV2Mapper$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SilentHuaweiPushV2Mapper.kt:SilentHuaweiPushV2Mapper$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:Store.kt:Store$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:TypedStorage.kt:TypedStorage$exception: Exception</ID>
+    <ID>TooGenericExceptionThrown:ContactClient.kt:ContactClient$throw Exception("Unknown Contact Event type.")</ID>
+    <ID>TooGenericExceptionThrown:HuaweiPushV2Mapper.kt:HuaweiPushV2Mapper$throw Exception("ems object missing from push payload: $from")</ID>
+    <ID>TooGenericExceptionThrown:HuaweiPushV2Mapper.kt:HuaweiPushV2Mapper$throw Exception("notification object missing from push payload: $from")</ID>
+    <ID>TooGenericExceptionThrown:SilentHuaweiPushV2Mapper.kt:SilentHuaweiPushV2Mapper$throw Exception("ems object missing from push payload: $from")</ID>
+    <ID>TooGenericExceptionThrown:SilentHuaweiPushV2Mapper.kt:SilentHuaweiPushV2Mapper$throw Exception("notification object missing from push payload: $from")</ID>
+    <ID>TooManyFunctions:Logger.kt:Logger</ID>
+    <ID>TooManyFunctions:MessageItemsListPane.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.list.MessageItemsListPane.kt</ID>
+    <ID>UnnecessarySafeCall:NotificationCompatStyler.kt:NotificationCompatStyler$pushMessage.displayableData?.body</ID>
+    <ID>UnnecessarySafeCall:NotificationCompatStyler.kt:NotificationCompatStyler$pushMessage.displayableData?.iconUrlString</ID>
+    <ID>UnnecessarySafeCall:NotificationCompatStyler.kt:NotificationCompatStyler$pushMessage.displayableData?.imageUrlString</ID>
+    <ID>UnnecessarySafeCall:NotificationCompatStyler.kt:NotificationCompatStyler$pushMessage.displayableData?.title</ID>
+    <ID>UnsafeCallOnNullableType:AndroidEngagementCloudSDKConfig.kt:AndroidECConfigSerializer$jsonObject["applicationCode"]?.jsonPrimitive?.content!!</ID>
+    <ID>UnsafeCallOnNullableType:AppEventSerializer.kt:AppEventSerializer$jsonObject["id"]?.jsonPrimitive?.content!!</ID>
+    <ID>UnsafeCallOnNullableType:AppEventSerializer.kt:AppEventSerializer$jsonObject["name"]?.jsonPrimitive?.content!!</ID>
+    <ID>UnsafeCallOnNullableType:AppEventSerializer.kt:AppEventSerializer$jsonObject["type"]?.jsonPrimitive?.content!!</ID>
+    <ID>UnsafeCallOnNullableType:ECClient.kt:ECClient$requestContext.refreshToken!!</ID>
+    <ID>UnsafeCallOnNullableType:ECSdkSession.kt:ECSdkSession$sessionContext.sessionStart!!</ID>
+    <ID>UnsafeCallOnNullableType:EventsQueries.kt:EventsQueries$cursor.getString(0)!!</ID>
+    <ID>UnsafeCallOnNullableType:HuaweiPushV2Mapper.kt:HuaweiPushV2Mapper$notificationObject.getValue(BODY).jsonPrimitive.contentOrNull!!</ID>
+    <ID>UnsafeCallOnNullableType:HuaweiPushV2Mapper.kt:HuaweiPushV2Mapper$notificationObject.getValue(TITLE).jsonPrimitive.contentOrNull!!</ID>
+    <ID>UnsafeCallOnNullableType:IosNotificationSettingsStatus.kt:IosNotificationConstant.Companion$enumValues&lt;T>().find { it.value == (value ?: 0L) }!!</ID>
+    <ID>UnsafeCallOnNullableType:ListPageViewModel.kt:ListPageViewModel$lastRefreshTimestamp!!</ID>
+    <ID>UnsafeCallOnNullableType:RemoteConfigClient.kt:RemoteConfigClient$(configResponse.exceptionOrNull() ?: signatureResponse.exceptionOrNull())!!</ID>
+    <ID>UnsafeCallOnNullableType:SilentAndroidPushV2Mapper.kt:SilentAndroidPushV2Mapper$from.getValue(EMS).jsonPrimitive.content.fromString(json)!!</ID>
+    <ID>UnsafeCallOnNullableType:TransitionSafeCurrentActivityWatchdog.kt:TransitionSafeCurrentActivityWatchdog$currentActivityFlow.first { activity -> activity != null}!!</ID>
+    <ID>UnusedParameter:LogEntry.kt:LogEntry.Companion$source: Source</ID>
+    <ID>UnusedParameter:RemoteConfigClient.kt:RemoteConfigClient$event: OnlineSdkEvent</ID>
+    <ID>UnusedPrivateProperty:Crypto.kt:Crypto$private val logger: Logger</ID>
+    <ID>UnusedPrivateProperty:DeviceInfoCollector.android.kt:DeviceInfoCollector$private val platformInfoCollector: PlatformInfoCollectorApi</ID>
+    <ID>UnusedPrivateProperty:LegacySDKMigrationState.android.kt:LegacySDKMigrationState$private val ioDispatcher: CoroutineDispatcher</ID>
+    <ID>UnusedPrivateProperty:ListPageViewModel.kt:ListPageViewModel$private val pagerFactory: PagerFactoryApi</ID>
+    <ID>UnusedPrivateProperty:RichContentDisplayAction.kt:RichContentDisplayAction$private val action: BasicRichContentDisplayActionModel</ID>
+    <ID>UnusedPrivateProperty:SdkEventDistributor.kt:SdkEventDistributor$private val sdkContext: SdkContextApi</ID>
+    <ID>UseOrEmpty:ContentReplacer.kt:ContentReplacer$stringStorage.get(StorageConstants.JS_BRIDGE)?.let { """&lt;script type="text/javascript">$it&lt;/script>""" } ?: ""</ID>
+    <ID>UseOrEmpty:InAppJsBridge.kt:InAppJsBridge$buttonClickJson["reporting"]?.jsonPrimitive?.contentOrNull ?: ""</ID>
+    <ID>UseOrEmpty:InlineInAppView.kt:state?.let { Json.encodeToString(it) } ?: ""</ID>
+    <ID>UseOrEmpty:SdkLogger.kt:SdkLogger$message ?: ""</ID>
+    <ID>UseRequire:Crypto.kt:Crypto$throw IllegalArgumentException("Invalid DER signature format")</ID>
+    <ID>WildcardImport:LanguageHandler.kt:import com.sap.ec.context.Features.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

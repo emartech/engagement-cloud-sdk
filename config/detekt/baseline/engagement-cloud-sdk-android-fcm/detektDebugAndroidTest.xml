@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>LibraryCodeMustSpecifyReturnType:EmarsysFirebaseMessagingServiceTest.kt:EmarsysFirebaseMessagingServiceTest.Companion$const val PACKAGE_NAME = "com.sap.ec.package"</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EmarsysFirebaseMessagingServiceTest.kt:EmarsysFirebaseMessagingServiceTest</ID>
+    <ID>NewLineAtEndOfFile:EmarsysFirebaseMessagingServiceTest.kt:com.sap.ec.service.EmarsysFirebaseMessagingServiceTest.kt</ID>
+    <ID>UseCheckOrError:EmarsysFirebaseMessagingServiceTest.kt:EmarsysFirebaseMessagingServiceTest$throw IllegalStateException("Unrecognized type: ${result.javaClass}")</ID>
+  </CurrentIssues>
+</SmellBaseline>

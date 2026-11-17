@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>LongMethod:EngagementCloudSDKServiceWorkerJs.kt:@OptIn(ExperimentalWasmJsInterop::class) fun main</ID>
+    <ID>NewLineAtEndOfFile:BrowserWindowHandler.kt:com.sap.ec.window.BrowserWindowHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:EngagementCloudSDKServiceWorkerJs.kt:com.sap.ec.EngagementCloudSDKServiceWorkerJs.kt</ID>
+    <ID>NewLineAtEndOfFile:NotificationClickHandler.kt:com.sap.ec.notification.NotificationClickHandler.kt</ID>
+  </CurrentIssues>
+</SmellBaseline>

@@ -1,0 +1,175 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>EmptyFunctionBlock:EmbeddedMessage.kt:{ }</ID>
+    <ID>EmptyFunctionBlock:JsGathererPush.kt:JsGathererPush${ }</ID>
+    <ID>EmptyFunctionBlock:JsLaunchApplicationHandler.kt:JsLaunchApplicationHandler${ }</ID>
+    <ID>EmptyFunctionBlock:JsLoggingPush.kt:JsLoggingPush${ }</ID>
+    <ID>EmptyFunctionBlock:LegacySDKMigrationState.js.kt:LegacySDKMigrationState${}</ID>
+    <ID>EmptyFunctionBlock:WebFileCache.js.kt:WebFileCache${}</ID>
+    <ID>ForbiddenPublicDataClass:JsApiConfig.kt:JsApiConfig : EngagementCloudConfig</ID>
+    <ID>ForbiddenPublicDataClass:JsApiConfig.kt:ServiceWorkerOptions : EngagementCloudCServiceWorkerOptions</ID>
+    <ID>ForbiddenPublicDataClass:JsNotificationClickedData.kt:JsNotificationClickedData</ID>
+    <ID>ForbiddenPublicDataClass:JsPushMessage.kt:JsPushMessage : PushMessageActionablePushDisplayablePush</ID>
+    <ID>ForbiddenPublicDataClass:WebNotificationSettings.kt:WebNotificationSettings</ID>
+    <ID>ForbiddenPublicDataClass:WebPushNotificationData.kt:WebPushNotificationData</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ConsoleLogger.js.kt:ConsoleLogger : ConsoleLoggerApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EmbeddedMessage.kt:@OptIn(ExperimentalJsExport::class) @JsExport fun embeddedMessageJs</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EngagementCloudServiceWorker.kt:EngagementCloudServiceWorker</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EventEmitterApi.kt:EventEmitterApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JSConfigApi.kt:JSConfigApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JSContactApi.kt:JSContactApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JSDeepLinkApi.kt:JSDeepLinkApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JSEngagementCloud.kt:@OptIn(ExperimentalWasmJsInterop::class) fun main</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JSEngagementCloud.kt:typealias EngagementCloudSdkEventListener = (JsApiEvent) -> Unit</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JSInAppApi.kt:JSInAppApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JSPushApi.kt:JSPushApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JSTrackingApi.kt:JSTrackingApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsApiConfig.kt:EngagementCloudCServiceWorkerOptions</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsApiConfig.kt:EngagementCloudConfig</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsApiConfig.kt:JsApiConfig : EngagementCloudConfig</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsApiConfig.kt:ServiceWorkerOptions : EngagementCloudCServiceWorkerOptions</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsApiConfig.kt:fun EngagementCloudCServiceWorkerOptions.toServiceWorkerOptions: ServiceWorkerOptions</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsApiEvent.kt:JsApiEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsApiEvent.kt:JsAppEvent : JsApiEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsApiEvent.kt:JsBadgeCountEvent : JsApiEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsCustomEvent.kt:JsCustomEvent : JsTrackedEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsEmbeddedMessagingApi.kt:JsEmbeddedMessagingApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsLinkContactData.kt:JsContactFieldValueData : JsLinkContactData</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsLinkContactData.kt:JsLinkContactData</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsLinkContactData.kt:JsOpenIdTokenData : JsLinkContactData</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsMessageCategory.kt:JsMessageCategory</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsNavigateEvent.kt:JsNavigateEvent : JsTrackedEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsNotificationClickedData.kt:JsNotificationClickedData</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsPushMessage.kt:JsPushMessage : PushMessageActionablePushDisplayablePush</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsSetupApi.kt:JsSetupApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:JsTrackedEvent.kt:JsTrackedEvent</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushMessagePresenter.kt:PushMessagePresenter : PushPresenter</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PushMessageWebV2Mapper.kt:PushMessageWebV2Mapper : Mapper</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SdkEventSubscription.kt:SdkEventSubscription : SdkEventSubscriptionApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:SdkEventSubscription.kt:SdkEventSubscriptionApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ServiceWorkerManagerApi.kt:ServiceWorkerManagerApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:WebNotificationSettings.kt:PermissionState</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:WebNotificationSettings.kt:WebNotificationSettings</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:WebPushNotificationData.kt:WebPushNotificationData</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:WebPushNotificationPresenter.kt:WebPushNotificationPresenter : WebPushNotificationPresenterApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:WebPushNotificationPresenterApi.kt:WebPushNotificationPresenterApi</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:bowser.kt:@JsName("parse") external fun parseUserAgent: BowserParserResult</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:bowser.kt:BowserParserResult</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:bowser.kt:BowserPlatform</ID>
+    <ID>MatchingDeclarationName:EngagementCloudObjectStoreConfig.js.kt.kt:EngagementCloudObjectStoreConfig&lt;T></ID>
+    <ID>MaxLineLength:JsSetupApi.kt:JsSetupApi$*</ID>
+    <ID>MaxLineLength:PushNotificationClickHandler.kt:PushNotificationClickHandler$listOf(actionFactory.create(NotificationOpenedActionModel(actionModel?.reporting, jsNotificationClickedData.jsPushMessage.trackingInfo)))</ID>
+    <ID>MaxLineLength:PushService.kt:PushService$return Result.failure(SdkException.PushManagerUnavailableException("Push API is not supported in this browser."))</ID>
+    <ID>MaxLineLength:PushService.kt:PushService$return Result.failure(SdkException.ServiceWorkerUnavailableException("Service workers are not supported in this browser."))</ID>
+    <ID>MaxLineLength:ServiceWorkerManager.kt:ServiceWorkerManager$println("Registering service worker with path: ${serviceWorkerOptions.serviceWorkerPath} and scope: ${serviceWorkerOptions.serviceWorkerScope}")</ID>
+    <ID>MaxLineLength:WebInAppPresenter.kt:WebInAppPresenter$sdkEventDistributor.sdkEventFlow.first { it is SdkEvent.Internal.Sdk.Dismiss &amp;&amp; it.id == inAppView.inAppMessage.dismissId }</ID>
+    <ID>NewLineAtEndOfFile:BrowserInfo.js.kt:com.sap.ec.core.device.constants.BrowserInfo.js.kt</ID>
+    <ID>NewLineAtEndOfFile:ConsoleLogger.js.kt:com.sap.ec.core.log.ConsoleLogger.js.kt</ID>
+    <ID>NewLineAtEndOfFile:DateTimeFormat.js.kt:com.sap.ec.core.datetime.DateTimeFormat.js.kt</ID>
+    <ID>NewLineAtEndOfFile:DeviceInfoCollector.js.kt:com.sap.ec.core.device.DeviceInfoCollector.js.kt</ID>
+    <ID>NewLineAtEndOfFile:ECIndexedDbObjectStore.js.kt:com.sap.ec.core.db.ECIndexedDbObjectStore.js.kt</ID>
+    <ID>NewLineAtEndOfFile:ECIndexedDbObjectStoreApi.js.kt:com.sap.ec.core.db.ECIndexedDbObjectStoreApi.js.kt</ID>
+    <ID>NewLineAtEndOfFile:EmbeddedMessage.kt:com.sap.ec.mobileengage.embeddedmessaging.ui.list.EmbeddedMessage.kt</ID>
+    <ID>NewLineAtEndOfFile:EngagementCloudIndexedDb.js.kt:com.sap.ec.core.db.EngagementCloudIndexedDb.js.kt</ID>
+    <ID>NewLineAtEndOfFile:EngagementCloudServiceWorker.kt:com.sap.ec.EngagementCloudServiceWorker.kt</ID>
+    <ID>NewLineAtEndOfFile:EventEmitterApi.kt:com.sap.ec.api.events.EventEmitterApi.kt</ID>
+    <ID>NewLineAtEndOfFile:IframeContainerResizer.kt:com.sap.ec.mobileengage.inapp.iframe.IframeContainerResizer.kt</ID>
+    <ID>NewLineAtEndOfFile:IframeContainerResizerApi.kt:com.sap.ec.mobileengage.inapp.iframe.IframeContainerResizerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:IframeFactory.kt:com.sap.ec.mobileengage.inapp.iframe.IframeFactory.kt</ID>
+    <ID>NewLineAtEndOfFile:IframeFactoryApi.kt:com.sap.ec.mobileengage.inapp.iframe.IframeFactoryApi.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppConstants.kt:com.sap.ec.mobileengage.inapp.InAppConstants.kt</ID>
+    <ID>NewLineAtEndOfFile:JSConfig.kt:com.sap.ec.api.config.JSConfig.kt</ID>
+    <ID>NewLineAtEndOfFile:JSConfigApi.kt:com.sap.ec.api.config.JSConfigApi.kt</ID>
+    <ID>NewLineAtEndOfFile:JSContact.kt:com.sap.ec.api.contact.JSContact.kt</ID>
+    <ID>NewLineAtEndOfFile:JSContactApi.kt:com.sap.ec.api.contact.JSContactApi.kt</ID>
+    <ID>NewLineAtEndOfFile:JSDeepLink.kt:com.sap.ec.api.deeplink.JSDeepLink.kt</ID>
+    <ID>NewLineAtEndOfFile:JSDeepLinkApi.kt:com.sap.ec.api.deeplink.JSDeepLinkApi.kt</ID>
+    <ID>NewLineAtEndOfFile:JSEngagementCloud.kt:.JSEngagementCloud.kt</ID>
+    <ID>NewLineAtEndOfFile:JSEventsDao.js.kt:com.sap.ec.core.db.events.JSEventsDao.js.kt</ID>
+    <ID>NewLineAtEndOfFile:JSInApp.kt:com.sap.ec.api.inapp.JSInApp.kt</ID>
+    <ID>NewLineAtEndOfFile:JSInAppApi.kt:com.sap.ec.api.inapp.JSInAppApi.kt</ID>
+    <ID>NewLineAtEndOfFile:JSPushApi.kt:com.sap.ec.api.push.JSPushApi.kt</ID>
+    <ID>NewLineAtEndOfFile:JSSdkState.kt:com.sap.ec.api.config.JSSdkState.kt</ID>
+    <ID>NewLineAtEndOfFile:JSTracking.kt:com.sap.ec.api.tracking.JSTracking.kt</ID>
+    <ID>NewLineAtEndOfFile:JSTrackingApi.kt:com.sap.ec.api.tracking.JSTrackingApi.kt</ID>
+    <ID>NewLineAtEndOfFile:JsCustomEvent.kt:com.sap.ec.api.tracking.model.JsCustomEvent.kt</ID>
+    <ID>NewLineAtEndOfFile:JsECConfigStore.kt:com.sap.ec.enable.config.JsECConfigStore.kt</ID>
+    <ID>NewLineAtEndOfFile:JsEmbeddedMessaging.kt:com.sap.ec.api.embeddedmessaging.JsEmbeddedMessaging.kt</ID>
+    <ID>NewLineAtEndOfFile:JsEmbeddedMessagingApi.kt:com.sap.ec.api.embeddedmessaging.JsEmbeddedMessagingApi.kt</ID>
+    <ID>NewLineAtEndOfFile:JsEngagementCloudSDKConfig.kt:.JsEngagementCloudSDKConfig.kt</ID>
+    <ID>NewLineAtEndOfFile:JsEventType.kt:com.sap.ec.api.tracking.model.JsEventType.kt</ID>
+    <ID>NewLineAtEndOfFile:JsEventValidationData.kt:com.sap.ec.api.tracking.model.JsEventValidationData.kt</ID>
+    <ID>NewLineAtEndOfFile:JsLaunchApplicationHandler.kt:com.sap.ec.core.launchapplication.JsLaunchApplicationHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:JsLinkContactData.kt:com.sap.ec.api.setup.JsLinkContactData.kt</ID>
+    <ID>NewLineAtEndOfFile:JsMessageCategory.kt:com.sap.ec.api.embeddedmessaging.JsMessageCategory.kt</ID>
+    <ID>NewLineAtEndOfFile:JsNavigateEvent.kt:com.sap.ec.api.tracking.model.JsNavigateEvent.kt</ID>
+    <ID>NewLineAtEndOfFile:JsPlatformData.kt:com.sap.ec.mobileengage.push.model.JsPlatformData.kt</ID>
+    <ID>NewLineAtEndOfFile:JsPushInstance.kt:com.sap.ec.mobileengage.push.JsPushInstance.kt</ID>
+    <ID>NewLineAtEndOfFile:JsPushMessage.kt:com.sap.ec.mobileengage.push.model.JsPushMessage.kt</ID>
+    <ID>NewLineAtEndOfFile:JsPushWrapper.kt:com.sap.ec.mobileengage.push.JsPushWrapper.kt</ID>
+    <ID>NewLineAtEndOfFile:JsPushWrapperApi.kt:com.sap.ec.mobileengage.push.JsPushWrapperApi.kt</ID>
+    <ID>NewLineAtEndOfFile:JsSetup.kt:com.sap.ec.api.setup.JsSetup.kt</ID>
+    <ID>NewLineAtEndOfFile:JsSetupApi.kt:com.sap.ec.api.setup.JsSetupApi.kt</ID>
+    <ID>NewLineAtEndOfFile:JsTrackedEvent.kt:com.sap.ec.api.tracking.model.JsTrackedEvent.kt</ID>
+    <ID>NewLineAtEndOfFile:KotlinPlatform.js.kt:com.sap.ec.KotlinPlatform.js.kt</ID>
+    <ID>NewLineAtEndOfFile:MessageChannelProvider.kt:com.sap.ec.mobileengage.inapp.iframe.MessageChannelProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:MessageChannelProviderApi.kt:com.sap.ec.mobileengage.inapp.iframe.MessageChannelProviderApi.kt</ID>
+    <ID>NewLineAtEndOfFile:OsInfo.js.kt:com.sap.ec.core.device.constants.OsInfo.js.kt</ID>
+    <ID>NewLineAtEndOfFile:PageLocationProvider.js.kt:com.sap.ec.core.providers.pagelocation.PageLocationProvider.js.kt</ID>
+    <ID>NewLineAtEndOfFile:PlatformCategoryProvider.js.kt:com.sap.ec.core.providers.platform.PlatformCategoryProvider.js.kt</ID>
+    <ID>NewLineAtEndOfFile:PlatformInitializer.kt:com.sap.ec.enable.PlatformInitializer.kt</ID>
+    <ID>NewLineAtEndOfFile:PushBroadcasterApi.kt:com.sap.ec.mobileengage.push.PushBroadcasterApi.kt</ID>
+    <ID>NewLineAtEndOfFile:PushMessagePresenter.kt:com.sap.ec.mobileengage.push.presentation.PushMessagePresenter.kt</ID>
+    <ID>NewLineAtEndOfFile:PushMessageWebV2Mapper.kt:com.sap.ec.mobileengage.push.mappers.PushMessageWebV2Mapper.kt</ID>
+    <ID>NewLineAtEndOfFile:PushNotificationClickHandler.kt:com.sap.ec.mobileengage.push.presentation.PushNotificationClickHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:PushNotificationClickHandlerApi.kt:com.sap.ec.mobileengage.push.presentation.PushNotificationClickHandlerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:PushServiceApi.kt:com.sap.ec.mobileengage.push.PushServiceApi.kt</ID>
+    <ID>NewLineAtEndOfFile:SdkEventSubscription.kt:com.sap.ec.api.events.SdkEventSubscription.kt</ID>
+    <ID>NewLineAtEndOfFile:ServiceWorkerManager.kt:com.sap.ec.mobileengage.push.serviceworker.ServiceWorkerManager.kt</ID>
+    <ID>NewLineAtEndOfFile:ServiceWorkerManagerApi.kt:com.sap.ec.mobileengage.push.serviceworker.ServiceWorkerManagerApi.kt</ID>
+    <ID>NewLineAtEndOfFile:WebApplicationVersionProvider.kt:com.sap.ec.core.providers.WebApplicationVersionProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:WebBadgeCountHandler.kt:com.sap.ec.core.badge.WebBadgeCountHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:WebClipboardHandler.kt:com.sap.ec.core.clipboard.WebClipboardHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:WebConnectionWatchDog.kt:com.sap.ec.watchdog.connection.WebConnectionWatchDog.kt</ID>
+    <ID>NewLineAtEndOfFile:WebExternalUrlOpener.kt:com.sap.ec.core.url.WebExternalUrlOpener.kt</ID>
+    <ID>NewLineAtEndOfFile:WebFileCache.js.kt:com.sap.ec.core.cache.WebFileCache.js.kt</ID>
+    <ID>NewLineAtEndOfFile:WebInAppPresenter.kt:com.sap.ec.mobileengage.inapp.WebInAppPresenter.kt</ID>
+    <ID>NewLineAtEndOfFile:WebInAppViewProvider.kt:com.sap.ec.mobileengage.inapp.WebInAppViewProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:WebInjection.kt:com.sap.ec.di.WebInjection.kt</ID>
+    <ID>NewLineAtEndOfFile:WebLanguageProvider.kt:com.sap.ec.core.providers.WebLanguageProvider.kt</ID>
+    <ID>NewLineAtEndOfFile:WebLifeCycleWatchDog.kt:com.sap.ec.watchdog.lifecycle.WebLifeCycleWatchDog.kt</ID>
+    <ID>NewLineAtEndOfFile:WebNotificationSettings.kt:com.sap.ec.core.device.notification.WebNotificationSettings.kt</ID>
+    <ID>NewLineAtEndOfFile:WebNotificationSettingsCollector.kt:com.sap.ec.core.device.notification.WebNotificationSettingsCollector.kt</ID>
+    <ID>NewLineAtEndOfFile:WebNotificationSettingsCollectorApi.kt:com.sap.ec.core.device.notification.WebNotificationSettingsCollectorApi.kt</ID>
+    <ID>NewLineAtEndOfFile:WebPermissionHandler.kt:com.sap.ec.core.permission.WebPermissionHandler.kt</ID>
+    <ID>NewLineAtEndOfFile:WebPlatformInfo.kt:com.sap.ec.core.device.WebPlatformInfo.kt</ID>
+    <ID>NewLineAtEndOfFile:WebPlatformInfoCollectorApi.kt:com.sap.ec.core.device.WebPlatformInfoCollectorApi.kt</ID>
+    <ID>NewLineAtEndOfFile:WebPushBroadcaster.kt:com.sap.ec.mobileengage.push.WebPushBroadcaster.kt</ID>
+    <ID>NewLineAtEndOfFile:WebPushNotificationPresenter.kt:com.sap.ec.mobileengage.push.WebPushNotificationPresenter.kt</ID>
+    <ID>NewLineAtEndOfFile:WindowHeaderData.kt:com.sap.ec.core.device.WindowHeaderData.kt</ID>
+    <ID>NewLineAtEndOfFile:bowser.kt:com.sap.ec.npm_dependencies.bowser.bowser.kt</ID>
+    <ID>PackageNaming:bowser.kt:package com.sap.ec.npm_dependencies.bowser</ID>
+    <ID>ReturnCount:PushService.kt:PushService$override suspend fun subscribe: Result&lt;String?></ID>
+    <ID>SwallowedException:WebLanguageTagValidator.js.kt:WebLanguageTagValidator$e: dynamic</ID>
+    <ID>TooGenericExceptionCaught:DeviceCategoryProvider.kt:DeviceCategoryProvider$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ECIndexedDbObjectStore.js.kt:ECIndexedDbObjectStore$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:EngagementCloudIndexedDb.js.kt:EngagementCloudIndexedDb$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:EngagementCloudServiceWorker.kt:EngagementCloudServiceWorker$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:EventEmitter.kt:EventEmitter$error: Throwable</ID>
+    <ID>TooGenericExceptionCaught:JSTracking.kt:JSTracking$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:LegacySDKMigrationState.js.kt:LegacySDKMigrationState$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:MessageChannelProvider.kt:MessageChannelProvider$exception: Throwable</ID>
+    <ID>TooGenericExceptionCaught:PushMessageWebV2Mapper.kt:PushMessageWebV2Mapper$exception: Exception</ID>
+    <ID>TooGenericExceptionCaught:PushNotificationClickHandler.kt:PushNotificationClickHandler$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:PushService.kt:PushService$e: Throwable</ID>
+    <ID>TooGenericExceptionCaught:ServiceWorkerManager.kt:ServiceWorkerManager$e: Throwable</ID>
+    <ID>TooGenericExceptionCaught:WebBadgeCountHandler.kt:WebBadgeCountHandler$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:WebExternalUrlOpener.kt:WebExternalUrlOpener$e: Throwable</ID>
+    <ID>UnusedParameter:EmbeddedMessage.kt:viewportContainerId: String = "embedded-message-container"</ID>
+    <ID>UnusedParameter:LegacySDKMigrationState.js.kt:LegacySDKMigrationState$db: IDBDatabase</ID>
+    <ID>UnusedParameter:WebConnectionWatchDog.kt:WebConnectionWatchDog$event: Event</ID>
+    <ID>UnusedParameter:WebLifeCycleWatchDog.kt:WebLifeCycleWatchDog$event: Event</ID>
+  </CurrentIssues>
+</SmellBaseline>

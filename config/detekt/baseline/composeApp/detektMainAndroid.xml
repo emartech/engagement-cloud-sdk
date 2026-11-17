@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>FunctionNaming:App.kt:@Composable fun App</ID>
+    <ID>FunctionNaming:AppNavigation.kt:@Composable fun AppNavigation</ID>
+    <ID>FunctionNaming:AppNavigation.kt:@Composable private fun CustomMessageItemView</ID>
+    <ID>FunctionNaming:BottomNavigationBar.kt:@Composable fun BottomNavigationBar</ID>
+    <ID>FunctionNaming:Drawable0.commonMain.kt:@InternalResourceApi internal fun _collectCommonMainDrawable0Resources</ID>
+    <ID>FunctionNaming:SdkTestScreen.kt:@Composable fun SdkTestScreen</ID>
+    <ID>InjectDispatcher:SdkTestScreenViewModel.kt:SdkTestScreenViewModel$Default</ID>
+    <ID>InjectDispatcher:enableTracking.android.kt:Default</ID>
+    <ID>Material2:App.kt:import androidx.compose.material.MaterialTheme</ID>
+    <ID>Material2:AppNavigation.kt:import androidx.compose.material.Card</ID>
+    <ID>Material2:AppNavigation.kt:import androidx.compose.material.Divider</ID>
+    <ID>Material2:AppNavigation.kt:import androidx.compose.material.MaterialTheme</ID>
+    <ID>Material2:AppNavigation.kt:import androidx.compose.material.Scaffold</ID>
+    <ID>Material2:AppNavigation.kt:import androidx.compose.material.Text</ID>
+    <ID>Material2:BottomNavigationBar.kt:import androidx.compose.material.BottomNavigation</ID>
+    <ID>Material2:BottomNavigationBar.kt:import androidx.compose.material.BottomNavigationItem</ID>
+    <ID>Material2:BottomNavigationBar.kt:import androidx.compose.material.Text</ID>
+    <ID>Material2:SdkTestScreen.kt:import androidx.compose.material.Button</ID>
+    <ID>Material2:SdkTestScreen.kt:import androidx.compose.material.Switch</ID>
+    <ID>Material2:SdkTestScreen.kt:import androidx.compose.material.Text</ID>
+    <ID>Material2:SdkTestScreen.kt:import androidx.compose.material.TextField</ID>
+    <ID>MaxLineLength:Res.kt:Res$public</ID>
+    <ID>MaxLineLength:Res.kt:Res$public suspend</ID>
+    <ID>ModifierMissing:AppNavigation.kt:@Composable fun AppNavigation</ID>
+    <ID>ModifierMissing:BottomNavigationBar.kt:@Composable fun BottomNavigationBar</ID>
+    <ID>ModifierMissing:SdkTestScreen.kt:@Composable fun SdkTestScreen</ID>
+    <ID>NewLineAtEndOfFile:App.kt:com.sap.ec.sample.App.kt</ID>
+    <ID>NewLineAtEndOfFile:enableTracking.android.kt:com.sap.ec.sample.enableTracking.android.kt</ID>
+    <ID>NewLineAtEndOfFile:enableTracking.kt:com.sap.ec.sample.enableTracking.kt</ID>
+    <ID>NewLineAtEndOfFile:trackPushToken.android.kt:com.sap.ec.sample.trackPushToken.android.kt</ID>
+    <ID>NewLineAtEndOfFile:trackPushToken.kt:com.sap.ec.sample.trackPushToken.kt</ID>
+    <ID>ParameterNaming:AppNavigation.kt:onTabSelected: (NavigationTab) -> Unit</ID>
+    <ID>ParameterNaming:BottomNavigationBar.kt:onTabSelected: (NavigationTab) -> Unit</ID>
+    <ID>TooManyFunctions:SdkTestScreenViewModel.kt:SdkTestScreenViewModel</ID>
+  </CurrentIssues>
+</SmellBaseline>

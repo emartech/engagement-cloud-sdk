@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>LibraryCodeMustSpecifyReturnType:EmarsysHuaweiMessagingServiceTest.kt:EmarsysHuaweiMessagingServiceTest.Companion$const val PACKAGE_NAME = "com.sap.ec.package"</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:EmarsysHuaweiMessagingServiceTest.kt:EmarsysHuaweiMessagingServiceTest</ID>
+    <ID>NewLineAtEndOfFile:EmarsysHuaweiMessagingServiceTest.kt:com.sap.ec.service.EmarsysHuaweiMessagingServiceTest.kt</ID>
+    <ID>UseCheckOrError:EmarsysHuaweiMessagingServiceTest.kt:EmarsysHuaweiMessagingServiceTest$throw IllegalStateException("Unrecognized type: ${result.javaClass}")</ID>
+  </CurrentIssues>
+</SmellBaseline>

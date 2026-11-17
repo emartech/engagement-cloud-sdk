@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   detekt:
-    name: Baseline adoption / Ubuntu / JDK 17
+    name: Committed baseline gate / Ubuntu / JDK 17
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
@@ -40,7 +40,6 @@ jobs:
           test ! -f androidApp/google-services.json
           java -version
           ./gradlew --version
-          df -h .
 
       - name: Test reconciliation and experimental-policy safety
         run: python3 -m unittest discover -s scripts/detekt -p 'test_*.py' -v
@@ -51,88 +50,53 @@ jobs:
       - name: Verify configuration-cache reuse
         run: ./gradlew validateDetektPolicy --configuration-cache --console=plain -Dorg.gradle.jvmargs=-Xmx4096m
 
-      - name: Discover canonical task graph
+      - name: Reconcile committed baselines against the preserved initial inventory
         shell: bash
         run: |
-          mkdir -p build/detekt-verification
-          set -o pipefail
-          ./gradlew detektAll --dry-run --console=plain --max-workers=2 -Dorg.gradle.jvmargs=-Xmx4096m \
-            2>&1 | tee build/detekt-verification/task-graph.txt
-          if grep -Eq '^:.*(kotlinNodeJsSetup|kotlinNpmInstall|bootIOSSimulator|connectedAndroid)' build/detekt-verification/task-graph.txt; then
-            echo 'Unexpected runtime/device dependency in static analysis.' >&2
-            exit 1
-          fi
-
-      - name: Produce complete initial findings without baselines
-        shell: bash
-        run: |
-          set -o pipefail
-          ./gradlew detektAll -Pdetekt.inventory=true --continue --console=plain --max-workers=2 \
-            '-Dorg.gradle.jvmargs=-Xmx4096m -Dfile.encoding=UTF-8 -Dkotlin.daemon.jvm.options=-Xmx2048m' \
-            2>&1 | tee build/detekt-verification/unbaselined-run.txt
-        # Adoption-only: findings are non-blocking, but configuration/compilation/tool crashes fail.
-
-      - name: Preserve and verify the complete unbaselined inventory
-        shell: bash
-        run: |
-          mkdir -p build/detekt-verification/initial-reports
-          cp -a build/reports/detekt/. build/detekt-verification/initial-reports/
-          python3 scripts/detekt/verify-merged-reports.py --reports build/detekt-verification/initial-reports
+          mkdir -p build/detekt-verification/reference-inventory
+          python3 - <<'PY'
+          import hashlib, json, tarfile
+          from pathlib import Path
+          bundle = Path('config/detekt/initial-inventory/reports.tar.gz')
+          proof = json.loads(Path('config/detekt/initial-inventory/adoption-proof.json').read_text())
+          assert hashlib.sha256(bundle.read_bytes()).hexdigest() == proof['reports_bundle_sha256']
+          destination = Path('build/detekt-verification/reference-inventory')
+          with tarfile.open(bundle) as archive:
+              for member in archive:
+                  assert member.isfile() and member.name == Path(member.name).name, member.name
+                  with archive.extractfile(member) as source:
+                      contents = source.read()
+                  assert hashlib.sha256(contents).hexdigest() == proof['initial_report_sha256'][member.name]
+                  (destination / member.name).write_bytes(contents)
+          print('Verified and safely extracted the preserved initial reports.')
+          PY
+          python3 scripts/detekt/verify-merged-reports.py \
+            --reports build/detekt-verification/reference-inventory
           python3 scripts/detekt/report-inventory.py \
-            --reports build/detekt-verification/initial-reports \
-            --output build/detekt-verification/initial-summary.json \
-            --html-index build/detekt-verification/initial-reports/index.html
-          find build/detekt-verification/initial-reports -type f -print0 \
-            | sort -z | xargs -0 sha256sum > build/detekt-verification/initial-reports.sha256
-
-      - name: Evaluate experimental rules without changing enforced policy
-        shell: bash
-        run: |
-          set -o pipefail
-          python3 scripts/detekt/experimental-policy.py \
-            --input config/detekt/detekt.yml \
-            --output build/detekt-verification/experimental.yml --evaluate-todos
-          ./gradlew detektAll -Pdetekt.inventory=true \
-            -Pdetekt.experimental.config=build/detekt-verification/experimental.yml \
-            --continue --console=plain --max-workers=2 \
-            '-Dorg.gradle.jvmargs=-Xmx4096m -Dfile.encoding=UTF-8 -Dkotlin.daemon.jvm.options=-Xmx2048m' \
-            2>&1 | tee build/detekt-verification/experimental-run.txt
-          mkdir -p build/detekt-verification/experimental-reports
-          cp -a build/reports/detekt/. build/detekt-verification/experimental-reports/
-          python3 scripts/detekt/report-inventory.py \
-            --reports build/detekt-verification/experimental-reports \
-            --output build/detekt-verification/experimental-summary.json
-
-      - name: Generate baselines only after preserving initial reports
-        shell: bash
-        run: |
-          set -o pipefail
-          sha256sum --check build/detekt-verification/initial-reports.sha256
-          ./gradlew detektBaselineAll --continue --console=plain --max-workers=2 \
-            '-Dorg.gradle.jvmargs=-Xmx4096m -Dfile.encoding=UTF-8 -Dkotlin.daemon.jvm.options=-Xmx2048m' \
-            2>&1 | tee build/detekt-verification/baseline-generation.txt
-          python3 scripts/detekt/report-inventory.py \
-            --reports build/detekt-verification/initial-reports \
+            --reports build/detekt-verification/reference-inventory \
             --baseline-dir config/detekt/baseline \
-            --output build/detekt-verification/baseline-reconciliation.json
-          find config/detekt/baseline -type f -name '*.xml' -print0 \
-            | sort -z | xargs -0 sha256sum > build/detekt-verification/baselines.sha256
+            --output build/detekt-verification/committed-baseline-reconciliation.json
+          python3 - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          proof = json.loads(Path('config/detekt/initial-inventory/adoption-proof.json').read_text())
+          bundle = Path('config/detekt/initial-inventory/reports.tar.gz')
+          assert hashlib.sha256(bundle.read_bytes()).hexdigest() == proof['reports_bundle_sha256']
+          for name, expected in proof['baseline_sha256_before_and_after'].items():
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == expected, name
+          print('Committed baselines and initial report bundle match verified CI evidence.')
+          PY
 
-      - name: Verify deterministic baseline regeneration
+      - name: Run the complete gate without regenerating baselines
         shell: bash
         run: |
           set -o pipefail
-          ./gradlew detektBaselineAll --rerun-tasks --continue --console=plain --max-workers=2 \
-            '-Dorg.gradle.jvmargs=-Xmx4096m -Dfile.encoding=UTF-8 -Dkotlin.daemon.jvm.options=-Xmx2048m' \
-            2>&1 | tee build/detekt-verification/baseline-regeneration.txt
-          sha256sum --check build/detekt-verification/baselines.sha256
-          mkdir -p build/detekt-verification/baseline-candidates
-          cp -a config/detekt/baseline/. build/detekt-verification/baseline-candidates/
+          make detekt-ci 2>&1 | tee build/detekt-verification/committed-baseline-gate.txt
 
-      - name: Prove new syntax and type-aware findings fail the complete gate
+      - name: Prove new syntax and type-aware findings fail without baseline changes
         run: python3 scripts/detekt/verify-new-findings.py
 
-      - name: Summarize preserved reports
+      - name: Summarize reports
         if: always()
         shell: bash
         run: |
@@ -147,11 +111,10 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7.0.0
         with:
-          name: detekt-baseline-adoption-${{ github.sha }}
+          name: detekt-committed-gate-${{ github.sha }}
           path: |
             build/reports/detekt/
             build/detekt-verification/
             build/reports/problems/
-            config/detekt/baseline/
           if-no-files-found: warn
           retention-days: 7

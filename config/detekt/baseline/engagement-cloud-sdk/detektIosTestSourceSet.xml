@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>LargeClass:IosPushInternalTests.kt:IosPushInternalTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DateTimeFormatTest.kt:DateTimeFormatTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:DeviceInfoCollectorTests.ios.kt:DeviceInfoCollectorTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InAppJsBridgeTests.kt:InAppJsBridgeTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:InAppViewProviderTests.kt:InAppViewProviderTest</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosConfigTests.kt:IosConfigTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosConnectionWatchdogTests.kt:IosConnectionWatchdogTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosEmbeddedMessagingTests.kt:IosEmbeddedMessagingTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosFileCacheTests.kt:IosFileCacheTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosGathererPushTests.kt:IosGathererPushTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosLanguageTagValidatorTests.ios.kt:IosLanguageTagValidatorTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosLoggingPushTests.kt:IosLoggingPushTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosPushWrapperTests.kt:IosPushWrapperTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosSetupTests.kt:IosSetupTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:IosSqlDelightEventsDaoTests.kt:IosSqDelightEventsDaoTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:LegacySDKMigrationStateTests.kt:LegacySDKMigrationStateTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:PageLocationProviderTests.kt:PageLocationProviderTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:StringStorageTests.kt:StringStorageTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:TestUserNotificationCenterDelegate.kt:TestUserNotificationCenterDelegate : NSObjectUNUserNotificationCenterDelegateProtocol</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:ViewControllerProviderTests.kt:ViewControllerProviderTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:WebViewFactoryTests.kt:WebViewFactoryTests</ID>
+    <ID>LibraryEntitiesShouldNotBePublic:WindowProviderTests.kt:WindowProviderTest</ID>
+    <ID>MatchingDeclarationName:InAppViewProviderTests.kt:InAppViewProviderTest</ID>
+    <ID>MatchingDeclarationName:IosSqlDelightEventsDaoTests.kt:IosSqDelightEventsDaoTests</ID>
+    <ID>MatchingDeclarationName:WindowProviderTests.kt:WindowProviderTest</ID>
+    <ID>MaxLineLength:IosConfigTests.kt:IosConfigTests$val exception = shouldThrow&lt;InvalidApplicationCodeException> { iosConfig.changeApplicationCode(testAppCode) }</ID>
+    <ID>MaxLineLength:IosPushInternalTests.kt:IosPushInternalTests$fun</ID>
+    <ID>MaxLineLength:IosPushWrapperTests.kt:IosPushWrapperTests$result.exceptionOrNull() shouldBe PreconditionFailedException("Error while handling silent push message, the userInfo can't be parsed")</ID>
+    <ID>MaxLineLength:LegacySDKMigrationStateTests.kt:LegacySDKMigrationStateTests.Companion$0x88.toByte()</ID>
+    <ID>MaxLineLength:LegacySDKMigrationStateTests.kt:LegacySDKMigrationStateTests.Companion$0x92.toByte()</ID>
+    <ID>NewLineAtEndOfFile:DeviceInfoCollectorTests.ios.kt:com.sap.ec.core.device.DeviceInfoCollectorTests.ios.kt</ID>
+    <ID>NewLineAtEndOfFile:InAppViewProviderTests.kt:com.sap.ec.mobileengage.inapp.providers.InAppViewProviderTests.kt</ID>
+    <ID>NewLineAtEndOfFile:IosConfigTests.kt:com.sap.ec.api.config.IosConfigTests.kt</ID>
+    <ID>NewLineAtEndOfFile:IosConnectionWatchdogTests.kt:com.sap.ec.core.watchdog.IosConnectionWatchdogTests.kt</ID>
+    <ID>NewLineAtEndOfFile:IosEmbeddedMessagingTests.kt:com.sap.ec.api.embeddedmessaging.IosEmbeddedMessagingTests.kt</ID>
+    <ID>NewLineAtEndOfFile:IosFileCacheTests.kt:com.sap.ec.core.cache.IosFileCacheTests.kt</ID>
+    <ID>NewLineAtEndOfFile:IosGathererPushTests.kt:com.sap.ec.mobileengage.push.IosGathererPushTests.kt</ID>
+    <ID>NewLineAtEndOfFile:IosLanguageTagValidatorTests.ios.kt:com.sap.ec.core.language.IosLanguageTagValidatorTests.ios.kt</ID>
+    <ID>NewLineAtEndOfFile:IosPushInternalTests.kt:com.sap.ec.mobileengage.push.IosPushInternalTests.kt</ID>
+    <ID>NewLineAtEndOfFile:IosSetupTests.kt:com.sap.ec.api.setup.IosSetupTests.kt</ID>
+    <ID>NewLineAtEndOfFile:IosSqlDelightEventsDaoTests.kt:com.sap.ec.core.db.events.IosSqlDelightEventsDaoTests.kt</ID>
+    <ID>NewLineAtEndOfFile:PageLocationProviderTests.kt:com.sap.ec.core.providers.pagelocation.PageLocationProviderTests.kt</ID>
+    <ID>NewLineAtEndOfFile:StringStorageTests.kt:com.sap.ec.core.storage.StringStorageTests.kt</ID>
+    <ID>NewLineAtEndOfFile:TestUserNotificationCenterDelegate.kt:com.sap.ec.api.push.TestUserNotificationCenterDelegate.kt</ID>
+    <ID>NewLineAtEndOfFile:WebViewFactoryTests.kt:com.sap.ec.mobileengage.inapp.providers.WebViewFactoryTests.kt</ID>
+    <ID>NewLineAtEndOfFile:WindowProviderTests.kt:com.sap.ec.mobileengage.inapp.providers.WindowProviderTests.kt</ID>
+  </CurrentIssues>
+</SmellBaseline>

@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>FunctionNaming:MainActivity.kt:@Preview @Composable fun AppAndroidPreview</ID>
+    <ID>NewLineAtEndOfFile:MainActivity.kt:com.sap.ec.sample.MainActivity.kt</ID>
+    <ID>NewLineAtEndOfFile:SampleApplication.kt:com.sap.ec.sample.SampleApplication.kt</ID>
+    <ID>PreviewPublic:MainActivity.kt:@Preview @Composable fun AppAndroidPreview</ID>
+  </CurrentIssues>
+</SmellBaseline>
