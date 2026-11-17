@@ -39,6 +39,15 @@ env:
   SPM_BUILD: ${{ vars.SPM_BUILD }}
 
 jobs:
+  detekt:
+    name: Detekt
+    permissions:
+      contents: read
+      security-events: write
+    uses: ./.github/workflows/detekt.yml
+    with:
+      upload_sarif: ${{ vars.DETEKT_UPLOAD_SARIF == 'true' }}
+
   derive-version:
     name: Derive Snapshot Version
     runs-on: ubuntu-latest
@@ -223,8 +232,8 @@ jobs:
 
   publish-android:
     name: Publish KMP Snapshot
-    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
-    needs: [derive-version, test, lint]
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') && needs.detekt.result == 'success'
+    needs: [derive-version, test, lint, detekt]
     runs-on: macos-latest-xlarge
     concurrency:
       group: publish-kmp-snapshot
@@ -257,8 +266,8 @@ jobs:
 
   publish-js:
     name: Publish JS Snapshot
-    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
-    needs: [derive-version, test, lint]
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') && needs.detekt.result == 'success'
+    needs: [derive-version, test, lint, detekt]
     runs-on: ubuntu-latest
     concurrency:
       group: publish-js-snapshot
@@ -350,8 +359,8 @@ jobs:
 
   publish-ios-snapshot:
     name: Publish iOS Snapshot
-    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
-    needs: [derive-version, test, lint]
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') && needs.detekt.result == 'success'
+    needs: [derive-version, test, lint, detekt]
     runs-on: macos-latest-xlarge
     concurrency:
       group: publish-ios-snapshot
@@ -456,7 +465,7 @@ jobs:
 
   reporting:
     if: always()
-    needs: [ derive-version, build, test, lint, publish-android, publish-js, publish-ios-snapshot ]
+    needs: [ derive-version, build, test, lint, detekt, publish-android, publish-js, publish-ios-snapshot ]
     runs-on: ubuntu-latest
     steps:
       - name: Compute pipeline summary

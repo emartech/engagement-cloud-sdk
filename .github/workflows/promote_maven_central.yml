@@ -37,8 +37,20 @@ permissions:
   contents: read
 
 jobs:
+  detekt:
+    name: Detekt
+    permissions:
+      contents: read
+      security-events: write
+    uses: ./.github/workflows/detekt.yml
+    with:
+      ref: refs/tags/${{ inputs.version }}
+      upload_sarif: ${{ vars.DETEKT_UPLOAD_SARIF == 'true' }}
+
   promote:
     name: Promote Deployment to Maven Central
+    needs: detekt
+    if: needs.detekt.result == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Validate version format

@@ -41,6 +41,15 @@ env:
   SPM_BUILD: ${{ vars.SPM_BUILD }}
 
 jobs:
+  detekt:
+    name: Detekt
+    permissions:
+      contents: read
+      security-events: write
+    uses: ./.github/workflows/detekt.yml
+    with:
+      upload_sarif: ${{ vars.DETEKT_UPLOAD_SARIF == 'true' }}
+
   build:
     name: Build ${{ matrix.platform }} / ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -198,7 +207,7 @@ jobs:
   trigger-e2e:
     name: Trigger E2E Tests
     if: ${{ !cancelled() && !contains(needs.*.result, 'failure') }}
-    needs: [build, test, lint]
+    needs: [build, test, lint, detekt]
     runs-on: ubuntu-latest
     steps:
       - name: Dispatch E2E to test-app
@@ -224,7 +233,7 @@ jobs:
 
   reporting:
     if: always()
-    needs: [build, test, lint, trigger-e2e]
+    needs: [build, test, lint, detekt, trigger-e2e]
     runs-on: ubuntu-latest
     steps:
       - name: Report on Slack (Error)
