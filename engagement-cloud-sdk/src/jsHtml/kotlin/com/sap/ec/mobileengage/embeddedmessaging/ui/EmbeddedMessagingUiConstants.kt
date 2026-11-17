@@ -48,6 +48,12 @@ internal object EmbeddedMessagingUiConstants {
     val DEFAULT_BORDER_RADIUS = 15.px
     val LARGE_BORDER_RADIUS = 24.px
 
+    val EXTRA_SMALL_CORNER_RADIUS = 4.px
+    val SMALL_CORNER_RADIUS = 8.px
+    val MEDIUM_CORNER_RADIUS = 12.px
+    val LARGE_CORNER_RADIUS = 16.px
+    val EXTRA_LARGE_CORNER_RADIUS = 28.px
+
     const val BUTTON_FONT_WEIGHT = 500
     const val TITLE_FONT_WEIGHT = 400
     const val MESSAGE_ITEM_TITLE_FONT_WEIGHT = 500

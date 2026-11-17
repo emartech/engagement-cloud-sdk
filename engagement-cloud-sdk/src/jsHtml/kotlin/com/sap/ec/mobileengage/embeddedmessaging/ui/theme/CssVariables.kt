@@ -1,5 +1,10 @@
 package com.sap.ec.mobileengage.embeddedmessaging.ui.theme
 
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.EXTRA_LARGE_CORNER_RADIUS
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.EXTRA_SMALL_CORNER_RADIUS
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LARGE_CORNER_RADIUS
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MEDIUM_CORNER_RADIUS
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.SMALL_CORNER_RADIUS
 import org.jetbrains.compose.web.css.CSSColorValue
 import org.jetbrains.compose.web.css.CSSNumeric
 import org.jetbrains.compose.web.css.Color
@@ -168,30 +173,30 @@ internal object CssShapeVars {
 }
 
 internal object DefaultShapeVars {
-    val extraSmallTopStart: CSSNumeric = 4.px
-    val extraSmallTopEnd: CSSNumeric = 4.px
-    val extraSmallBottomStart: CSSNumeric = 4.px
-    val extraSmallBottomEnd: CSSNumeric = 4.px
+    val extraSmallTopStart: CSSNumeric = EXTRA_SMALL_CORNER_RADIUS
+    val extraSmallTopEnd: CSSNumeric = EXTRA_SMALL_CORNER_RADIUS
+    val extraSmallBottomStart: CSSNumeric = EXTRA_SMALL_CORNER_RADIUS
+    val extraSmallBottomEnd: CSSNumeric = EXTRA_SMALL_CORNER_RADIUS
 
-    val smallTopStart: CSSNumeric = 8.px
-    val smallTopEnd: CSSNumeric = 8.px
-    val smallBottomStart: CSSNumeric = 8.px
-    val smallBottomEnd: CSSNumeric = 8.px
+    val smallTopStart: CSSNumeric = SMALL_CORNER_RADIUS
+    val smallTopEnd: CSSNumeric = SMALL_CORNER_RADIUS
+    val smallBottomStart: CSSNumeric = SMALL_CORNER_RADIUS
+    val smallBottomEnd: CSSNumeric = SMALL_CORNER_RADIUS
 
-    val mediumTopStart: CSSNumeric = 12.px
-    val mediumTopEnd: CSSNumeric = 12.px
-    val mediumBottomStart: CSSNumeric = 12.px
-    val mediumBottomEnd: CSSNumeric = 12.px
+    val mediumTopStart: CSSNumeric = MEDIUM_CORNER_RADIUS
+    val mediumTopEnd: CSSNumeric = MEDIUM_CORNER_RADIUS
+    val mediumBottomStart: CSSNumeric = MEDIUM_CORNER_RADIUS
+    val mediumBottomEnd: CSSNumeric = MEDIUM_CORNER_RADIUS
 
-    val largeTopStart: CSSNumeric = 16.px
-    val largeTopEnd: CSSNumeric = 16.px
-    val largeBottomStart: CSSNumeric = 16.px
-    val largeBottomEnd: CSSNumeric = 16.px
+    val largeTopStart: CSSNumeric = LARGE_CORNER_RADIUS
+    val largeTopEnd: CSSNumeric = LARGE_CORNER_RADIUS
+    val largeBottomStart: CSSNumeric = LARGE_CORNER_RADIUS
+    val largeBottomEnd: CSSNumeric = LARGE_CORNER_RADIUS
 
-    val extraLargeTopStart: CSSNumeric = 28.px
-    val extraLargeTopEnd: CSSNumeric = 28.px
-    val extraLargeBottomStart: CSSNumeric = 28.px
-    val extraLargeBottomEnd: CSSNumeric = 28.px
+    val extraLargeTopStart: CSSNumeric = EXTRA_LARGE_CORNER_RADIUS
+    val extraLargeTopEnd: CSSNumeric = EXTRA_LARGE_CORNER_RADIUS
+    val extraLargeBottomStart: CSSNumeric = EXTRA_LARGE_CORNER_RADIUS
+    val extraLargeBottomEnd: CSSNumeric = EXTRA_LARGE_CORNER_RADIUS
 }
 
 internal object DefaultFontVars {

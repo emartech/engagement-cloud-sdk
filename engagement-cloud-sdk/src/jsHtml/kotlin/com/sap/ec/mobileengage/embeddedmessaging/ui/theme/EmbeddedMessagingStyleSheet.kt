@@ -2,7 +2,6 @@ package com.sap.ec.mobileengage.embeddedmessaging.ui.theme
 
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.BUTTON_FONT_WEIGHT
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.CHECKMARK_ICON_DEFAULT_SIZE
-import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_BORDER_RADIUS
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_BORDER_WIDTH
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_CURSOR
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_DIVIDER_WIDTH
@@ -14,7 +13,6 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.FIFTY_PERCENT
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.FLOATING_ACTION_BUTTON_SIZE
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ISLAND_SPACING
-import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LARGE_BORDER_RADIUS
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LARGE_MARGIN
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LARGE_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LIST_PANE_MIN_WIDTH
@@ -33,7 +31,6 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MESSAGE_ITEM_UNOPENED_FONT_WEIGHT
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.MESSAGE_ITEM_UNOPENED_LEAD_FONT_WEIGHT
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.ONE_THIRD
-import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.SMALL_BORDER_RADIUS
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.SMALL_PADDING
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.SWIPE_DELETE_BACKGROUND_CORRECTION
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.TEXT_PLACEHOLDER_HEIGHT
@@ -139,7 +136,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
 
     val islandCard by style {
         backgroundColor(CssColorVars.colorSurface.value())
-        borderRadius(DEFAULT_BORDER_RADIUS)
+        borderRadius(CssShapeVars.mediumTopStart)
         property("box-shadow", "0 2px 8px rgba(0, 0, 0, 0.1)")
         property("overflow", "hidden")
         height(MAX_HEIGHT)
@@ -209,7 +206,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         height(FLOATING_ACTION_BUTTON_SIZE)
         padding(DEFAULT_PADDING)
         border(ZERO_BORDER_WIDTH)
-        borderRadius(SMALL_BORDER_RADIUS)
+        borderRadius(CssShapeVars.smallTopStart)
         cursor(DEFAULT_CURSOR)
         fontSize(CssFontVars.fontSizeBodyMedium)
         fontWeight(BUTTON_FONT_WEIGHT)
@@ -362,7 +359,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         property("z-index", "100")
         padding(DEFAULT_PADDING)
         backgroundColor(CssColorVars.colorOnPrimaryFixed.value())
-        borderRadius(DEFAULT_BORDER_RADIUS)
+        borderRadius(CssShapeVars.extraSmallTopStart)
     }
 
     val noConnectionEmptyStateText by style {
@@ -388,7 +385,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
 
     val dialogCard by style {
         backgroundColor(CssColorVars.colorSurface.value())
-        borderRadius(LARGE_BORDER_RADIUS)
+        borderRadius(CssShapeVars.extraLargeTopStart)
         property("box-shadow", "0 4px 16px rgba(0,0,0,0.2)")
         maxWidth(DIALOG_CARD_WIDTH)
         width(MAX_WIDTH)
@@ -465,7 +462,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         cursor(DEFAULT_CURSOR)
         fontSize(CssFontVars.fontSizeLabelMedium)
         fontWeight(BUTTON_FONT_WEIGHT)
-        borderRadius(SMALL_BORDER_RADIUS)
+        borderRadius(CssShapeVars.smallTopStart)
     }
 
     val categoryChipSelected by style {
@@ -507,7 +504,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
     }
     val deleteDialogApplyButton by style {
         border(ZERO_BORDER_WIDTH)
-        borderRadius(LARGE_BORDER_RADIUS)
+        borderRadius(CssShapeVars.extraLargeTopStart)
         backgroundColor(CssColorVars.colorPrimary.value())
         color(CssColorVars.colorOnPrimary.value())
         property("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
@@ -515,14 +512,14 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
 
     val deleteDialogCancelButton by style {
         border(ZERO_BORDER_WIDTH)
-        borderRadius(LARGE_BORDER_RADIUS)
+        borderRadius(CssShapeVars.extraLargeTopStart)
         backgroundColor(Color.transparent)
         color(CssColorVars.colorPrimary.value())
     }
 
     val categoriesDialogApplyButton by style {
         border(ZERO_BORDER_WIDTH)
-        borderRadius(SMALL_BORDER_RADIUS)
+        borderRadius(CssShapeVars.smallTopStart)
         backgroundColor(CssColorVars.colorPrimary.value())
         color(CssColorVars.colorOnPrimary.value())
         property("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
@@ -530,7 +527,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
 
     val categoriesDialogResetButton by style {
         border(DEFAULT_BORDER_WIDTH, LineStyle.Solid, CssColorVars.colorOutline.value())
-        borderRadius(SMALL_BORDER_RADIUS)
+        borderRadius(CssShapeVars.smallTopStart)
         backgroundColor(Color.transparent)
         color(CssColorVars.colorOnSurfaceVariant.value())
         fontSize(CssFontVars.fontSizeLabelMedium)
@@ -547,7 +544,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         gap(DEFAULT_SPACING)
         padding(DEFAULT_PADDING)
         border(ZERO_BORDER_WIDTH)
-        borderRadius(DEFAULT_BORDER_RADIUS)
+        borderRadius(CssShapeVars.mediumTopStart)
         cursor(DEFAULT_CURSOR)
         fontSize(CssFontVars.fontSizeLabelMedium)
         fontWeight(BUTTON_FONT_WEIGHT)
@@ -579,7 +576,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         gap(DEFAULT_SPACING)
         padding(DEFAULT_PADDING)
         border(ZERO_BORDER_WIDTH)
-        borderRadius(SMALL_BORDER_RADIUS)
+        borderRadius(CssShapeVars.smallTopStart)
         cursor(DEFAULT_CURSOR)
         fontSize(CssFontVars.fontSizeLabelMedium)
         fontWeight(BUTTON_FONT_WEIGHT)
@@ -596,7 +593,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         gap(DEFAULT_SPACING)
         padding(DEFAULT_PADDING)
         border(ZERO_BORDER_WIDTH)
-        borderRadius(SMALL_BORDER_RADIUS)
+        borderRadius(CssShapeVars.smallTopStart)
         cursor(DEFAULT_CURSOR)
         fontSize(CssFontVars.fontSizeLabelLarge)
         fontWeight(BUTTON_FONT_WEIGHT)
@@ -609,7 +606,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
     val deleteMessageIcon by style {
         color(CssColorVars.colorOnSurface.value())
         padding(DEFAULT_PADDING)
-        borderRadius(DEFAULT_BORDER_RADIUS)
+        borderRadius(CssShapeVars.mediumTopStart)
         marginRight(DEFAULT_MARGIN)
         background("radial-gradient(circle, transparent, var(--sap-color-surface-variant))")
         property("opacity", 0)
