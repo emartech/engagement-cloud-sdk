@@ -7,6 +7,7 @@ import com.sap.ec.core.log.Logger
 import com.sap.ec.core.networking.model.Response
 import com.sap.ec.core.state.State
 import com.sap.ec.event.SdkEvent
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
@@ -16,6 +17,10 @@ internal class FetchEmbeddedMessagingMetaState(
     private val sdkEventDistributor: SdkEventDistributorApi,
     private val sdkLogger: Logger
 ) : State {
+    private companion object {
+        val META_FETCH_TIMEOUT = 10.seconds
+    }
+
     override val name: String = "fetchEmbeddedMessagingMetaState"
 
     override fun prepare() {
@@ -23,21 +28,22 @@ internal class FetchEmbeddedMessagingMetaState(
 
     override suspend fun active(): Result<Unit> {
         sdkLogger.debug("Fetching Embedded Messaging Meta State started")
-        if (sdkContext.features.contains(Features.EmbeddedMessaging)) {
-            sdkEventDistributor.registerEvent(
-                SdkEvent.Internal.EmbeddedMessaging.FetchMeta()
-            ).await<Response>()
-                .result
-                .onFailure {
-                    sdkLogger.error(
-                        "Failed to fetch Embedded Messaging Meta data, proceeding anyway",
-                        it,
-                        isRemoteLog = false
-                    )
-                }
-        } else {
+        if (!sdkContext.features.contains(Features.EmbeddedMessaging)) {
             sdkLogger.debug("Feature Embedded Messaging is disabled, skipping Fetch Meta data job")
+            return Result.success(Unit)
         }
+
+        sdkEventDistributor.registerEvent(
+            SdkEvent.Internal.EmbeddedMessaging.FetchMeta()
+        ).await<Response>(META_FETCH_TIMEOUT)
+            .result
+            .onFailure {
+                sdkLogger.error(
+                    "Failed to fetch Embedded Messaging Meta data, proceeding with defaults",
+                    it,
+                    isRemoteLog = false
+                )
+            }
         return Result.success(Unit)
     }
 

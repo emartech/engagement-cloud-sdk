@@ -7,12 +7,15 @@ import dev.mokkery.mock
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class, ExperimentalCoroutinesApi::class)
@@ -102,6 +105,22 @@ class SdkEventWaiterTests {
             sharedFlow.emit(testAnswer2)
 
             sharedFlow.emit(testAnswer)
+        }
+
+    @Test
+    fun await_shouldReturnFailureResponse_whenTimeoutExpires() =
+        runTest {
+            sdkEvent = SdkEvent.Internal.Sdk.AppStart(id = ORIGIN_ID_1)
+            everySuspend { mockConnectionStatus.value } returns true
+            everySuspend { mockSdkEventDistributor.sdkEventFlow } returns sharedFlow
+            val testWaiter = SdkEventWaiter(mockSdkEventDistributor, sdkEvent, mockConnectionStatus)
+
+            val result = backgroundScope.async {
+                testWaiter.await<Result<Unit>>(1.milliseconds)
+            }
+            advanceTimeBy(1L.milliseconds)
+
+            result.await().result.isFailure shouldBe true
         }
 
     @Test
