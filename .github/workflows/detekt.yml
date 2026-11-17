@@ -1,0 +1,97 @@
+name: Detekt Quality Gate
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: 'Exact source ref to analyze; defaults to the caller commit.'
+        type: string
+        required: false
+        default: ''
+      upload_sarif:
+        description: 'Opt in only when repository Code Scanning permissions/licensing allow uploads.'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  quality:
+    name: Quality gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VERSION_OVERRIDE: 4.0.0-LOCAL
+      DETEKT_ARGS: >-
+        --continue --console=plain --max-workers=2
+        "-Dorg.gradle.jvmargs=-Xmx4096m -Dfile.encoding=UTF-8 -Dkotlin.daemon.jvm.options=-Xmx2048m"
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-java@v5.6.0
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v6.2.0
+      - uses: android-actions/setup-android@v4
+
+      - name: Verify analysis does not receive release credentials
+        shell: bash
+        run: |
+          test ! -f .env
+          test ! -f androidApp/google-services.json
+          test -f config/detekt/detekt.yml
+          test -z "${DETEKT_CALLER_ENV_SENTINEL:-}"
+          for variable in GOOGLE_SERVICES_JSON_BASE64 OSSRH_USERNAME OSSRH_PASSWORD GPG_PRIVATE_KEY SONATYPE_SIGNING_SECRET_KEY_RING_FILE; do
+            if [ -n "${!variable:-}" ]; then
+              echo "Unexpected release credential in Detekt job: $variable" >&2
+              exit 1
+            fi
+          done
+
+      - name: Validate the pinned complete policy
+        run: ./gradlew validateDetektPolicy --configuration-cache --console=plain -Dorg.gradle.jvmargs=-Xmx4096m
+
+      - name: Run complete baselined Detekt analysis
+        shell: bash
+        run: |
+          mkdir -p build/detekt-ci
+          set -o pipefail
+          make detekt-ci 2>&1 | tee build/detekt-ci/quality.log
+
+      - name: Index reports
+        if: always()
+        shell: bash
+        run: |
+          if compgen -G 'build/reports/detekt/*.sarif' >/dev/null; then
+            python3 scripts/detekt/report-inventory.py \
+              --reports build/reports/detekt \
+              --output build/detekt-ci/findings-summary.json \
+              --html-index build/reports/detekt/index.html
+          fi
+
+      - name: Retain HTML XML and SARIF even on failure
+        if: always()
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: detekt-reports-${{ github.run_id }}
+          path: |
+            build/reports/detekt/
+            build/detekt-ci/
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: Upload SARIF when explicitly supported
+        if: >-
+          always() && inputs.upload_sarif && github.actor != 'dependabot[bot]' &&
+          (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) &&
+          hashFiles('build/reports/detekt/merged.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: build/reports/detekt/merged.sarif
+          category: detekt

@@ -8,13 +8,38 @@ on:
 permissions:
   contents: read
 
+env:
+  DETEKT_CALLER_ENV_SENTINEL: must-not-propagate-to-reusable-workflow
+
 concurrency:
   group: detekt-verification-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  production-detekt:
+    name: Detekt
+    permissions:
+      contents: read
+      security-events: write
+    uses: ./.github/workflows/detekt.yml
+    with:
+      upload_sarif: false
+
+  publication-dependency-proof:
+    name: Read-only publication dependency simulation
+    needs: production-detekt
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm the publishing prerequisite succeeded without publishing
+        env:
+          QUALITY_RESULT: ${{ needs.production-detekt.result }}
+        run: |
+          test "$QUALITY_RESULT" = success
+          echo 'The consumer runs only after Detekt succeeds. No publishing is performed.'
+
   detekt:
     name: Committed baseline gate / Ubuntu / JDK 17
+    needs: production-detekt
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
