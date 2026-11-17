@@ -90,6 +90,9 @@ allprojects {
             baseline.set(rootProject.layout.buildDirectory.file("detekt/unbaselined.xml"))
             ignoreFailures.set(true)
         }
+        providers.gradleProperty("detekt.experimental.config").orNull?.let { experimentConfig ->
+            config.setFrom(rootProject.file(experimentConfig))
+        }
         autoCorrect.set(false)
         reports {
             html.required.set(true)
@@ -103,6 +106,9 @@ allprojects {
     }
 
     tasks.withType<dev.detekt.gradle.DetektCreateBaselineTask>().configureEach {
+        require(!providers.gradleProperty("detekt.experimental.config").isPresent) {
+            "Experimental findings must not be generated into enforced baselines."
+        }
         val analysisTaskName = name.replaceFirst("detektBaseline", "detekt")
         baseline.set(
             rootProject.layout.projectDirectory.file(
@@ -207,4 +213,31 @@ gradle.projectsEvaluated {
             })
         }
     }
+
+    val analyses = linkedSetOf<dev.detekt.gradle.Detekt>()
+    fun collectAnalysisTasks(task: Task) {
+        if (task is dev.detekt.gradle.Detekt) {
+            analyses.add(task)
+        } else {
+            task.taskDependencies.getDependencies(task)
+                .filter { it.name.startsWith("detekt") }
+                .forEach(::collectAnalysisTasks)
+        }
+    }
+    collectAnalysisTasks(detektAll.get())
+
+    fun mergeReports(extension: String) = tasks.register<dev.detekt.gradle.report.ReportMergeTask>(
+        "detektMerge${extension.replaceFirstChar(Char::uppercase)}",
+    ) {
+        // Static paths avoid implicit dependencies that would prevent merging after analysis failure.
+        input.from(analyses.map { analysis ->
+            val reportPath = "reports/detekt/${analysis.project.name}-${analysis.name}.$extension"
+            layout.buildDirectory.file(reportPath).get().asFile
+        })
+        output.set(layout.buildDirectory.file("reports/detekt/merged.$extension"))
+        mustRunAfter(analyses)
+    }
+    val mergeXml = mergeReports("xml")
+    val mergeSarif = mergeReports("sarif")
+    analyses.forEach { it.finalizedBy(mergeXml, mergeSarif) }
 }

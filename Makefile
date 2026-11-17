@@ -1,4 +1,5 @@
 .PHONY: build build-pipeline build-android build-ios build-ios-all-archtypes build-js-html build-web check-env clean create-apks help lint pipeline-android pipeline-js pipeline-ios prepare-release prepare-local-spm publish-android publish-ios-spm publish-npm release release-locally stage-maven-central test test-android test-android-firebase test-ios test-sdk-loader test-web add-privacy-manifest-to-frameworks assemble-npm-package fix-npm-typescript-brand-fields
+.PHONY: detekt-ci
 .DEFAULT_GOAL := help
 SHELL := /bin/bash
 
@@ -26,6 +27,7 @@ help:
 	@echo "  build-ios                   - Build iOS artifacts"
 	@echo "  build-js-html               - Build JS artifacts"
 	@echo "  lint                        - Run lint"
+	@echo "  detekt-ci                   - Run complete Detekt analysis (CI only)"
 	@echo "  test                        - Run all tests"
 	@echo "  prepare-local-spm           - Build local iOS frameworks for iosApp testing (no Privacy Manifest)"
 	@echo "  add-privacy-manifest-to-frameworks - Add Privacy Manifest to release XCFrameworks (run after building release frameworks)"
@@ -100,6 +102,10 @@ lint: check-env
 	@./gradlew \
 		:engagement-cloud-sdk-android-fcm:lintRelease \
 		:engagement-cloud-sdk-android-hms:lintRelease
+
+# No check-env dependency. Extra options are reserved for CI verification.
+detekt-ci:
+	@./gradlew detektAll $(DETEKT_ARGS)
 
 prepare-local-spm: check-env
 	@./gradlew \
