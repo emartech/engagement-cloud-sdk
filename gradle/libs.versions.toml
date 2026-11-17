@@ -19,6 +19,8 @@ buildConfig = "6.0.9"
 compose = "1.10.6"
 compose-plugin = "1.10.3"
 dokka = "2.1.0"
+detekt = "2.0.0-alpha.6"
+detektCompose = "0.6.8"
 junit = "4.13.2"
 kmmbridge = "1.2.1"
 kotlin = "2.3.10"
@@ -119,6 +121,8 @@ cryptography-provider-jdk = { module = "dev.whyoleg.cryptography:cryptography-pr
 cryptography-provider-apple = { module = "dev.whyoleg.cryptography:cryptography-provider-openssl3-prebuilt" }
 cryptography-provider-webcrypto = { module = "dev.whyoleg.cryptography:cryptography-provider-webcrypto" }
 google-play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "google-play-services-location" }
+detekt-rules-libraries = { module = "dev.detekt:detekt-rules-libraries", version.ref = "detekt" }
+detekt-rules-compose = { module = "io.nlopez.compose.rules:detekt", version.ref = "detektCompose" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -141,3 +145,4 @@ skie = { id = "co.touchlab.skie", version.ref = "skie" }
 sqlDelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 dotenv = { id = "co.uzzu.dotenv.gradle", version.ref = "dotEnv" }
+detekt = { id = "dev.detekt", version.ref = "detekt" }

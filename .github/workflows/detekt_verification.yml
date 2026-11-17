@@ -1,0 +1,91 @@
+name: Detekt Integration Verification
+
+on:
+  push:
+    branches: ['ci/detekt-verification']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: detekt-verification-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detekt:
+    name: Unbaselined Detekt / Ubuntu / JDK 17
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      VERSION_OVERRIDE: 4.0.0-LOCAL
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5.6.0
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v6.2.0
+      - uses: android-actions/setup-android@v4
+
+      - name: Verify credential-free environment and record toolchain
+        shell: bash
+        run: |
+          test ! -f .env
+          test ! -f androidApp/google-services.json
+          java -version
+          ./gradlew --version
+          df -h .
+
+      - name: Validate complete rule policy
+        run: ./gradlew validateDetektPolicy --configuration-cache --console=plain -Dorg.gradle.jvmargs=-Xmx4096m
+
+      - name: Verify configuration-cache reuse
+        run: ./gradlew validateDetektPolicy --configuration-cache --console=plain -Dorg.gradle.jvmargs=-Xmx4096m
+
+      - name: Discover canonical task graph
+        shell: bash
+        run: |
+          mkdir -p build/detekt-verification
+          set -o pipefail
+          ./gradlew detektAll --dry-run --console=plain --max-workers=2 -Dorg.gradle.jvmargs=-Xmx4096m \
+            2>&1 | tee build/detekt-verification/task-graph.txt
+          if grep -Eq '^:.*(kotlinNodeJsSetup|kotlinNpmInstall|bootIOSSimulator|connectedAndroid)' build/detekt-verification/task-graph.txt; then
+            echo 'Unexpected runtime/device dependency in static analysis.' >&2
+            exit 1
+          fi
+
+      - name: Produce complete initial findings without baselines
+        shell: bash
+        run: |
+          set -o pipefail
+          ./gradlew detektAll -Pdetekt.inventory=true --continue --console=plain --max-workers=2 \
+            '-Dorg.gradle.jvmargs=-Xmx4096m -Dfile.encoding=UTF-8 -Dkotlin.daemon.jvm.options=-Xmx2048m' \
+            2>&1 | tee build/detekt-verification/unbaselined-run.txt
+        # Adoption-only: findings are non-blocking, but configuration/compilation/tool crashes fail.
+        # No baseline generation, source fixes, hooks, build/test matrix, or publishing is performed.
+
+      - name: Summarize preserved reports
+        if: always()
+        shell: bash
+        run: |
+          if compgen -G 'build/reports/detekt/*.sarif' >/dev/null; then
+            python3 scripts/detekt/report-inventory.py \
+              --reports build/reports/detekt \
+              --output build/detekt-verification/findings-summary.json \
+              --html-index build/reports/detekt/index.html
+          fi
+
+      - name: Preserve findings and verification logs
+        if: always()
+        uses: actions/upload-artifact@v7.0.0
+        with:
+          name: detekt-unbaselined-${{ github.sha }}
+          path: |
+            build/reports/detekt/
+            build/detekt-verification/
+            build/reports/problems/
+          if-no-files-found: warn
+          retention-days: 30
