@@ -11,11 +11,15 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.SWIPE_THRESHOLD_PERCENTAGE
 import com.sap.ec.mobileengage.embeddedmessaging.ui.category.SvgIcon
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyleSheet
+import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
 import com.sap.ec.mobileengage.embeddedmessaging.util.asFormattedTimestamp
 import com.sap.ec.util.JsonUtil
 import kotlinx.browser.window
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.display
+import org.jetbrains.compose.web.css.height
+import org.jetbrains.compose.web.css.marginBottom
+import org.jetbrains.compose.web.css.marginTop
 import org.jetbrains.compose.web.css.width
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Img
@@ -40,6 +44,7 @@ internal fun MessageItemView(
     withDeleteIcon: Boolean = true,
     withSwipeGesture: Boolean = false
 ) {
+    val designValues = LocalDesignValues.current
     val hasCustomElementDefined =
         customMessageItemName?.let {
             val isCustomElementFound = window.customElements.get(it) != null
@@ -73,6 +78,10 @@ internal fun MessageItemView(
         Div({
             id("$ID_PREFIX-mi-${viewModel.id}")
             classes(classes + "$ID_PREFIX-mi-${viewModel.id}")
+            style {
+                marginTop(designValues.listItemSpacing)
+                marginBottom(designValues.listItemSpacing)
+            }
             onClick { onClick() }
         }) {
             if (hasCustomElementDefined) {
@@ -124,12 +133,17 @@ private fun SwipeableMessageItem(
     onClick: () -> Unit,
     onDeleteClicked: () -> Unit
 ) {
+    val designValues = LocalDesignValues.current
     var swipeElementRef by remember { mutableStateOf<HTMLElement?>(null) }
     var swipeContainerRef by remember { mutableStateOf<HTMLElement?>(null) }
 
     Div({
         id("$ID_PREFIX-mi-${viewModel.id}")
         classes(EmbeddedMessagingStyleSheet.swipeContainer, "$ID_PREFIX-mi-${viewModel.id}")
+        style {
+            marginTop(designValues.listItemSpacing)
+            marginBottom(designValues.listItemSpacing)
+        }
         ref { element ->
             swipeContainerRef = element
             onDispose { }
@@ -306,6 +320,7 @@ private fun SwipeableMessageItem(
 
 @Composable
 private fun ECMessageItem(viewModel: MessageItemViewModelApi) {
+    val designValues = LocalDesignValues.current
     val titleClasses = mutableListOf(EmbeddedMessagingStyleSheet.messageItemTitle).apply {
         if (viewModel.isNotOpened) {
             this.add(EmbeddedMessagingStyleSheet.unopenedTitle)
@@ -319,9 +334,12 @@ private fun ECMessageItem(viewModel: MessageItemViewModelApi) {
     val hasThumbnailImage = viewModel.imageUrl != null
     if (hasThumbnailImage) {
         viewModel.imageUrl?.let { url ->
-            Div(
-                { classes(EmbeddedMessagingStyleSheet.messageItemImageContainer) }
-            ) {
+            Div({
+                classes(EmbeddedMessagingStyleSheet.messageItemImageContainer)
+                style {
+                    height(designValues.messageItemImageHeight)
+                }
+            }) {
                 Img(src = url, alt = viewModel.imageAltText ?: "") {
                     classes(EmbeddedMessagingStyleSheet.messageItemImage)
                 }

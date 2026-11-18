@@ -2,7 +2,9 @@ package com.sap.ec.mobileengage.embeddedmessaging.ui.theme
 
 import androidx.compose.runtime.Composable
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingConstants
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_ELEVATION
 import com.sap.ec.networking.clients.embedded.messaging.model.MetaData
+import com.sap.ec.networking.clients.embedded.messaging.model.Misc
 import com.sap.ec.networking.clients.embedded.messaging.model.ShapesData
 import com.sap.ec.networking.clients.embedded.messaging.model.TextMetaData
 import org.jetbrains.compose.web.css.px
@@ -16,6 +18,7 @@ internal class ThemeMapper(private val metaData: MetaData?) {
         val design = metaData?.design
         mapFontSizes(design?.text)
         mapShapes(design?.shapes)
+        mapMiscStyles(design?.misc)
 
         val colors = design?.fillColor
 
@@ -267,6 +270,10 @@ internal class ThemeMapper(private val metaData: MetaData?) {
                 messageItemCustomShape = it.messageItemCustomShape
             )
         } ?: EmbeddedMessagingDesignValues()
+    }
+
+    private fun mapMiscStyles(misc: Misc?) {
+        CssMiscVars.buttonBoxShadow = "0 2px ${misc?.buttonElevation?.roundToInt() ?: DEFAULT_ELEVATION} rgba(0,0,0,0.1)"
     }
 
     private fun mapShapes(shapes: ShapesData?) {

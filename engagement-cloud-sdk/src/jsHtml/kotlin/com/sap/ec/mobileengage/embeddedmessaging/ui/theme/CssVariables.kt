@@ -1,5 +1,6 @@
 package com.sap.ec.mobileengage.embeddedmessaging.ui.theme
 
+import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.DEFAULT_ELEVATION
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.EXTRA_LARGE_CORNER_RADIUS
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.EXTRA_SMALL_CORNER_RADIUS
 import com.sap.ec.mobileengage.embeddedmessaging.ui.EmbeddedMessagingUiConstants.LARGE_CORNER_RADIUS
@@ -143,6 +144,10 @@ internal object CssFontVars {
     var fontSizeLabelLarge: CSSNumeric = DefaultFontVars.fontSizeLabelLarge
     var fontSizeLabelMedium: CSSNumeric = DefaultFontVars.fontSizeLabelMedium
     var fontSizeLabelSmall: CSSNumeric = DefaultFontVars.fontSizeLabelSmall
+}
+
+internal object CssMiscVars {
+    var buttonBoxShadow: String = "0 2px $DEFAULT_ELEVATION rgba(0,0,0,0.1)"
 }
 
 internal object CssShapeVars {

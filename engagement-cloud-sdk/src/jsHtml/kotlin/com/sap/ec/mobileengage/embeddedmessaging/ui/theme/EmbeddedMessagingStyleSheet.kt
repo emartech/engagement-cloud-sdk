@@ -507,7 +507,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         borderRadius(CssShapeVars.extraLargeTopStart)
         backgroundColor(CssColorVars.colorPrimary.value())
         color(CssColorVars.colorOnPrimary.value())
-        property("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
+        property("box-shadow", CssMiscVars.buttonBoxShadow)
     }
 
     val deleteDialogCancelButton by style {
@@ -522,7 +522,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         borderRadius(CssShapeVars.smallTopStart)
         backgroundColor(CssColorVars.colorPrimary.value())
         color(CssColorVars.colorOnPrimary.value())
-        property("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
+        property("box-shadow", CssMiscVars.buttonBoxShadow)
     }
 
     val categoriesDialogResetButton by style {
@@ -548,7 +548,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         cursor(DEFAULT_CURSOR)
         fontSize(CssFontVars.fontSizeLabelMedium)
         fontWeight(BUTTON_FONT_WEIGHT)
-        property("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
+        property("box-shadow", CssMiscVars.buttonBoxShadow)
     }
 
     val categorySelectorButtonActive by style {
@@ -583,7 +583,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         backgroundColor(CssColorVars.colorSurfaceVariant.value())
         color(CssColorVars.colorOnSurfaceVariant.value())
         marginTop(DEFAULT_MARGIN)
-        property("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
+        property("box-shadow", CssMiscVars.buttonBoxShadow)
     }
 
     val emptyStateClearFiltersButton by style {
@@ -600,7 +600,7 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         backgroundColor(CssColorVars.colorPrimary.value())
         color(CssColorVars.colorOnPrimary.value())
         marginTop(DEFAULT_MARGIN)
-        property("box-shadow", "0 2px 4px rgba(0,0,0,0.1)")
+        property("box-shadow", CssMiscVars.buttonBoxShadow)
     }
 
     val deleteMessageIcon by style {
@@ -622,8 +622,6 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         alignItems(AlignItems.Center)
         padding(ZERO_PADDING)
         paddingRight(MESSAGE_ITEM_RIGHT_PADDING)
-        marginTop(SMALL_PADDING)
-        marginBottom(SMALL_PADDING)
         cursor(DEFAULT_CURSOR)
 
         self + hover style {
@@ -687,7 +685,6 @@ internal object EmbeddedMessagingStyleSheet : StyleSheet() {
         justifyContent(JustifyContent.Start)
         alignItems(AlignItems.Center)
         width(MESSAGE_ITEM_IMAGE_SIZE)
-        height(MESSAGE_ITEM_IMAGE_SIZE)
         marginLeft(MEDIUM_MARGIN)
         marginRight(MEDIUM_MARGIN)
         padding(DEFAULT_PADDING)

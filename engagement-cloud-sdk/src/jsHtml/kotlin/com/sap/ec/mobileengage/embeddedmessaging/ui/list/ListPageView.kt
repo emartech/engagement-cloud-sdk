@@ -24,9 +24,11 @@ import com.sap.ec.mobileengage.embeddedmessaging.ui.item.MessageItemViewModelApi
 import com.sap.ec.mobileengage.embeddedmessaging.ui.list.placeholders.PlaceholderMessageList
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingStyleSheet
 import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.EmbeddedMessagingTheme
+import com.sap.ec.mobileengage.embeddedmessaging.ui.theme.LocalDesignValues
 import com.sap.ec.mobileengage.embeddedmessaging.ui.translation.LocalStringResources
 import kotlinx.browser.window
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.web.css.padding
 import org.jetbrains.compose.web.css.Position
 import org.jetbrains.compose.web.css.left
 import org.jetbrains.compose.web.css.position
@@ -368,6 +370,7 @@ internal fun ListContent(
     noConnectionWithEmptyList: Boolean,
     noConnectionWithList: Boolean
 ) {
+    val designValues = LocalDesignValues.current
     val isRefreshing = lazyPagingMessageItems.loadState.source.refresh is LoadState.Loading
 
     if (isRefreshing) {
@@ -387,6 +390,7 @@ internal fun ListContent(
     } else {
         Div({
             classes(EmbeddedMessagingStyleSheet.scrollingMessageListContainer)
+            style { padding(designValues.listContentPadding) }
         }) {
             if (noConnectionWithList) {
                 Div({
