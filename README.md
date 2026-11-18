@@ -26,6 +26,34 @@ You can access our official documentation here: [SAP Engagement Cloud SDK - Wiki
 
 This project is open to feature requests/suggestions, bug reports etc. via [Zendesk](https://emarsys.zendesk.com). Contribution and feedback are encouraged and always welcome. For more information about how to contribute, the project structure, as well as additional contribution information, see our [Contribution Guidelines](https://github.com/SAP/.github/blob/main/CONTRIBUTING.md).
 
+## Kotlin static analysis
+
+Detekt uses pinned versions and a shared explicit policy. In a Unix-like developer environment with Git, Make, Python 3, and the project's Gradle/JDK toolchain:
+
+```sh
+git add -- path/to/intended-change.kt
+make detekt-staged
+```
+
+This checks the **staged/index content**, not different unstaged edits. It never auto-corrects source or changes the index. It uses module-specific plugin scope and baseline identities. Only staged Kotlin files are analyzed; cross-file/dependent-file and some type-aware findings can be missed. A staged pass is not a replacement for the complete required CI gate.
+
+- `make detekt-staged`: fast developer/agent feedback; no `.env`, release credentials, Node, Chrome, emulator, or simulator setup is required.
+- `make detekt-ci`: complete baselined analysis, **CI only**. Do not run it as a local edit/pre-push loop.
+- `make lint`: the existing Android Lint command and `check-env` behavior are unchanged.
+- `make help`: lists staged, CI-only, and hook-install commands separately.
+
+Install the repository-owned pre-commit hook explicitly:
+
+```sh
+make install-git-hooks
+```
+
+Installation sets repository-local `core.hooksPath=.githooks` and is idempotent. It refuses to shadow unrelated local/global hook paths or existing executable hooks. Migrate those hooks first; `CONFIRM_REPLACE_HOOKS=1 make install-git-hooks` is an explicit confirmation, not an automatic override. No full-analysis pre-push hook is installed.
+
+The hook exits without Gradle when no Kotlin file is staged and blocks a commit on a staged finding. `SKIP_DETEKT=1 git commit ...` is an emergency local bypass only; hooks are optional/bypassable and CI remains authoritative.
+
+Do not change baselines, suppressions, or broad exclusions merely to obtain a pass. Baseline maintenance requires explicit review/authorization. The initial findings remain preserved in `config/detekt/initial-inventory/`; accepted Detekt KMP/serialization limitations are documented in `config/detekt/ADOPTION-REPORT.md`. See `config/detekt/CI-ENFORCEMENT.md` for publishing dependencies, SARIF permissions, and the repository-owner required-check configuration.
+
 ## Security / Disclosure
 
 If you find any bug that may be a security problem, please follow our instructions at in our [security policy](https://github.com/emartech/engagement-cloud-sdk/security/policy) on how to report it. Please do not create GitHub issues or Zendesk tickets for security-related doubts or problems.

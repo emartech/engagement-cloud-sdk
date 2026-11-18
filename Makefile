@@ -1,11 +1,20 @@
 .PHONY: build build-pipeline build-android build-ios build-ios-all-archtypes build-js-html build-web check-env clean create-apks help lint pipeline-android pipeline-js pipeline-ios prepare-release prepare-local-spm publish-android publish-ios-spm publish-npm release release-locally stage-maven-central test test-android test-android-firebase test-ios test-sdk-loader test-web add-privacy-manifest-to-frameworks assemble-npm-package fix-npm-typescript-brand-fields
-.PHONY: detekt-ci
+.PHONY: detekt-ci detekt-staged install-git-hooks
 .DEFAULT_GOAL := help
 SHELL := /bin/bash
 
+DETEKT_GOALS := detekt-ci detekt-staged install-git-hooks
+SKIP_ENV_FILE :=
+ifneq ($(strip $(MAKECMDGOALS)),)
+ifeq ($(strip $(filter-out $(DETEKT_GOALS),$(MAKECMDGOALS))),)
+SKIP_ENV_FILE := true
+endif
+endif
+ifneq ($(SKIP_ENV_FILE),true)
 ifneq (,$(wildcard .env))
 include .env
 export
+endif
 endif
 
 REQUIRED_VARS := $(shell cat .env.example | sed 's/=.*//' | xargs)
@@ -28,6 +37,8 @@ help:
 	@echo "  build-js-html               - Build JS artifacts"
 	@echo "  lint                        - Run lint"
 	@echo "  detekt-ci                   - Run complete Detekt analysis (CI only)"
+	@echo "  detekt-staged               - Analyze staged Kotlin index content (developer/agent)"
+	@echo "  install-git-hooks           - Install opt-in repository pre-commit hook"
 	@echo "  test                        - Run all tests"
 	@echo "  prepare-local-spm           - Build local iOS frameworks for iosApp testing (no Privacy Manifest)"
 	@echo "  add-privacy-manifest-to-frameworks - Add Privacy Manifest to release XCFrameworks (run after building release frameworks)"
@@ -106,6 +117,12 @@ lint: check-env
 # No check-env dependency. Extra options are reserved for CI verification.
 detekt-ci:
 	@./gradlew detektAll $(DETEKT_ARGS)
+
+detekt-staged:
+	@python3 scripts/detekt/staged-index.py
+
+install-git-hooks:
+	@bash scripts/detekt/install-hooks.sh
 
 prepare-local-spm: check-env
 	@./gradlew \

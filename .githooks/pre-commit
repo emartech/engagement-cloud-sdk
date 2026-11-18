@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ ${SKIP_DETEKT:-0} == 1 ]]; then
+  echo 'SKIP_DETEKT=1: local staged check bypassed; complete CI remains required.'
+  exit 0
+fi
+
+cd "$(git rev-parse --show-toplevel)"
+if ! make --no-print-directory detekt-staged; then
+  echo >&2 'Staged Detekt failed. Reproduce with: make detekt-staged'
+  exit 1
+fi

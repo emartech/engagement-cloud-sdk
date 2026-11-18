@@ -118,8 +118,20 @@ jobs:
           set -o pipefail
           make detekt-ci 2>&1 | tee build/detekt-verification/committed-baseline-gate.txt
 
+      - name: Verify real staged hook fidelity and warm latency
+        run: python3 scripts/detekt/verify-staged.py
+
       - name: Prove new syntax and type-aware findings fail without baseline changes
         run: python3 scripts/detekt/verify-new-findings.py
+
+      - name: Verify existing Android library build and Lint tasks
+        run: >-
+          ./gradlew :engagement-cloud-sdk-android-fcm:assembleRelease
+          :engagement-cloud-sdk-android-hms:assembleRelease
+          :engagement-cloud-sdk-android-fcm:lintRelease
+          :engagement-cloud-sdk-android-hms:lintRelease
+          --continue --console=plain --max-workers=2
+          -Dorg.gradle.jvmargs=-Xmx4096m
 
       - name: Summarize reports
         if: always()
@@ -141,5 +153,7 @@ jobs:
             build/reports/detekt/
             build/detekt-verification/
             build/reports/problems/
+            engagement-cloud-sdk-android-fcm/build/reports/
+            engagement-cloud-sdk-android-hms/build/reports/
           if-no-files-found: warn
           retention-days: 7

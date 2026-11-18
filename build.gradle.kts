@@ -175,6 +175,61 @@ allprojects {
     }
 }
 
+val stagedDirectory = layout.buildDirectory.dir("detekt/staged")
+val stagedRelativePaths = providers.fileContents(stagedDirectory.map { it.file("paths.txt") })
+    .asText.orElse("").map { text ->
+        text.lineSequence().filter(String::isNotBlank).map { encoded ->
+            String(java.util.Base64.getDecoder().decode(encoded), Charsets.UTF_8)
+        }.toList()
+    }
+val prepareStagedBaselines = tasks.register<Exec>("prepareDetektStagedBaselines") {
+    group = "verification"
+    description = "Prepares staged-only unions without changing committed baselines."
+    commandLine(
+        "python3", file("scripts/detekt/merge-staged-baselines.py"),
+        "--input", file("config/detekt/baseline"),
+        "--output", stagedDirectory.get().dir("baselines").asFile,
+        "--modules", *allprojects.map { it.name }.toTypedArray(),
+    )
+    inputs.file("scripts/detekt/merge-staged-baselines.py")
+    inputs.files(fileTree("config/detekt/baseline") { include("**/*.xml") })
+    outputs.dir(stagedDirectory.map { it.dir("baselines") })
+}
+val stagedTasks = mutableListOf<org.gradle.api.tasks.TaskProvider<dev.detekt.gradle.Detekt>>()
+val modulePrefixes = subprojects.map { "${it.name}/" }
+allprojects {
+    val rootModule = this == rootProject
+    val prefix = "${name}/"
+    val moduleName = name
+    val sourceDirectory = stagedDirectory.get().dir("source").asFile
+    val prefixes = modulePrefixes.toList()
+    val relativePaths = stagedRelativePaths
+    listOf("detektStaged" to ".kt", "detektStagedBuildScripts" to ".kts").forEach { (taskName, suffix) ->
+        stagedTasks += tasks.register<dev.detekt.gradle.Detekt>(taskName) {
+            description = "Analyzes only index-snapshot files for $moduleName (no compilation dependencies)."
+            setSource(relativePaths.map { paths ->
+                paths.filter { path ->
+                    path.endsWith(suffix) && if (rootModule) {
+                        prefixes.none(path::startsWith)
+                    } else path.startsWith(prefix)
+                }.map { sourceDirectory.resolve(it) }
+            })
+            classpath.setFrom(emptyList<File>())
+            baseline.set(stagedDirectory.map { it.file("baselines/$moduleName.xml") })
+            basePath.set(sourceDirectory.absolutePath)
+            multiPlatformEnabled.set(suffix == ".kt")
+            autoCorrect.set(false)
+            if (rootModule || suffix == ".kts") pluginClasspath.setFrom(emptyList<File>())
+            dependsOn(prepareStagedBaselines)
+        }
+    }
+}
+tasks.register("detektStagedAll") {
+    group = "verification"
+    description = "Runs staged/index-only analysis; complete analysis remains CI-only."
+    dependsOn(stagedTasks)
+}
+
 val detektBaselineAll = tasks.register("detektBaselineAll") {
     group = "verification"
     description = "Generates baselines for the canonical KMP Detekt matrix."
