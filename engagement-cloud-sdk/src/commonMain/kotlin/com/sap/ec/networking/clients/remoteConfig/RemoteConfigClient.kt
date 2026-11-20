@@ -14,8 +14,9 @@ import com.sap.ec.event.SdkEvent
 import com.sap.ec.event.SdkEvent.Internal.Sdk.Answer.Response
 import com.sap.ec.networking.clients.EventBasedClientApi
 import com.sap.ec.networking.clients.error.ClientExceptionHandler
-import com.sap.ec.remoteConfig.RemoteConfigResponse
-import com.sap.ec.remoteConfig.RemoteConfigResponseHandlerApi
+import com.sap.ec.remoteConfig.RemoteConfig
+import com.sap.ec.remoteConfig.RemoteConfigHandlerApi
+import com.sap.ec.remoteConfig.RemoteConfigServiceUrls
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
@@ -26,6 +27,8 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -38,7 +41,7 @@ internal class RemoteConfigClient(
     private val clientExceptionHandler: ClientExceptionHandler,
     private val urlFactoryApi: UrlFactoryApi,
     private val sdkEventManager: SdkEventManagerApi,
-    private val remoteConfigResponseHandler: RemoteConfigResponseHandlerApi,
+    private val remoteConfigHandler: RemoteConfigHandlerApi,
     private val applicationScope: CoroutineScope,
     private val eventsDao: EventsDaoApi,
     private val crypto: CryptoApi,
@@ -61,7 +64,7 @@ internal class RemoteConfigClient(
                     sdkLogger.debug("ConsumeRemoteConfigEvents")
                     val remoteConfigResponse = fetchRemoteConfig(event)
                     remoteConfigResponse?.let {
-                        remoteConfigResponseHandler.handle(remoteConfigResponse)
+                        remoteConfigHandler.handle(remoteConfigResponse)
                         sdkEventManager.emitEvent(
                             Response(
                                 originId = event.id,
@@ -76,6 +79,7 @@ internal class RemoteConfigClient(
             }
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
     private suspend fun handleException(exception: Throwable, event: OnlineSdkEvent) {
         currentCoroutineContext().ensureActive()
         clientExceptionHandler.handleException(
@@ -96,6 +100,15 @@ internal class RemoteConfigClient(
                     Result.success(Unit)
                 )
             )
+        } else if (exception is MissingFieldException &&
+            exception.serialName?.contains("${RemoteConfigServiceUrls::class.simpleName}.") ?: false) {
+            sdkLogger.error("Remote config service URLs incomplete.")
+            sdkEventManager.emitEvent(
+                Response(
+                    originId = event.id,
+                    Result.failure<Exception>(exception)
+                )
+            )
         } else {
             sdkEventManager.emitEvent(
                 Response(
@@ -110,7 +123,7 @@ internal class RemoteConfigClient(
         return sdkEvent is SdkEvent.Internal.Sdk.ApplyGlobalRemoteConfig || sdkEvent is SdkEvent.Internal.Sdk.ApplyAppCodeBasedRemoteConfig
     }
 
-    private suspend fun fetchRemoteConfig(event: OnlineSdkEvent): RemoteConfigResponse? {
+    private suspend fun fetchRemoteConfig(event: OnlineSdkEvent): RemoteConfig.Response? {
         val isGlobal = event is SdkEvent.Internal.Sdk.ApplyGlobalRemoteConfig
         sdkLogger.debug(
             "FetchRemoteConfig",
@@ -135,7 +148,11 @@ internal class RemoteConfigClient(
             }
             val verified = crypto.verify(config, signature)
             if (verified) {
-                json.decodeFromString(config)
+                if (isGlobal) {
+                    json.decodeFromString<RemoteConfig.Response.Global>(config)
+                } else {
+                    json.decodeFromString<RemoteConfig.Response.AppCodeBased>(config)
+                }
             } else {
                 event.ack(eventsDao, sdkLogger)
                 sdkEventManager.emitEvent(

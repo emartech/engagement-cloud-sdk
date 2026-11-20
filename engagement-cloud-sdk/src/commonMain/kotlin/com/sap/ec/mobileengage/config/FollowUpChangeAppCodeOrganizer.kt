@@ -15,11 +15,13 @@ internal class FollowUpChangeAppCodeOrganizer(
         sdkContext.setSdkState(SdkState.OnHold)
         followUpChangeAppCodeStateMachine.activate()
             .onFailure {
+                sdkContext.setSdkConfig(null)
+                sdkContext.setSdkState(SdkState.Initialized)
                 logger.error(
                     "Failed to activate ChangeAppCodeStateMachine during app code change",
                     it
                 )
-            }
+            }.getOrThrow()
         sdkContext.setSdkState(SdkState.Active)
     }
 }
