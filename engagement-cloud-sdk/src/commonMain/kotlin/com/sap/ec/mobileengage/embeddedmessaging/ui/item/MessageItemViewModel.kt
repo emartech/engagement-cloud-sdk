@@ -82,7 +82,9 @@ internal class MessageItemViewModel(
         return try {
             val defaultAction = model.message.defaultAction
             if (defaultAction is BasicRichContentDisplayActionModel) {
-                Url("${model.sdkContext.defaultUrls.embeddedMessagingBaseUrl}${defaultAction.url}")
+                model.sdkContext.serviceUrls.appCodeBasedServiceUrls?.let {
+                    Url("${it.embeddedMessagingBaseUrl}${defaultAction.url}")
+                }
             } else {
                 null
             }
