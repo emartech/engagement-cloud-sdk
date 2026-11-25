@@ -66,7 +66,7 @@ env:
   OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
   OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
   SONATYPE_STAGING_PROFILE_ID: ${{ secrets.SONATYPE_STAGING_PROFILE_ID }}
-  SONATYPE_SIGNING_KEY_ID: ${{ secrets.SONATYPE_SIGNING_KEY_ID }}
+  SONATYPE_SIGNING_KEY_ID: ${{ vars.SONATYPE_SIGNING_KEY_ID }}
   SONATYPE_SIGNING_PASSWORD: ${{ secrets.SONATYPE_SIGNING_PASSWORD }}
   SONATYPE_SIGNING_SECRET_KEY_RING_FILE: ${{ secrets.SONATYPE_SIGNING_SECRET_KEY_RING_FILE }}
   DETECT_LATEST_RELEASE_VERSION: ${{ vars.DETECT_LATEST_RELEASE_VERSION }}
@@ -121,7 +121,7 @@ jobs:
       OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
       OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
       SONATYPE_STAGING_PROFILE_ID: ${{ secrets.SONATYPE_STAGING_PROFILE_ID }}
-      SONATYPE_SIGNING_KEY_ID: ${{ secrets.SONATYPE_SIGNING_KEY_ID }}
+      SONATYPE_SIGNING_KEY_ID: ${{ vars.SONATYPE_SIGNING_KEY_ID }}
       SONATYPE_SIGNING_PASSWORD: ${{ secrets.SONATYPE_SIGNING_PASSWORD }}
       SONATYPE_SIGNING_SECRET_KEY_RING_FILE: ${{ secrets.SONATYPE_SIGNING_SECRET_KEY_RING_FILE }}
       ANDROID_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
@@ -198,7 +198,7 @@ jobs:
           echo "Validating signing by publishing to Maven Local..."
           ./gradlew publishToMavenLocal \
             -PENABLE_PUBLISHING=true \
-            -Psigning.keyId="${{ secrets.SONATYPE_SIGNING_KEY_ID }}" \
+            -Psigning.keyId="${{ vars.SONATYPE_SIGNING_KEY_ID }}" \
             -Psigning.password="${{ secrets.SONATYPE_SIGNING_PASSWORD }}" \
             -Psigning.secretKeyRingFile=$GITHUB_WORKSPACE/engagement-cloud-sdk/secring.asc.gpg \
             --no-daemon
@@ -225,7 +225,7 @@ jobs:
             -PENABLE_PUBLISHING=true \
             -PmavenCentralUsername="${{ secrets.OSSRH_USERNAME }}" \
             -PmavenCentralPassword="${{ secrets.OSSRH_PASSWORD }}" \
-            -Psigning.keyId="${{ secrets.SONATYPE_SIGNING_KEY_ID }}" \
+            -Psigning.keyId="${{ vars.SONATYPE_SIGNING_KEY_ID }}" \
             -Psigning.password="${{ secrets.SONATYPE_SIGNING_PASSWORD }}" \
             -Psigning.secretKeyRingFile=$GITHUB_WORKSPACE/engagement-cloud-sdk/secring.asc.gpg \
             --no-daemon
